@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Activity, FileText, Pill, TrendingUp, Users, 
   Plus, Calendar, AlertCircle, CheckCircle, ArrowRight 
@@ -10,18 +10,25 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import ProfileSwitcher from '../components/ProfileSwitcher';
+import VitalEntryForm from '../components/VitalEntryForm';
+import UploadModal from '../components/UploadModal';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
-  const [currentProfile, setCurrentProfile] = useState(null);
-  const [upcomingMeds, setUpcomingMeds] = useState([]);
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [vitalDialogOpen, setVitalDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    loadData();
+    loadUser();
   }, []);
 
-  const loadData = async () => {
+  const loadUser = async () => {
     const userData = await base44.auth.me();
     setUser(userData);
     
@@ -31,48 +38,52 @@ export default function Dashboard() {
     });
     
     if (profiles.length === 0) {
-      // Redirect to onboarding
       window.location.href = createPageUrl('Onboarding');
       return;
     }
     
-    setCurrentProfile(profiles[0]);
-    
-    // Load upcoming medications
-    const meds = await base44.entities.Medication.filter({ 
-      profile_id: profiles[0].id,
-      is_active: true 
-    }, '-created_date', 5);
-    setUpcomingMeds(meds);
+    setSelectedProfileId(profiles[0].id);
   };
 
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: () => base44.entities.Profile.list('-created_date'),
+    enabled: !!user,
+  });
+
+  const currentProfile = allProfiles.find(p => p.id === selectedProfileId) || allProfiles[0];
+
+  const { data: upcomingMeds = [] } = useQuery({
+    queryKey: ['medications', selectedProfileId],
+    queryFn: () => base44.entities.Medication.filter({ 
+      profile_id: selectedProfileId,
+      is_active: true 
+    }, '-created_date', 5),
+    enabled: !!selectedProfileId,
+  });
+
   const { data: documents = [] } = useQuery({
-    queryKey: ['documents', currentProfile?.id],
-    queryFn: () => currentProfile ? base44.entities.MedicalDocument.filter({ 
-      profile_id: currentProfile.id 
-    }, '-created_date', 5) : [],
-    enabled: !!currentProfile,
+    queryKey: ['documents', selectedProfileId],
+    queryFn: () => base44.entities.MedicalDocument.filter({ 
+      profile_id: selectedProfileId 
+    }, '-created_date', 5),
+    enabled: !!selectedProfileId,
   });
 
   const { data: vitals = [] } = useQuery({
-    queryKey: ['vitals', currentProfile?.id],
-    queryFn: () => currentProfile ? base44.entities.VitalMeasurement.filter({ 
-      profile_id: currentProfile.id 
-    }, '-measured_at', 5) : [],
-    enabled: !!currentProfile,
+    queryKey: ['vitals', selectedProfileId],
+    queryFn: () => base44.entities.VitalMeasurement.filter({ 
+      profile_id: selectedProfileId 
+    }, '-measured_at', 5),
+    enabled: !!selectedProfileId,
   });
 
   const { data: labResults = [] } = useQuery({
-    queryKey: ['labResults', currentProfile?.id],
-    queryFn: () => currentProfile ? base44.entities.LabResult.filter({ 
-      profile_id: currentProfile.id 
-    }, '-test_date', 5) : [],
-    enabled: !!currentProfile,
-  });
-
-  const { data: allProfiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date'),
+    queryKey: ['labResults', selectedProfileId],
+    queryFn: () => base44.entities.LabResult.filter({ 
+      profile_id: selectedProfileId 
+    }, '-test_date', 5),
+    enabled: !!selectedProfileId,
   });
 
   const getLatestVital = (type) => {
@@ -125,11 +136,18 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Welcome Section */}
+      {/* Profile Switcher & Welcome Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          Welcome back, {currentProfile.full_name.split(' ')[0]}! 👋
-        </h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Welcome back, {currentProfile?.full_name.split(' ')[0]}! 👋
+          </h1>
+          <ProfileSwitcher
+            profiles={allProfiles}
+            selectedProfile={selectedProfileId}
+            onProfileChange={setSelectedProfileId}
+          />
+        </div>
         <p className="text-slate-600">Here's your health overview for today</p>
       </div>
 
@@ -152,22 +170,24 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <Link to={createPageUrl('Documents')}>
-          <Button className="w-full h-auto p-6 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg">
-            <div className="flex items-center gap-3">
-              <Plus className="w-5 h-5" />
-              <span className="font-medium">Upload Document</span>
-            </div>
-          </Button>
-        </Link>
-        <Link to={createPageUrl('Vitals')}>
-          <Button className="w-full h-auto p-6 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg">
-            <div className="flex items-center gap-3">
-              <Activity className="w-5 h-5" />
-              <span className="font-medium">Log Vitals</span>
-            </div>
-          </Button>
-        </Link>
+        <Button 
+          onClick={() => setUploadDialogOpen(true)}
+          className="w-full h-auto p-6 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">Upload Document</span>
+          </div>
+        </Button>
+        <Button 
+          onClick={() => setVitalDialogOpen(true)}
+          className="w-full h-auto p-6 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <Activity className="w-5 h-5" />
+            <span className="font-medium">Log Vitals</span>
+          </div>
+        </Button>
         <Link to={createPageUrl('Medications')}>
           <Button className="w-full h-auto p-6 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg">
             <div className="flex items-center gap-3">
@@ -360,6 +380,40 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Vital Entry Dialog */}
+      <Dialog open={vitalDialogOpen} onOpenChange={setVitalDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Log Vital Sign</DialogTitle>
+          </DialogHeader>
+          <VitalEntryForm
+            profileId={selectedProfileId}
+            onSuccess={() => {
+              setVitalDialogOpen(false);
+              queryClient.invalidateQueries(['vitals', selectedProfileId]);
+            }}
+            onCancel={() => setVitalDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Document Dialog */}
+      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Upload Medical Document</DialogTitle>
+          </DialogHeader>
+          <UploadModal
+            profileId={selectedProfileId}
+            onSuccess={() => {
+              setUploadDialogOpen(false);
+              queryClient.invalidateQueries(['documents', selectedProfileId]);
+            }}
+            onCancel={() => setUploadDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
