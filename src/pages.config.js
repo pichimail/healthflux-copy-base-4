@@ -8,6 +8,7 @@ import Trends from './pages/Trends';
 import LabResults from './pages/LabResults';
 import Insights from './pages/Insights';
 import Share from './pages/Share';
+import PublicShare from './pages/PublicShare';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "LabResults": LabResults,
     "Insights": Insights,
     "Share": Share,
+    "PublicShare": PublicShare,
 }
 
 export const pagesConfig = {
