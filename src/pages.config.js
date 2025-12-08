@@ -6,6 +6,8 @@ import Vitals from './pages/Vitals';
 import Medications from './pages/Medications';
 import Trends from './pages/Trends';
 import LabResults from './pages/LabResults';
+import Insights from './pages/Insights';
+import Share from './pages/Share';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +20,8 @@ export const PAGES = {
     "Medications": Medications,
     "Trends": Trends,
     "LabResults": LabResults,
+    "Insights": Insights,
+    "Share": Share,
 }
 
 export const pagesConfig = {
