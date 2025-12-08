@@ -9,6 +9,9 @@ import LabResults from './pages/LabResults';
 import Insights from './pages/Insights';
 import Share from './pages/Share';
 import PublicShare from './pages/PublicShare';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import Demo from './pages/Demo';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +27,9 @@ export const PAGES = {
     "Insights": Insights,
     "Share": Share,
     "PublicShare": PublicShare,
+    "AdminLogin": AdminLogin,
+    "AdminDashboard": AdminDashboard,
+    "Demo": Demo,
 }
 
 export const pagesConfig = {
