@@ -8,13 +8,15 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, Eye, Trash2, Search, Filter, Plus, Download, Sparkles } from 'lucide-react';
+import { Upload, FileText, Eye, Trash2, Search, Filter, Plus, Download, Sparkles, Brain, Pill, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import ExtractedDataReview from '../components/ExtractedDataReview';
 
 export default function Documents() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [viewDoc, setViewDoc] = useState(null);
+  const [reviewDoc, setReviewDoc] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -265,6 +267,32 @@ export default function Documents() {
                     </div>
                   )}
 
+                  {doc.doctor_name && (
+                    <p className="text-xs text-gray-600 mb-2">👨‍⚕️ {doc.doctor_name}</p>
+                  )}
+
+                  {(doc.extracted_medications?.length > 0 || doc.extracted_lab_results?.length > 0 || doc.extracted_vitals?.length > 0) && (
+                    <div className="flex gap-2 mb-3">
+                      {doc.extracted_medications?.length > 0 && (
+                        <Badge className="bg-[#F7C9A3] text-[#0A0A0A] border-none text-xs rounded-lg">
+                          <Pill className="w-3 h-3 mr-1" />
+                          {doc.extracted_medications.length} meds
+                        </Badge>
+                      )}
+                      {doc.extracted_lab_results?.length > 0 && (
+                        <Badge className="bg-[#EFF1ED] text-[#0A0A0A] border-none text-xs rounded-lg">
+                          <Activity className="w-3 h-3 mr-1" />
+                          {doc.extracted_lab_results.length} labs
+                        </Badge>
+                      )}
+                      {doc.extracted_vitals?.length > 0 && (
+                        <Badge className="bg-[#9BB4FF] text-[#0A0A0A] border-none text-xs rounded-lg">
+                          {doc.extracted_vitals.length} vitals
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -275,16 +303,15 @@ export default function Documents() {
                       <Eye className="w-3 h-3 mr-1" />
                       View
                     </Button>
-                    {!doc.ai_summary && (
+                    {(doc.extracted_medications?.length > 0 || doc.extracted_lab_results?.length > 0 || doc.extracted_vitals?.length > 0) && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => generateAISummary.mutate(doc)}
-                        disabled={generateAISummary.isLoading}
-                        className="flex-1 rounded-xl text-xs"
+                        onClick={() => setReviewDoc(doc)}
+                        className="flex-1 rounded-xl text-xs bg-[#E9F46A] hover:bg-[#D9E45A] border-none"
                       >
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        AI
+                        <Brain className="w-3 h-3 mr-1" />
+                        Review
                       </Button>
                     )}
                     <Button
@@ -302,6 +329,23 @@ export default function Documents() {
           })}
         </div>
       )}
+
+      {/* Extracted Data Review Dialog */}
+      <Dialog open={!!reviewDoc} onOpenChange={(open) => !open && setReviewDoc(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>AI Extracted Data - {reviewDoc?.title}</DialogTitle>
+          </DialogHeader>
+          {reviewDoc && (
+            <ExtractedDataReview
+              document={reviewDoc}
+              onAddMedication={(med) => console.log('Add medication:', med)}
+              onAddVital={(vital) => console.log('Add vital:', vital)}
+              onAddLabResult={(lab) => console.log('Add lab:', lab)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Upload Dialog */}
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>

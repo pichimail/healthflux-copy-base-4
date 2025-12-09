@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, FileText, Loader2 } from 'lucide-react';
+import { Upload, FileText, Loader2, Sparkles } from 'lucide-react';
 
 export default function UploadModal({ profileId, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
@@ -175,14 +175,23 @@ export default function UploadModal({ profileId, onSuccess, onCancel }) {
         />
       </div>
 
-      <div className="flex gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={uploading || processing}>
+      <div className="bg-[#E9F46A] rounded-xl p-3 mb-4">
+        <p className="text-xs text-[#0A0A0A] flex items-start gap-2">
+          <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>
+            AI will automatically analyze your document and extract medications, lab results, vitals, and generate insights.
+          </span>
+        </p>
+      </div>
+
+      <div className="flex gap-3">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 rounded-xl" disabled={uploading || processing}>
           Cancel
         </Button>
-        <Button type="submit" disabled={uploading || processing} className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500">
+        <Button type="submit" disabled={uploading || processing} className="flex-1 bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold">
           {uploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {uploading ? 'Uploading...' : processing ? 'Processing...' : 'Upload Document'}
+          {processing ? 'AI Processing...' : uploading ? 'Uploading...' : 'Upload & Process'}
         </Button>
       </div>
     </form>
