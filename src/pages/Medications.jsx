@@ -332,6 +332,19 @@ export default function Medications() {
           })}
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="adherence">
+          <AdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+        </TabsContent>
+
+        <TabsContent value="sideeffects">
+          <SideEffectTracker 
+            profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+            medications={medications}
+          />
+        </TabsContent>
+      </Tabs>
 
       {/* Add/Edit Medication Dialog */}
       <Dialog open={dialogOpen} onOpenChange={(open) => {
