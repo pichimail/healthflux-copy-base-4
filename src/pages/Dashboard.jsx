@@ -5,22 +5,26 @@ import { createPageUrl } from '../utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Activity, FileText, Pill, TrendingUp, Users, 
-  Plus, Calendar, AlertCircle, CheckCircle, ArrowRight 
+  Plus, AlertCircle, CheckCircle, ArrowRight, Brain, Sparkles, MessageSquare
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ProfileSwitcher from '../components/ProfileSwitcher';
 import VitalEntryForm from '../components/VitalEntryForm';
 import UploadModal from '../components/UploadModal';
+import AIHealthChat from '../components/AIHealthChat';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [vitalDialogOpen, setVitalDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [generatingPredictions, setGeneratingPredictions] = useState(false);
   
   const queryClient = useQueryClient();
 
@@ -82,9 +86,31 @@ export default function Dashboard() {
     queryKey: ['labResults', selectedProfileId],
     queryFn: () => base44.entities.LabResult.filter({ 
       profile_id: selectedProfileId 
-    }, '-test_date', 5),
+    }, '-test_date', 50),
     enabled: !!selectedProfileId,
   });
+
+  const { data: insights = [] } = useQuery({
+    queryKey: ['insights', selectedProfileId],
+    queryFn: () => base44.entities.HealthInsight.filter({ 
+      profile_id: selectedProfileId 
+    }, '-created_date', 10),
+    enabled: !!selectedProfileId,
+  });
+
+  const generatePredictions = async () => {
+    setGeneratingPredictions(true);
+    try {
+      await base44.functions.invoke('healthPredictions', {
+        profile_id: selectedProfileId
+      });
+      queryClient.invalidateQueries(['insights', selectedProfileId]);
+    } catch (error) {
+      console.error('Predictions error:', error);
+    } finally {
+      setGeneratingPredictions(false);
+    }
+  };
 
   const getLatestVital = (type) => {
     return vitals.find(v => v.vital_type === type);
@@ -94,6 +120,29 @@ export default function Dashboard() {
   const latestWeight = getLatestVital('weight');
   const latestGlucose = getLatestVital('blood_glucose');
   const latestHR = getLatestVital('heart_rate');
+
+  // Prepare chart data
+  const bpChartData = vitals
+    .filter(v => v.vital_type === 'blood_pressure')
+    .slice(0, 10)
+    .reverse()
+    .map(v => ({
+      date: format(new Date(v.measured_at), 'MM/dd'),
+      systolic: v.systolic,
+      diastolic: v.diastolic
+    }));
+
+  const weightChartData = vitals
+    .filter(v => v.vital_type === 'weight')
+    .slice(0, 10)
+    .reverse()
+    .map(v => ({
+      date: format(new Date(v.measured_at), 'MM/dd'),
+      weight: v.value
+    }));
+
+  const unreadInsights = insights.filter(i => !i.is_read);
+  const criticalInsights = insights.filter(i => i.severity === 'high' || i.severity === 'critical');
 
   const stats = [
     { 
@@ -135,21 +184,64 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Profile Switcher & Welcome Section */}
+    <div className="px-6 py-6">
+      {/* Header */}
       <div className="mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A0A0A]">
-            Welcome, {currentProfile?.full_name.split(' ')[0]}
-          </h1>
-          <ProfileSwitcher
-            profiles={allProfiles}
-            selectedProfile={selectedProfileId}
-            onProfileChange={setSelectedProfileId}
-          />
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-2">
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">
+              Welcome, {currentProfile?.full_name.split(' ')[0]}
+            </h1>
+            <p className="text-sm text-gray-600">Your personal health dashboard</p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setChatOpen(true)}
+              className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Ask AI
+            </Button>
+            <Button
+              onClick={generatePredictions}
+              disabled={generatingPredictions}
+              className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-xl"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              {generatingPredictions ? 'Analyzing...' : 'Generate Insights'}
+            </Button>
+            <ProfileSwitcher
+              profiles={allProfiles}
+              selectedProfile={selectedProfileId}
+              onProfileChange={setSelectedProfileId}
+            />
+          </div>
         </div>
-        <p className="text-sm text-gray-600">Your personal health dashboard</p>
       </div>
+
+      {/* Alerts Section */}
+      {criticalInsights.length > 0 && (
+        <div className="mb-6">
+          <Card className="border-0 shadow-sm rounded-2xl bg-gradient-to-r from-red-50 to-orange-50">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-[#0A0A0A] text-sm mb-1">Critical Health Alerts</h3>
+                  <p className="text-xs text-gray-700">
+                    {criticalInsights.length} item{criticalInsights.length > 1 ? 's' : ''} requiring attention
+                  </p>
+                </div>
+                <Link to={createPageUrl('Insights')}>
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700 rounded-xl text-xs">
+                    View All
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Feature Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 mb-6">
@@ -271,6 +363,93 @@ export default function Dashboard() {
           </div>
         </Link>
       </div>
+
+      {/* Health Trends Charts */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-6">
+        {/* Blood Pressure Trend */}
+        {bpChartData.length > 0 && (
+          <Card className="border-0 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-gray-100">
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Blood Pressure Trend</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={bpChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#0A0A0A" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#0A0A0A" />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="systolic" stroke="#F7C9A3" strokeWidth={2} dot={{ fill: '#F7C9A3', r: 4 }} />
+                  <Line type="monotone" dataKey="diastolic" stroke="#9BB4FF" strokeWidth={2} dot={{ fill: '#9BB4FF', r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Weight Trend */}
+        {weightChartData.length > 0 && (
+          <Card className="border-0 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-gray-100">
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Weight Trend</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={weightChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#0A0A0A" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#0A0A0A" />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="weight" stroke="#0B5A46" fill="#EFF1ED" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* AI Insights Section */}
+      {unreadInsights.length > 0 && (
+        <div className="mb-6">
+          <Card className="border-0 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  AI Health Insights
+                </CardTitle>
+                <Link to={createPageUrl('Insights')}>
+                  <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
+                    View All <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                {unreadInsights.slice(0, 3).map((insight) => (
+                  <div key={insight.id} className="p-4 bg-[#EDE6F7] rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <Brain className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-[#0A0A0A] text-sm mb-1">{insight.title}</p>
+                        <p className="text-xs text-gray-700">{insight.description}</p>
+                      </div>
+                      <Badge className={`text-xs ${
+                        insight.severity === 'high' ? 'bg-red-100 text-red-700' :
+                        insight.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-green-100 text-green-700'
+                      }`}>
+                        {insight.severity}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Latest Vitals */}
@@ -485,6 +664,21 @@ export default function Dashboard() {
             }}
             onCancel={() => setUploadDialogOpen(false)}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Health Chat Dialog */}
+      <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+        <DialogContent className="max-w-2xl h-[600px] flex flex-col p-0">
+          <DialogHeader className="p-6 pb-4 border-b border-gray-200">
+            <DialogTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-[#9BB4FF]" />
+              AI Health Assistant
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <AIHealthChat profileId={selectedProfileId} />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
