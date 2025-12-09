@@ -51,163 +51,116 @@ export default function Layout({ children, currentPageName }) {
   const isActive = (page) => currentPageName === page;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-slate-200/50 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to={createPageUrl('Dashboard')} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Activity className="w-6 h-6 text-white" />
+      <header className="px-4 pt-4 pb-2">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-[#F4F4F2] rounded-xl px-6 h-14 flex justify-between items-center">
+            <Link to={createPageUrl('Dashboard')} className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#0A0A0A] rounded-lg flex items-center justify-center">
+                <Activity className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                HealthFlux
-              </span>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-base font-bold text-[#0A0A0A]">HealthFlux</span>
+                <span className="text-xs text-gray-600 -mt-0.5">Personal Health Records</span>
+              </div>
+              <span className="sm:hidden text-base font-bold text-[#0A0A0A]">HealthFlux</span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.page}
-                  to={createPageUrl(item.page)}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
-                    isActive(item.page)
-                      ? 'bg-blue-500 text-white shadow-md'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{item.name}</span>
-                </Link>
-              ))}
-            </nav>
-
             {/* User Menu */}
-            <div className="flex items-center gap-3">
-              <Link to={createPageUrl('Insights')}>
-                <Button variant="ghost" size="icon" className="hidden sm:flex">
-                  <Bell className="w-5 h-5 text-slate-600" />
-                </Button>
-              </Link>
-              <Link to={createPageUrl('Share')}>
-                <Button variant="ghost" size="icon" className="hidden sm:flex">
-                  <Share2 className="w-5 h-5 text-slate-600" />
-                </Button>
-              </Link>
-              
+            <div className="flex items-center gap-2">
               {user && (
-                <div className="flex items-center gap-2">
-                  <Link to={createPageUrl('Profiles')}>
-                    <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-blue-100 hover:ring-blue-200 transition-all">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm">
-                        {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleLogout}
-                    className="hidden sm:flex text-slate-600 hover:text-red-600"
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </Button>
-                </div>
+                <>
+                  <span className="hidden lg:block text-sm font-medium text-[#0A0A0A] mr-1">
+                    {currentProfile?.full_name || user.full_name}
+                  </span>
+                  <Avatar className="h-8 w-8 cursor-pointer">
+                    <AvatarFallback className="bg-[#0A0A0A] text-white text-sm font-semibold">
+                      {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Hamburger Menu */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
                 onClick={() => setMenuOpen(!menuOpen)}
+                className="h-8 w-8 hover:bg-transparent"
               >
-                {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                <div className="flex flex-col gap-1">
+                  <div className="w-5 h-0.5 bg-[#0A0A0A]" />
+                  <div className="w-5 h-0.5 bg-[#0A0A0A]" />
+                  <div className="w-5 h-0.5 bg-[#0A0A0A]" />
+                </div>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Dropdown Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden">
+        <div className="fixed inset-0 z-30">
           <div 
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute top-16 right-0 left-0 bg-white border-b border-slate-200 shadow-xl">
-            <nav className="p-4 space-y-1">
+          <div className="absolute top-20 right-4 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <nav className="p-2">
               {navItems.map((item) => (
                 <Link
                   key={item.page}
                   to={createPageUrl(item.page)}
                   onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    isActive(item.page)
-                      ? 'bg-blue-500 text-white shadow-md'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#0A0A0A] hover:bg-[#F4F4F2] transition-colors"
                 >
                   <item.icon className="w-5 h-5" />
                   <span className="font-medium">{item.name}</span>
                 </Link>
               ))}
-              <div className="border-t border-slate-200 my-2 pt-2">
-                <Link
-                  to={createPageUrl('Insights')}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 hover:bg-slate-100"
-                >
-                  <Bell className="w-5 h-5" />
-                  <span className="font-medium">Insights</span>
-                </Link>
-                <Link
-                  to={createPageUrl('Share')}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 hover:bg-slate-100"
-                >
-                  <Share2 className="w-5 h-5" />
-                  <span className="font-medium">Share</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span className="font-medium">Logout</span>
-                </button>
-              </div>
+              <div className="border-t border-gray-200 my-2" />
+              <Link
+                to={createPageUrl('Insights')}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#0A0A0A] hover:bg-[#F4F4F2]"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="font-medium">Insights</span>
+              </Link>
+              <Link
+                to={createPageUrl('Share')}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#0A0A0A] hover:bg-[#F4F4F2]"
+              >
+                <Share2 className="w-5 h-5" />
+                <span className="font-medium">Share</span>
+              </Link>
+              <Link
+                to={createPageUrl('Profiles')}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#0A0A0A] hover:bg-[#F4F4F2]"
+              >
+                <User className="w-5 h-5" />
+                <span className="font-medium">My Profiles</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#0A0A0A] hover:bg-red-50"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="font-medium">Sign Out</span>
+              </button>
             </nav>
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="pb-20 md:pb-8">
+      <main className="pb-8">
         {children}
       </main>
-
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 md:hidden z-40 shadow-2xl">
-        <nav className="flex justify-around items-center h-16 px-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.page}
-              to={createPageUrl(item.page)}
-              className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all flex-1 ${
-                isActive(item.page)
-                  ? 'text-blue-600'
-                  : 'text-slate-500'
-              }`}
-            >
-              <item.icon className={`w-5 h-5 ${isActive(item.page) ? 'scale-110' : ''}`} />
-              <span className="text-xs font-medium">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
     </div>
   );
 }

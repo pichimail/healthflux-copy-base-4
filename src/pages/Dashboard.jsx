@@ -135,12 +135,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Profile Switcher & Welcome Section */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <h1 className="text-3xl font-bold text-slate-900">
-            Welcome back, {currentProfile?.full_name.split(' ')[0]}! 👋
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A0A0A]">
+            Welcome, {currentProfile?.full_name.split(' ')[0]}
           </h1>
           <ProfileSwitcher
             profiles={allProfiles}
@@ -148,110 +148,184 @@ export default function Dashboard() {
             onProfileChange={setSelectedProfileId}
           />
         </div>
-        <p className="text-slate-600">Here's your health overview for today</p>
+        <p className="text-sm text-gray-600">Your personal health dashboard</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, idx) => (
-          <Link key={idx} to={createPageUrl(stat.link)}>
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-0 bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</p>
-                <p className="text-sm text-slate-600">{stat.label}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <Button 
+      {/* Feature Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 mb-6">
+        {/* Hero Card - Upload Document */}
+        <div
           onClick={() => setUploadDialogOpen(true)}
-          className="w-full h-auto p-6 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg"
+          className="lg:col-span-12 rounded-2xl p-6 h-52 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+          style={{ backgroundColor: '#E9F46A' }}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
-          <div className="flex items-center gap-3">
-            <Plus className="w-5 h-5" />
-            <span className="font-medium">Upload Document</span>
+          <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
+            Medical Records<br />Upload & AI Processing
           </div>
-        </Button>
-        <Button 
+          <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
+            Upload Document
+          </div>
+          <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
+            <Plus className="w-4 h-4 text-[#0A0A0A]" />
+          </button>
+        </div>
+
+        {/* Vitals Card */}
+        <div
           onClick={() => setVitalDialogOpen(true)}
-          className="w-full h-auto p-6 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg"
+          className="lg:col-span-6 rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+          style={{ backgroundColor: '#9BB4FF' }}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
-          <div className="flex items-center gap-3">
-            <Activity className="w-5 h-5" />
-            <span className="font-medium">Log Vitals</span>
+          <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
+            Track Daily<br />Blood Pressure, Weight & More
           </div>
-        </Button>
-        <Link to={createPageUrl('Medications')}>
-          <Button className="w-full h-auto p-6 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg">
-            <div className="flex items-center gap-3">
-              <Pill className="w-5 h-5" />
-              <span className="font-medium">Add Medication</span>
+          <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
+            Log Vitals
+          </div>
+          <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
+            <Activity className="w-4 h-4 text-[#0A0A0A]" />
+          </button>
+        </div>
+
+        {/* Medications Card */}
+        <Link to={createPageUrl('Medications')} className="lg:col-span-6">
+          <div
+            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: '#F7C9A3' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
+              Medication Tracking<br />Schedule & Reminders
             </div>
-          </Button>
+            <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
+              Medications
+            </div>
+            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
+              <Pill className="w-4 h-4 text-[#0A0A0A]" />
+            </button>
+          </div>
+        </Link>
+
+        {/* Lab Results Card */}
+        <Link to={createPageUrl('LabResults')} className="lg:col-span-4">
+          <div
+            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: '#EDE6F7' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
+              Test Results<br />Lab Reports
+            </div>
+            <div className="text-lg sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
+              Lab Results
+            </div>
+            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200">
+              <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
+            </button>
+          </div>
+        </Link>
+
+        {/* Trends Card */}
+        <Link to={createPageUrl('Trends')} className="lg:col-span-4">
+          <div
+            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: '#EFF1ED' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
+              Health Analytics<br />Visual Insights
+            </div>
+            <div className="text-lg sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
+              Health Trends
+            </div>
+            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200">
+              <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
+            </button>
+          </div>
+        </Link>
+
+        {/* Profiles Card */}
+        <Link to={createPageUrl('Profiles')} className="lg:col-span-4">
+          <div
+            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: '#0B5A46' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div className="text-xs sm:text-sm text-white/90 mb-1">
+              Family Members<br />Manage Profiles
+            </div>
+            <div className="text-lg sm:text-xl font-semibold text-white mt-auto">
+              My Profiles
+            </div>
+            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/15 rounded-full flex items-center justify-center border border-white/20">
+              <Users className="w-4 h-4 text-white" />
+            </button>
+          </div>
         </Link>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Latest Vitals */}
-        <Card className="border-0 shadow-md bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100">
+        <Card className="border-0 shadow-sm rounded-2xl">
+          <CardHeader className="border-b border-gray-100">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold">Latest Vitals</CardTitle>
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Latest Vitals</CardTitle>
               <Link to={createPageUrl('Vitals')}>
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
+                  View All <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
           <CardContent className="p-6">
             {vitals.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">No vitals recorded yet</p>
+              <p className="text-center text-gray-600 py-8 text-sm">No vitals recorded yet</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {latestBP && (
-                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
                     <div>
-                      <p className="font-medium text-slate-900">Blood Pressure</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="font-semibold text-[#0A0A0A]">Blood Pressure</p>
+                      <p className="text-xs text-gray-600">
                         {format(new Date(latestBP.measured_at), 'MMM d, h:mm a')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-slate-900">
+                    <p className="text-xl font-bold text-[#0A0A0A]">
                       {latestBP.systolic}/{latestBP.diastolic}
                     </p>
                   </div>
                 )}
                 {latestHR && (
-                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
                     <div>
-                      <p className="font-medium text-slate-900">Heart Rate</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="font-semibold text-[#0A0A0A]">Heart Rate</p>
+                      <p className="text-xs text-gray-600">
                         {format(new Date(latestHR.measured_at), 'MMM d, h:mm a')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-slate-900">
-                      {latestHR.value} <span className="text-sm text-slate-600">bpm</span>
+                    <p className="text-xl font-bold text-[#0A0A0A]">
+                      {latestHR.value} <span className="text-sm text-gray-600">bpm</span>
                     </p>
                   </div>
                 )}
                 {latestWeight && (
-                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
                     <div>
-                      <p className="font-medium text-slate-900">Weight</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="font-semibold text-[#0A0A0A]">Weight</p>
+                      <p className="text-xs text-gray-600">
                         {format(new Date(latestWeight.measured_at), 'MMM d, h:mm a')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-slate-900">
-                      {latestWeight.value} <span className="text-sm text-slate-600">{latestWeight.unit}</span>
+                    <p className="text-xl font-bold text-[#0A0A0A]">
+                      {latestWeight.value} <span className="text-sm text-gray-600">{latestWeight.unit}</span>
                     </p>
                   </div>
                 )}
@@ -261,35 +335,34 @@ export default function Dashboard() {
         </Card>
 
         {/* Upcoming Medications */}
-        <Card className="border-0 shadow-md bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100">
+        <Card className="border-0 shadow-sm rounded-2xl">
+          <CardHeader className="border-b border-gray-100">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold">Active Medications</CardTitle>
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Active Medications</CardTitle>
               <Link to={createPageUrl('Medications')}>
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
+                  View All <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
           <CardContent className="p-6">
             {upcomingMeds.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">No active medications</p>
+              <p className="text-center text-gray-600 py-8 text-sm">No active medications</p>
             ) : (
               <div className="space-y-3">
                 {upcomingMeds.map((med) => (
-                  <div key={med.id} className="flex items-start justify-between p-3 bg-slate-50 rounded-lg">
+                  <div key={med.id} className="flex items-start justify-between p-4 bg-[#F4F4F2] rounded-xl">
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900">{med.medication_name}</p>
-                      <p className="text-sm text-slate-600">{med.dosage} • {med.frequency.replace(/_/g, ' ')}</p>
+                      <p className="font-semibold text-[#0A0A0A]">{med.medication_name}</p>
+                      <p className="text-xs text-gray-600">{med.dosage} • {med.frequency.replace(/_/g, ' ')}</p>
                       {med.times && med.times.length > 0 && (
-                        <p className="text-xs text-slate-500 mt-1">
-                          <Calendar className="w-3 h-3 inline mr-1" />
+                        <p className="text-xs text-gray-500 mt-1">
                           {med.times.join(', ')}
                         </p>
                       )}
                     </div>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
                       Active
                     </Badge>
                   </div>
@@ -300,13 +373,13 @@ export default function Dashboard() {
         </Card>
 
         {/* Recent Documents */}
-        <Card className="border-0 shadow-md bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100">
+        <Card className="border-0 shadow-sm rounded-2xl">
+          <CardHeader className="border-b border-gray-100">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold">Recent Documents</CardTitle>
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Recent Documents</CardTitle>
               <Link to={createPageUrl('Documents')}>
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
+                  View All <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
@@ -353,22 +426,22 @@ export default function Dashboard() {
             {labResults.filter(r => r.flag !== 'normal').length === 0 ? (
               <div className="text-center py-8">
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
-                <p className="text-slate-600">All lab results are normal</p>
+                <p className="text-gray-600 text-sm">All lab results are normal</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {labResults.filter(r => r.flag !== 'normal').slice(0, 4).map((result) => (
-                  <div key={result.id} className="flex items-start justify-between p-3 bg-slate-50 rounded-lg">
+                  <div key={result.id} className="flex items-start justify-between p-4 bg-[#F4F4F2] rounded-xl">
                     <div className="flex items-start gap-2">
                       <AlertCircle className={`w-5 h-5 mt-0.5 ${result.flag === 'high' ? 'text-red-500' : 'text-yellow-500'}`} />
                       <div>
-                        <p className="font-medium text-slate-900">{result.test_name}</p>
-                        <p className="text-sm text-slate-600">
+                        <p className="font-semibold text-[#0A0A0A] text-sm">{result.test_name}</p>
+                        <p className="text-xs text-gray-600">
                           {result.value} {result.unit}
                         </p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`${
+                    <Badge variant="outline" className={`text-xs ${
                       result.flag === 'high' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                     }`}>
                       {result.flag}
