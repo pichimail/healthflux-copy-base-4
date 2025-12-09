@@ -4,15 +4,14 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   LayoutDashboard, FileText, Activity, Pill, TrendingUp, 
-  Share2, Bell, Users, TestTube, Brain, ChevronLeft, ChevronRight
+  User, TestTube, Brain, Menu, X
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentProfile, setCurrentProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -40,40 +39,101 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const navItems = [
-    { name: 'Dashboard', page: 'Dashboard', icon: LayoutDashboard },
+    { name: 'Home', page: 'Dashboard', icon: LayoutDashboard },
     { name: 'Documents', page: 'Documents', icon: FileText },
-    { name: 'Lab Results', page: 'LabResults', icon: TestTube },
     { name: 'Vitals', page: 'Vitals', icon: Activity },
-    { name: 'Medications', page: 'Medications', icon: Pill },
+    { name: 'Meds', page: 'Medications', icon: Pill },
+    { name: 'Profile', page: 'Profiles', icon: User },
+  ];
+
+  const moreItems = [
+    { name: 'Lab Results', page: 'LabResults', icon: TestTube },
     { name: 'Trends', page: 'Trends', icon: TrendingUp },
     { name: 'AI Insights', page: 'Insights', icon: Brain },
-    { name: 'Profiles', page: 'Profiles', icon: Users },
-    { name: 'Share', page: 'Share', icon: Share2 },
   ];
 
   const isActive = (page) => currentPageName === page;
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
-        sidebarOpen ? 'w-64' : 'w-16'
-      }`}>
-        <div className="p-4">
+    <div className="min-h-screen bg-[#F4F4F2] pb-20 md:pb-0">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <Link to={createPageUrl('Dashboard')} className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#0A0A0A] rounded-xl flex items-center justify-center">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-[#0A0A0A]">HealthFlux</span>
+          </Link>
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {menuOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-40 pt-16" onClick={() => setMenuOpen(false)}>
+          <div className="bg-white rounded-t-3xl p-6 space-y-2" onClick={(e) => e.stopPropagation()}>
+            {moreItems.map((item) => (
+              <Link
+                key={item.page}
+                to={createPageUrl(item.page)}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100"
+              >
+                <item.icon className="w-5 h-5 text-[#0A0A0A]" />
+                <span className="text-sm font-medium text-[#0A0A0A]">{item.name}</span>
+              </Link>
+            ))}
+            {user && (
+              <>
+                <div className="border-t border-gray-200 my-4" />
+                <div className="p-3 bg-[#F4F4F2] rounded-xl mb-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-[#0A0A0A] text-white font-semibold">
+                        {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-semibold text-[#0A0A0A]">
+                        {currentProfile?.full_name || user.full_name}
+                      </p>
+                      <p className="text-xs text-gray-600">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-sm font-medium text-[#0A0A0A] bg-white hover:bg-gray-50 py-2 px-3 rounded-lg"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 overflow-y-auto">
+        <div className="p-6">
           <Link to={createPageUrl('Dashboard')} className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-[#0A0A0A] rounded-xl flex items-center justify-center flex-shrink-0">
               <Activity className="w-6 h-6 text-white" />
             </div>
-            {sidebarOpen && (
-              <div>
-                <span className="text-lg font-bold text-[#0A0A0A] block">HealthFlux</span>
-                <span className="text-xs text-gray-600">Personal Health</span>
-              </div>
-            )}
+            <div>
+              <span className="text-lg font-bold text-[#0A0A0A] block">HealthFlux</span>
+              <span className="text-xs text-gray-600">Personal Health</span>
+            </div>
           </Link>
 
           <nav className="space-y-1">
-            {navItems.map((item) => (
+            {[...navItems, ...moreItems].map((item) => (
               <Link
                 key={item.page}
                 to={createPageUrl(item.page)}
@@ -84,13 +144,13 @@ export default function Layout({ children, currentPageName }) {
                 }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
-                {sidebarOpen && <span className="text-sm">{item.name}</span>}
+                <span className="text-sm">{item.name}</span>
               </Link>
             ))}
           </nav>
 
-          {user && sidebarOpen && (
-            <div className="mt-auto pt-8">
+          {user && (
+            <div className="mt-8">
               <div className="px-3 py-3 bg-[#F4F4F2] rounded-xl">
                 <div className="flex items-center gap-2 mb-2">
                   <Avatar className="h-8 w-8">
@@ -105,31 +165,50 @@ export default function Layout({ children, currentPageName }) {
                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                   </div>
                 </div>
-                <Button
+                <button
                   onClick={handleLogout}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-xs hover:bg-white"
+                  className="w-full text-xs font-medium text-[#0A0A0A] bg-white hover:bg-gray-50 py-2 px-3 rounded-lg"
                 >
                   Sign Out
-                </Button>
+                </button>
               </div>
             </div>
           )}
         </div>
-
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50"
-        >
-          {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-        </button>
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+      <main className="pt-16 md:pt-0 md:ml-64 min-h-screen">
         {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-inset-bottom">
+        <div className="flex items-center justify-around px-2 py-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.page}
+              to={createPageUrl(item.page)}
+              className="flex flex-col items-center justify-center flex-1 py-2"
+            >
+              <div className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
+                isActive(item.page)
+                  ? 'bg-[#E9F46A]'
+                  : 'bg-transparent'
+              }`}>
+                <item.icon className={`w-6 h-6 ${
+                  isActive(item.page) ? 'text-[#0A0A0A]' : 'text-gray-400'
+                }`} />
+              </div>
+              <span className={`text-xs mt-1 font-medium ${
+                isActive(item.page) ? 'text-[#0A0A0A]' : 'text-gray-400'
+              }`}>
+                {item.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
