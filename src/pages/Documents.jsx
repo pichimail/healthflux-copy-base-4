@@ -153,18 +153,18 @@ export default function Documents() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Medical Documents</h1>
-          <p className="text-slate-600">Upload and manage your medical records</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Medical Documents</h1>
+          <p className="text-sm text-gray-600">Upload and manage your medical records</p>
         </div>
         <Button
           onClick={() => setUploadOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg"
+          className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
         >
-          <Upload className="w-5 h-5 mr-2" />
+          <Upload className="w-4 h-4 mr-2" />
           Upload Document
         </Button>
       </div>
@@ -172,16 +172,16 @@ export default function Documents() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             placeholder="Search documents..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 rounded-xl border-gray-200"
           />
         </div>
         <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
             <SelectValue placeholder="All Profiles" />
           </SelectTrigger>
           <SelectContent>
@@ -194,7 +194,7 @@ export default function Documents() {
           </SelectContent>
         </Select>
         <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -218,50 +218,50 @@ export default function Documents() {
         </div>
       ) : filteredDocuments.length === 0 ? (
         <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-4">No documents found</p>
-          <Button onClick={() => setUploadOpen(true)} variant="outline">
+          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No documents found</p>
+          <Button onClick={() => setUploadOpen(true)} className="rounded-xl bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A]">
             <Plus className="w-4 h-4 mr-2" />
             Upload Your First Document
           </Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDocuments.map((doc) => {
             const profile = profiles.find(p => p.id === doc.profile_id);
             return (
-              <Card key={doc.id} className="border-0 shadow-lg bg-white/80 backdrop-blur overflow-hidden hover:shadow-xl transition-shadow">
+              <Card key={doc.id} className="border-0 shadow-sm rounded-2xl overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md">
-                      <FileText className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 bg-[#9BB4FF] rounded-xl flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-[#0A0A0A]" />
                     </div>
-                    <Badge variant="outline" className={getTypeColor(doc.document_type)}>
+                    <Badge variant="outline" className="text-xs capitalize rounded-lg">
                       {doc.document_type.replace(/_/g, ' ')}
                     </Badge>
                   </div>
 
-                  <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2">{doc.title}</h3>
+                  <h3 className="font-semibold text-[#0A0A0A] mb-2 line-clamp-2 text-sm">{doc.title}</h3>
                   
                   {profile && (
-                    <p className="text-sm text-slate-600 mb-2">
+                    <p className="text-xs text-gray-600 mb-1">
                       {profile.full_name}
                     </p>
                   )}
 
                   {doc.document_date && (
-                    <p className="text-sm text-slate-500 mb-2">
+                    <p className="text-xs text-gray-500 mb-1">
                       {format(new Date(doc.document_date), 'MMM d, yyyy')}
                     </p>
                   )}
 
                   {doc.facility_name && (
-                    <p className="text-sm text-slate-500 mb-4">{doc.facility_name}</p>
+                    <p className="text-xs text-gray-500 mb-3">{doc.facility_name}</p>
                   )}
 
                   {doc.ai_summary && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <p className="text-xs text-blue-900">{doc.ai_summary}</p>
+                    <div className="mb-3 p-3 bg-[#EDE6F7] rounded-xl">
+                      <p className="text-xs text-[#0A0A0A]">{doc.ai_summary}</p>
                     </div>
                   )}
 
@@ -270,9 +270,9 @@ export default function Documents() {
                       variant="outline"
                       size="sm"
                       onClick={() => window.open(doc.file_url, '_blank')}
-                      className="flex-1"
+                      className="flex-1 rounded-xl text-xs"
                     >
-                      <Eye className="w-4 h-4 mr-1" />
+                      <Eye className="w-3 h-3 mr-1" />
                       View
                     </Button>
                     {!doc.ai_summary && (
@@ -281,19 +281,19 @@ export default function Documents() {
                         size="sm"
                         onClick={() => generateAISummary.mutate(doc)}
                         disabled={generateAISummary.isLoading}
-                        className="flex-1"
+                        className="flex-1 rounded-xl text-xs"
                       >
-                        <Sparkles className="w-4 h-4 mr-1" />
-                        AI Summary
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        AI
                       </Button>
                     )}
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(doc)}
-                      className="text-red-600 hover:bg-red-50"
+                      className="text-red-600 hover:bg-red-50 rounded-xl"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>
                 </CardContent>
