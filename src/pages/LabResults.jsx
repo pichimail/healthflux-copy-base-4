@@ -143,18 +143,18 @@ export default function LabResults() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Lab Results</h1>
-          <p className="text-slate-600">Track your laboratory test results</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Lab Results</h1>
+          <p className="text-sm text-gray-600">Track your laboratory test results</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 shadow-lg"
+          className="bg-[#EFF1ED] hover:bg-[#DFE1DD] text-[#0A0A0A] rounded-xl font-semibold"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Add Lab Result
         </Button>
       </div>
@@ -162,7 +162,7 @@ export default function LabResults() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64">
+          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
             <SelectValue placeholder="Select Profile" />
           </SelectTrigger>
           <SelectContent>
@@ -175,7 +175,7 @@ export default function LabResults() {
         </Select>
 
         <Select value={filterCategory} onValueChange={setFilterCategory}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -200,31 +200,31 @@ export default function LabResults() {
         </div>
       ) : labResults.length === 0 ? (
         <div className="text-center py-12">
-          <Activity className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-4">No lab results found</p>
-          <Button onClick={() => setDialogOpen(true)} variant="outline">
+          <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No lab results found</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#EFF1ED] hover:bg-[#DFE1DD] text-[#0A0A0A]">
             <Plus className="w-4 h-4 mr-2" />
             Add Your First Lab Result
           </Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {labResults.map((result) => {
             const profile = profiles.find(p => p.id === result.profile_id);
             return (
-              <Card key={result.id} className="border-0 shadow-lg bg-white/80 backdrop-blur overflow-hidden">
-                <div className={`h-2 bg-gradient-to-r ${getCategoryColor(result.test_category)}`} />
+              <Card key={result.id} className="border-0 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-all hover:scale-[1.02]">
+                <div className="h-1" style={{ backgroundColor: result.flag === 'normal' ? '#EFF1ED' : result.flag === 'high' ? '#F7C9A3' : '#E9F46A' }} />
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900 mb-1">
+                      <h3 className="font-bold text-base text-[#0A0A0A] mb-1">
                         {result.test_name}
                       </h3>
-                      <p className="text-sm text-slate-600 capitalize">
+                      <p className="text-xs text-gray-600 capitalize">
                         {result.test_category.replace(/_/g, ' ')}
                       </p>
                     </div>
-                    <Badge variant="outline" className={getFlagColor(result.flag)}>
+                    <Badge variant="outline" className={`${getFlagColor(result.flag)} text-xs rounded-lg`}>
                       <div className="flex items-center gap-1">
                         {getFlagIcon(result.flag)}
                         <span className="capitalize">{result.flag}</span>
@@ -232,28 +232,28 @@ export default function LabResults() {
                     </Badge>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
-                    <p className="text-3xl font-bold text-slate-900 mb-1">
+                  <div className="bg-[#F4F4F2] rounded-xl p-4 mb-4">
+                    <p className="text-2xl font-bold text-[#0A0A0A] mb-1">
                       {result.value}
-                      <span className="text-lg text-slate-600 ml-2">{result.unit}</span>
+                      <span className="text-base text-gray-600 ml-2">{result.unit}</span>
                     </p>
                     {(result.reference_low || result.reference_high) && (
-                      <p className="text-sm text-slate-600">
-                        Reference: {result.reference_low || '—'} - {result.reference_high || '—'} {result.unit}
+                      <p className="text-xs text-gray-600">
+                        Ref: {result.reference_low || '—'} - {result.reference_high || '—'} {result.unit}
                       </p>
                     )}
                   </div>
 
-                  <div className="space-y-2 text-sm text-slate-600 mb-4">
+                  <div className="space-y-1 text-xs text-gray-600 mb-4">
                     {profile && (
-                      <p>👤 {profile.full_name}</p>
+                      <p>{profile.full_name}</p>
                     )}
-                    <p>📅 {format(new Date(result.test_date), 'MMM d, yyyy')}</p>
+                    <p>{format(new Date(result.test_date), 'MMM d, yyyy')}</p>
                     {result.facility && (
-                      <p>🏥 {result.facility}</p>
+                      <p>{result.facility}</p>
                     )}
                     {result.notes && (
-                      <p className="bg-blue-50 p-2 rounded text-blue-900 mt-2">
+                      <p className="bg-[#EDE6F7] p-2 rounded-lg text-[#0A0A0A] mt-2">
                         {result.notes}
                       </p>
                     )}
@@ -267,9 +267,9 @@ export default function LabResults() {
                         deleteMutation.mutate(result.id);
                       }
                     }}
-                    className="w-full text-red-600 hover:bg-red-50"
+                    className="w-full text-red-600 hover:bg-red-50 rounded-xl text-xs"
                   >
-                    <Trash2 className="w-4 h-4 mr-1" />
+                    <Trash2 className="w-3 h-3 mr-1" />
                     Delete
                   </Button>
                 </CardContent>

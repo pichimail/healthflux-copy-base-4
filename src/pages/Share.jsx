@@ -117,18 +117,18 @@ export default function Share() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Share Health Data</h1>
-          <p className="text-slate-600">Create secure links to share health records</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Share Health Data</h1>
+          <p className="text-sm text-gray-600">Create secure links to share health records</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg"
+          className="bg-[#EFF1ED] hover:bg-[#DFE1DD] text-[#0A0A0A] rounded-xl font-semibold"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Create Share Link
         </Button>
       </div>
@@ -139,102 +139,102 @@ export default function Share() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
         </div>
       ) : shareLinks.length === 0 ? (
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
+        <Card className="border-0 shadow-sm rounded-2xl">
           <CardContent className="p-12 text-center">
-            <Share2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Share Links Yet</h3>
-            <p className="text-slate-600 mb-6">
+            <Share2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">No Share Links Yet</h3>
+            <p className="text-sm text-gray-600 mb-6">
               Create secure links to share health data with doctors or family members
             </p>
-            <Button onClick={() => setDialogOpen(true)} variant="outline">
+            <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#EFF1ED] hover:bg-[#DFE1DD] text-[#0A0A0A]">
               <Plus className="w-4 h-4 mr-2" />
               Create Your First Share Link
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-4">
           {shareLinks.map((link) => {
             const profile = profiles.find(p => p.id === link.profile_id);
             const expired = isExpired(link.expires_at);
             const shareUrl = `${window.location.origin}/PublicShare?token=${link.token}`;
             
             return (
-              <Card key={link.id} className="border-0 shadow-lg bg-white/80 backdrop-blur">
+              <Card key={link.id} className="border-0 shadow-sm rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-3">
-                        <h3 className="font-bold text-lg text-slate-900">
+                        <h3 className="font-bold text-base text-[#0A0A0A]">
                           {link.purpose || 'Shared Health Data'}
                         </h3>
                         {link.is_active && !expired ? (
-                          <Badge className="bg-green-100 text-green-700 border-green-200">
+                          <Badge className="bg-green-100 text-green-700 border-green-200 text-xs rounded-lg">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Active
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="bg-slate-100 text-slate-600">
+                          <Badge variant="outline" className="bg-gray-100 text-gray-600 text-xs rounded-lg">
                             Inactive
                           </Badge>
                         )}
                         {expired && (
-                          <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200">
+                          <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200 text-xs rounded-lg">
                             Expired
                           </Badge>
                         )}
                       </div>
 
-                      <div className="space-y-2 text-sm text-slate-600 mb-4">
+                      <div className="space-y-1 text-xs text-gray-600 mb-4">
                         {profile && (
-                          <p>👤 Profile: <span className="font-medium text-slate-900">{profile.full_name}</span></p>
+                          <p>Profile: <span className="font-medium text-[#0A0A0A]">{profile.full_name}</span></p>
                         )}
                         {link.recipient_name && (
-                          <p>📧 Recipient: <span className="font-medium text-slate-900">{link.recipient_name}</span></p>
+                          <p>Recipient: <span className="font-medium text-[#0A0A0A]">{link.recipient_name}</span></p>
                         )}
                         {link.recipient_email && (
-                          <p>✉️ Email: <span className="font-medium text-slate-900">{link.recipient_email}</span></p>
+                          <p>Email: <span className="font-medium text-[#0A0A0A]">{link.recipient_email}</span></p>
                         )}
                         <p>
-                          <Clock className="w-4 h-4 inline mr-1" />
-                          Expires: <span className="font-medium text-slate-900">
-                            {format(new Date(link.expires_at), 'MMM d, yyyy h:mm a')}
+                          Expires: <span className="font-medium text-[#0A0A0A]">
+                            {format(new Date(link.expires_at), 'MMM d, yyyy')}
                           </span>
                         </p>
                         <p>
-                          <Eye className="w-4 h-4 inline mr-1" />
-                          Accessed: <span className="font-medium text-slate-900">{link.access_count} times</span>
+                          Accessed: <span className="font-medium text-[#0A0A0A]">{link.access_count} times</span>
                         </p>
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
                         {link.allowed_scopes.map(scope => (
-                          <Badge key={scope} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          <Badge key={scope} variant="outline" className="bg-[#9BB4FF] text-[#0A0A0A] border-none text-xs rounded-lg">
                             {scope.replace(/_/g, ' ')}
                           </Badge>
                         ))}
                       </div>
 
                       {link.is_active && !expired && (
-                        <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-2 p-3 bg-[#F4F4F2] rounded-xl">
                           <Input
                             value={shareUrl}
                             readOnly
-                            className="flex-1 text-sm"
+                            className="flex-1 text-xs border-gray-200"
                           />
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => copyToClipboard(link)}
+                            className="rounded-xl"
                           >
-                            <Copy className="w-4 h-4" />
+                            <Copy className="w-3 h-3" />
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(shareUrl, '_blank')}
+                            className="rounded-xl"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-3 h-3" />
                           </Button>
                         </div>
                       )}
@@ -250,7 +250,7 @@ export default function Share() {
                               deactivateMutation.mutate(link);
                             }
                           }}
-                          className="flex-1 lg:flex-none"
+                          className="flex-1 lg:flex-none rounded-xl text-xs"
                         >
                           Deactivate
                         </Button>
@@ -263,7 +263,7 @@ export default function Share() {
                             deleteMutation.mutate(link.id);
                           }
                         }}
-                        className="flex-1 lg:flex-none text-red-600 hover:bg-red-50"
+                        className="flex-1 lg:flex-none text-red-600 hover:bg-red-50 rounded-xl"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

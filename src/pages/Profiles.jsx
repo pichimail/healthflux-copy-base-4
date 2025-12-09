@@ -130,12 +130,12 @@ export default function Profiles() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Family Profiles</h1>
-          <p className="text-slate-600">Manage health records for your family members</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Family Profiles</h1>
+          <p className="text-sm text-gray-600">Manage health records for your family members</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -145,8 +145,8 @@ export default function Profiles() {
           }
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg">
-              <Plus className="w-5 h-5 mr-2" />
+            <Button className="bg-[#0B5A46] hover:bg-[#094A38] text-white rounded-xl font-semibold">
+              <Plus className="w-4 h-4 mr-2" />
               Add Family Member
             </Button>
           </DialogTrigger>
@@ -274,46 +274,46 @@ export default function Profiles() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {profiles.map((profile) => {
             const age = calculateAge(profile.date_of_birth);
             return (
-              <Card key={profile.id} className="border-0 shadow-lg bg-white/80 backdrop-blur overflow-hidden">
-                <div className={`h-2 bg-gradient-to-r ${getRelationshipColor(profile.relationship)}`} />
+              <Card key={profile.id} className="border-0 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-all hover:scale-[1.02]">
+                <div className="h-1" style={{ backgroundColor: profile.relationship === 'self' ? '#0B5A46' : '#9BB4FF' }} />
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-16 w-16 ring-4 ring-white shadow-lg">
-                        <AvatarFallback className={`bg-gradient-to-br ${getRelationshipColor(profile.relationship)} text-white text-xl`}>
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-[#0A0A0A] text-white text-base font-semibold">
                           {profile.full_name[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <CardTitle className="text-lg mb-1">{profile.full_name}</CardTitle>
-                        <Badge variant="outline" className="capitalize">
+                        <CardTitle className="text-base font-bold text-[#0A0A0A] mb-1">{profile.full_name}</CardTitle>
+                        <Badge variant="outline" className="capitalize text-xs rounded-lg">
                           {profile.relationship}
                         </Badge>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2">
                   {age && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <User className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-600">{age} years old</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <span className="text-gray-600">{age} years old</span>
                     </div>
                   )}
                   {profile.gender && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Activity className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-600 capitalize">{profile.gender}</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Activity className="w-4 h-4 text-gray-500" />
+                      <span className="text-gray-600 capitalize">{profile.gender}</span>
                     </div>
                   )}
                   {profile.blood_group && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Heart className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-600">{profile.blood_group}</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Heart className="w-4 h-4 text-gray-500" />
+                      <span className="text-gray-600">{profile.blood_group}</span>
                     </div>
                   )}
 
@@ -322,9 +322,9 @@ export default function Profiles() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(profile)}
-                      className="flex-1"
+                      className="flex-1 rounded-xl text-xs"
                     >
-                      <Edit className="w-4 h-4 mr-1" />
+                      <Edit className="w-3 h-3 mr-1" />
                       Edit
                     </Button>
                     {profile.relationship !== 'self' && (
@@ -332,9 +332,9 @@ export default function Profiles() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(profile)}
-                        className="text-red-600 hover:bg-red-50"
+                        className="text-red-600 hover:bg-red-50 rounded-xl"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3" />
                       </Button>
                     )}
                   </div>
@@ -347,9 +347,9 @@ export default function Profiles() {
 
       {profiles.length === 0 && !isLoading && (
         <div className="text-center py-12">
-          <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-4">No family profiles yet</p>
-          <Button onClick={() => setDialogOpen(true)} variant="outline">
+          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No family profiles yet</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#0B5A46] hover:bg-[#094A38] text-white">
             <Plus className="w-4 h-4 mr-2" />
             Add Your First Profile
           </Button>
