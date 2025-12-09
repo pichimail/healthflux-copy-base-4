@@ -12,6 +12,7 @@ import PublicShare from './pages/PublicShare';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Demo from './pages/Demo';
+import AIAssistant from './pages/AIAssistant';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +31,7 @@ export const PAGES = {
     "AdminLogin": AdminLogin,
     "AdminDashboard": AdminDashboard,
     "Demo": Demo,
+    "AIAssistant": AIAssistant,
 }
 
 export const pagesConfig = {

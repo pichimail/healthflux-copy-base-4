@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Pill, Activity, TestTube, CheckCircle, AlertCircle, Plus } from 'lucide-react';
+import { Pill, Activity, TestTube, CheckCircle, AlertCircle, Plus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ExtractedDataReview({ document, onAddMedication, onAddVital, onAddLabResult }) {
+  const [addingId, setAddingId] = useState(null);
+  const [addedIds, setAddedIds] = useState(new Set());
+
   const hasMedications = document.extracted_medications?.length > 0;
   const hasVitals = document.extracted_vitals?.length > 0;
   const hasLabResults = document.extracted_lab_results?.length > 0;
@@ -12,6 +16,22 @@ export default function ExtractedDataReview({ document, onAddMedication, onAddVi
   if (!hasMedications && !hasVitals && !hasLabResults) {
     return null;
   }
+
+  const handleAdd = async (id, type, data) => {
+    setAddingId(id);
+    try {
+      if (type === 'medication') await onAddMedication(data);
+      if (type === 'vital') await onAddVital(data);
+      if (type === 'lab') await onAddLabResult(data);
+      setAddedIds(new Set([...addedIds, id]));
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} added successfully`);
+    } catch (error) {
+      console.error('Error adding:', error);
+      toast.error(`Failed to add ${type}`);
+    } finally {
+      setAddingId(null);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -25,24 +45,41 @@ export default function ExtractedDataReview({ document, onAddMedication, onAddVi
           </CardHeader>
           <CardContent className="p-4">
             <div className="space-y-2">
-              {document.extracted_medications.map((med, idx) => (
-                <div key={idx} className="p-3 bg-white rounded-xl flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-semibold text-[#0A0A0A] text-sm">{med.name}</p>
-                    <p className="text-xs text-gray-600">{med.dosage} • {med.frequency}</p>
-                    {med.purpose && <p className="text-xs text-gray-500 mt-1">{med.purpose}</p>}
+              {document.extracted_medications.map((med, idx) => {
+                const itemId = `med-${idx}`;
+                const isAdded = addedIds.has(itemId);
+                const isAdding = addingId === itemId;
+                return (
+                  <div key={idx} className="p-3 bg-white rounded-xl flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-semibold text-[#0A0A0A] text-sm">{med.name}</p>
+                      <p className="text-xs text-gray-600">{med.dosage} • {med.frequency}</p>
+                      {med.purpose && <p className="text-xs text-gray-500 mt-1">{med.purpose}</p>}
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleAdd(itemId, 'medication', med)}
+                      disabled={isAdding || isAdded}
+                      className={`rounded-xl text-xs ${isAdded ? 'bg-green-50 border-green-200' : ''}`}
+                    >
+                      {isAdding ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isAdded ? (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Added
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3 h-3 mr-1" />
+                          Add
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => onAddMedication(med)}
-                    className="rounded-xl text-xs"
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -58,25 +95,42 @@ export default function ExtractedDataReview({ document, onAddMedication, onAddVi
           </CardHeader>
           <CardContent className="p-4">
             <div className="space-y-2">
-              {document.extracted_vitals.map((vital, idx) => (
-                <div key={idx} className="p-3 bg-white rounded-xl flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-semibold text-[#0A0A0A] text-sm capitalize">{vital.type?.replace(/_/g, ' ')}</p>
-                    <p className="text-xs text-gray-600">
-                      {vital.systolic ? `${vital.systolic}/${vital.diastolic}` : vital.value} {vital.unit}
-                    </p>
+              {document.extracted_vitals.map((vital, idx) => {
+                const itemId = `vital-${idx}`;
+                const isAdded = addedIds.has(itemId);
+                const isAdding = addingId === itemId;
+                return (
+                  <div key={idx} className="p-3 bg-white rounded-xl flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-semibold text-[#0A0A0A] text-sm capitalize">{vital.type?.replace(/_/g, ' ')}</p>
+                      <p className="text-xs text-gray-600">
+                        {vital.systolic ? `${vital.systolic}/${vital.diastolic}` : vital.value} {vital.unit}
+                      </p>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleAdd(itemId, 'vital', vital)}
+                      disabled={isAdding || isAdded}
+                      className={`rounded-xl text-xs ${isAdded ? 'bg-green-50 border-green-200' : ''}`}
+                    >
+                      {isAdding ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isAdded ? (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Added
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3 h-3 mr-1" />
+                          Add
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => onAddVital(vital)}
-                    className="rounded-xl text-xs"
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -93,6 +147,9 @@ export default function ExtractedDataReview({ document, onAddMedication, onAddVi
           <CardContent className="p-4">
             <div className="space-y-2">
               {document.extracted_lab_results.map((lab, idx) => {
+                const itemId = `lab-${idx}`;
+                const isAdded = addedIds.has(itemId);
+                const isAdding = addingId === itemId;
                 const flag = calculateFlag(lab.value, lab.reference_low, lab.reference_high);
                 return (
                   <div key={idx} className="p-3 bg-white rounded-xl flex items-start justify-between">
@@ -116,11 +173,23 @@ export default function ExtractedDataReview({ document, onAddMedication, onAddVi
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        onClick={() => onAddLabResult(lab)}
-                        className="rounded-xl text-xs"
+                        onClick={() => handleAdd(itemId, 'lab', lab)}
+                        disabled={isAdding || isAdded}
+                        className={`rounded-xl text-xs ${isAdded ? 'bg-green-50 border-green-200' : ''}`}
                       >
-                        <Plus className="w-3 h-3 mr-1" />
-                        Add
+                        {isAdding ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : isAdded ? (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Added
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-3 h-3 mr-1" />
+                            Add
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>

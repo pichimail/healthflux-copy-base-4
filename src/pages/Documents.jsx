@@ -12,6 +12,18 @@ import { Upload, FileText, Eye, Trash2, Search, Filter, Plus, Download, Sparkles
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import ExtractedDataReview from '../components/ExtractedDataReview';
+import { toast } from 'sonner';
+
+const calculateFlag = (value, refLow, refHigh) => {
+  const val = parseFloat(value);
+  const low = refLow ? parseFloat(refLow) : null;
+  const high = refHigh ? parseFloat(refHigh) : null;
+
+  if (isNaN(val)) return 'normal';
+  if (low !== null && val < low) return 'low';
+  if (high !== null && val > high) return 'high';
+  return 'normal';
+};
 
 export default function Documents() {
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -339,9 +351,49 @@ export default function Documents() {
           {reviewDoc && (
             <ExtractedDataReview
               document={reviewDoc}
-              onAddMedication={(med) => console.log('Add medication:', med)}
-              onAddVital={(vital) => console.log('Add vital:', vital)}
-              onAddLabResult={(lab) => console.log('Add lab:', lab)}
+              onAddMedication={async (med) => {
+                await base44.entities.Medication.create({
+                  profile_id: reviewDoc.profile_id,
+                  medication_name: med.name,
+                  dosage: med.dosage,
+                  frequency: med.frequency || 'as_needed',
+                  times: med.times || [],
+                  start_date: reviewDoc.document_date || new Date().toISOString().split('T')[0],
+                  is_active: true,
+                  purpose: med.purpose,
+                  prescriber: reviewDoc.doctor_name
+                });
+                queryClient.invalidateQueries(['documents']);
+              }}
+              onAddVital={async (vital) => {
+                await base44.entities.VitalMeasurement.create({
+                  profile_id: reviewDoc.profile_id,
+                  vital_type: vital.type,
+                  systolic: vital.systolic,
+                  diastolic: vital.diastolic,
+                  value: vital.value,
+                  unit: vital.unit,
+                  measured_at: reviewDoc.document_date ? new Date(reviewDoc.document_date).toISOString() : new Date().toISOString(),
+                  source: 'document'
+                });
+                queryClient.invalidateQueries(['documents']);
+              }}
+              onAddLabResult={async (lab) => {
+                await base44.entities.LabResult.create({
+                  profile_id: reviewDoc.profile_id,
+                  document_id: reviewDoc.id,
+                  test_name: lab.name,
+                  test_category: lab.category || 'other',
+                  value: parseFloat(lab.value),
+                  unit: lab.unit,
+                  reference_low: lab.reference_low ? parseFloat(lab.reference_low) : null,
+                  reference_high: lab.reference_high ? parseFloat(lab.reference_high) : null,
+                  flag: calculateFlag(lab.value, lab.reference_low, lab.reference_high),
+                  test_date: reviewDoc.document_date || new Date().toISOString().split('T')[0],
+                  facility: reviewDoc.facility_name
+                });
+                queryClient.invalidateQueries(['documents']);
+              }}
             />
           )}
         </DialogContent>

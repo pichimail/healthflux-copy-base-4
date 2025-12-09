@@ -43,13 +43,14 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Documents', page: 'Documents', icon: FileText },
     { name: 'Vitals', page: 'Vitals', icon: Activity },
     { name: 'Meds', page: 'Medications', icon: Pill },
-    { name: 'Profile', page: 'Profiles', icon: User },
+    { name: 'AI', page: 'AIAssistant', icon: Brain },
   ];
 
   const moreItems = [
     { name: 'Lab Results', page: 'LabResults', icon: TestTube },
     { name: 'Trends', page: 'Trends', icon: TrendingUp },
-    { name: 'AI Insights', page: 'Insights', icon: Brain },
+    { name: 'Health Insights', page: 'Insights', icon: Brain },
+    { name: 'My Profiles', page: 'Profiles', icon: User },
   ];
 
   const isActive = (page) => currentPageName === page;
