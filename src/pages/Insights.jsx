@@ -201,22 +201,22 @@ Provide clear, actionable insights in a friendly tone.`;
 
       {/* AI Insights */}
       {insights && (
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-purple-50 to-pink-50">
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="w-6 h-6 text-purple-600" />
+        <Card className="border-0 shadow-sm rounded-2xl">
+          <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#EDE6F7' }}>
+            <CardTitle className="flex items-center gap-2 text-[#0A0A0A]">
+              <Brain className="w-5 h-5" />
               AI-Generated Health Insights
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="prose prose-slate max-w-none">
-              <div className="whitespace-pre-wrap text-slate-700 leading-relaxed">
+              <div className="whitespace-pre-wrap text-[#0A0A0A] leading-relaxed text-sm">
                 {insights}
               </div>
             </div>
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-900 flex items-start gap-2">
-                <Lightbulb className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div className="mt-6 p-4 bg-[#E9F46A] rounded-xl">
+              <p className="text-xs text-[#0A0A0A] flex items-start gap-2">
+                <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>
                   These insights are AI-generated and for informational purposes only. 
                   Always consult with qualified healthcare professionals for medical advice.
@@ -228,11 +228,11 @@ Provide clear, actionable insights in a friendly tone.`;
       )}
 
       {!insights && vitals.length === 0 && labResults.length === 0 && (
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
+        <Card className="border-0 shadow-sm rounded-2xl">
           <CardContent className="p-12 text-center">
-            <Brain className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Data Available</h3>
-            <p className="text-slate-600 mb-6">
+            <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">No Data Available</h3>
+            <p className="text-sm text-gray-600 mb-6">
               Start logging vitals and lab results to get personalized AI insights
             </p>
           </CardContent>
@@ -240,11 +240,11 @@ Provide clear, actionable insights in a friendly tone.`;
       )}
 
       {!insights && (vitals.length > 0 || labResults.length > 0) && (
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
+        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
           <CardContent className="p-12 text-center">
             <Sparkles className="w-16 h-16 text-purple-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Generate Insights</h3>
-            <p className="text-slate-600 mb-6">
+            <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">Ready to Generate Insights</h3>
+            <p className="text-sm text-gray-700 mb-6">
               Click the "Generate AI Insights" button to get personalized health recommendations
             </p>
           </CardContent>

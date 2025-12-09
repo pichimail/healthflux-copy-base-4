@@ -171,18 +171,18 @@ export default function Medications() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Medications</h1>
-          <p className="text-slate-600">Track medications and adherence</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Medications</h1>
+          <p className="text-sm text-gray-600">Track medications and adherence</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg"
+          className="bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A] rounded-xl font-semibold"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Add Medication
         </Button>
       </div>
@@ -190,7 +190,7 @@ export default function Medications() {
       {/* Profile Filter */}
       <div className="mb-6">
         <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64">
+          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
             <SelectValue placeholder="All Profiles" />
           </SelectTrigger>
           <SelectContent>
@@ -211,32 +211,32 @@ export default function Medications() {
         </div>
       ) : medications.length === 0 ? (
         <div className="text-center py-12">
-          <Pill className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-4">No active medications</p>
-          <Button onClick={() => setDialogOpen(true)} variant="outline">
+          <Pill className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No active medications</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A]">
             <Plus className="w-4 h-4 mr-2" />
             Add Your First Medication
           </Button>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-4">
           {medications.map((med) => {
             const profile = profiles.find(p => p.id === med.profile_id);
             return (
-              <Card key={med.id} className="border-0 shadow-lg bg-white/80 backdrop-blur">
+              <Card key={med.id} className="border-0 shadow-sm rounded-2xl hover:shadow-md transition-all hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md">
-                        <Pill className="w-6 h-6 text-white" />
+                      <div className="w-10 h-10 rounded-xl bg-[#F7C9A3] flex items-center justify-center">
+                        <Pill className="w-5 h-5 text-[#0A0A0A]" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg text-slate-900 mb-1">
+                        <h3 className="font-bold text-base text-[#0A0A0A] mb-1">
                           {med.medication_name}
                         </h3>
-                        <p className="text-slate-600 mb-2">{med.dosage}</p>
+                        <p className="text-gray-600 mb-2 text-sm">{med.dosage}</p>
                         {profile && (
-                          <p className="text-sm text-slate-500">👤 {profile.full_name}</p>
+                          <p className="text-xs text-gray-500">{profile.full_name}</p>
                         )}
                       </div>
                     </div>
@@ -245,6 +245,7 @@ export default function Medications() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(med)}
+                        className="rounded-xl"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -252,32 +253,32 @@ export default function Medications() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeactivate(med)}
-                        className="text-red-600 hover:bg-red-50"
+                        className="text-red-600 hover:bg-red-50 rounded-xl"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
 
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-700 capitalize">{med.frequency.replace(/_/g, ' ')}</span>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-xs">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      <span className="text-gray-700 capitalize">{med.frequency.replace(/_/g, ' ')}</span>
                     </div>
                     {med.times && med.times.length > 0 && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Bell className="w-4 h-4 text-slate-500" />
-                        <span className="text-slate-700">{med.times.join(', ')}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <Bell className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-700">{med.times.join(', ')}</span>
                       </div>
                     )}
                     {med.purpose && (
-                      <p className="text-sm text-slate-600 bg-slate-50 p-2 rounded">
+                      <p className="text-xs text-gray-600 bg-[#F4F4F2] p-2 rounded-lg">
                         {med.purpose}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-700">
+                    <div className="flex items-center gap-2 text-xs">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      <span className="text-gray-700">
                         Started {format(new Date(med.start_date), 'MMM d, yyyy')}
                       </span>
                     </div>
@@ -287,18 +288,18 @@ export default function Medications() {
                     <Button
                       size="sm"
                       onClick={() => handleLogDose(med, 'taken')}
-                      className="flex-1 bg-green-500 hover:bg-green-600"
+                      className="flex-1 bg-green-500 hover:bg-green-600 rounded-xl text-xs"
                     >
-                      <CheckCircle className="w-4 h-4 mr-1" />
+                      <CheckCircle className="w-3 h-3 mr-1" />
                       Taken
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleLogDose(med, 'skipped')}
-                      className="flex-1"
+                      className="flex-1 rounded-xl text-xs"
                     >
-                      <XCircle className="w-4 h-4 mr-1" />
+                      <XCircle className="w-3 h-3 mr-1" />
                       Skipped
                     </Button>
                   </div>

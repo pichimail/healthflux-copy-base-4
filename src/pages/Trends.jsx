@@ -102,17 +102,17 @@ export default function Trends() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Health Trends</h1>
-        <p className="text-slate-600">Visualize your health data over time</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Health Trends</h1>
+        <p className="text-sm text-gray-600">Visualize your health data over time</p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64">
+          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
             <SelectValue placeholder="Select Profile" />
           </SelectTrigger>
           <SelectContent>
@@ -125,7 +125,7 @@ export default function Trends() {
         </Select>
 
         <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -138,13 +138,13 @@ export default function Trends() {
       </div>
 
       {/* Vital Signs Charts */}
-      <div className="space-y-6 mb-8">
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100">
+      <div className="space-y-6 mb-6">
+        <Card className="border-0 shadow-sm rounded-2xl">
+          <CardHeader className="border-b border-gray-100">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Vital Signs Trends</CardTitle>
+              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Vital Signs Trends</CardTitle>
               <Select value={vitalType} onValueChange={setVitalType}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 rounded-xl border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -161,39 +161,39 @@ export default function Trends() {
           <CardContent className="p-6">
             {chartData.length === 0 ? (
               <div className="text-center py-12">
-                <Activity className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-600">No data available for the selected period</p>
+                <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm">No data available for the selected period</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={400}>
                 {vitalType === 'blood_pressure' ? (
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#64748b" 
-                      style={{ fontSize: '12px' }}
+                      stroke="#0A0A0A" 
+                      style={{ fontSize: '11px' }}
                     />
                     <YAxis 
-                      stroke="#64748b" 
-                      style={{ fontSize: '12px' }}
+                      stroke="#0A0A0A" 
+                      style={{ fontSize: '11px' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Line 
                       type="monotone" 
                       dataKey="systolic" 
-                      stroke="#ef4444" 
+                      stroke="#F7C9A3" 
                       strokeWidth={2}
-                      dot={{ fill: '#ef4444', r: 4 }}
+                      dot={{ fill: '#F7C9A3', r: 4 }}
                       name="Systolic"
                     />
                     <Line 
                       type="monotone" 
                       dataKey="diastolic" 
-                      stroke="#3b82f6" 
+                      stroke="#9BB4FF" 
                       strokeWidth={2}
-                      dot={{ fill: '#3b82f6', r: 4 }}
+                      dot={{ fill: '#9BB4FF', r: 4 }}
                       name="Diastolic"
                     />
                   </LineChart>
@@ -201,25 +201,25 @@ export default function Trends() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#9BB4FF" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#9BB4FF" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#64748b" 
-                      style={{ fontSize: '12px' }}
+                      stroke="#0A0A0A" 
+                      style={{ fontSize: '11px' }}
                     />
                     <YAxis 
-                      stroke="#64748b" 
-                      style={{ fontSize: '12px' }}
+                      stroke="#0A0A0A" 
+                      style={{ fontSize: '11px' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area 
                       type="monotone" 
                       dataKey="value" 
-                      stroke="#3b82f6" 
+                      stroke="#9BB4FF" 
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorValue)"
@@ -236,8 +236,8 @@ export default function Trends() {
       {/* Lab Results by Category */}
       {Object.keys(labCategories).length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Lab Results</h2>
-          <div className="grid lg:grid-cols-2 gap-6">
+          <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Lab Results</h2>
+          <div className="grid lg:grid-cols-2 gap-4">
             {Object.entries(labCategories).map(([category, tests]) => {
               const uniqueTests = {};
               tests.forEach(test => {
@@ -248,9 +248,9 @@ export default function Trends() {
               });
 
               return (
-                <Card key={category} className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                  <CardHeader className="border-b border-slate-100">
-                    <CardTitle className="text-lg capitalize">
+                <Card key={category} className="border-0 shadow-sm rounded-2xl">
+                  <CardHeader className="border-b border-gray-100">
+                    <CardTitle className="text-base font-semibold text-[#0A0A0A] capitalize">
                       {category.replace(/_/g, ' ')} Tests
                     </CardTitle>
                   </CardHeader>
@@ -265,30 +265,30 @@ export default function Trends() {
 
                         return (
                           <div key={testName} className="space-y-2">
-                            <h4 className="font-medium text-slate-900">{testName}</h4>
+                            <h4 className="font-semibold text-[#0A0A0A] text-sm">{testName}</h4>
                             <ResponsiveContainer width="100%" height={150}>
                               <AreaChart data={chartData}>
                                 <defs>
                                   <linearGradient id={`color${testName}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                    <stop offset="5%" stopColor="#EFF1ED" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="#EFF1ED" stopOpacity={0.1}/>
                                   </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
                                 <XAxis 
                                   dataKey="date" 
-                                  stroke="#64748b" 
+                                  stroke="#0A0A0A" 
                                   style={{ fontSize: '10px' }}
                                 />
                                 <YAxis 
-                                  stroke="#64748b" 
+                                  stroke="#0A0A0A" 
                                   style={{ fontSize: '10px' }}
                                 />
                                 <Tooltip />
                                 <Area 
                                   type="monotone" 
                                   dataKey="value" 
-                                  stroke="#10b981" 
+                                  stroke="#0B5A46" 
                                   strokeWidth={2}
                                   fillOpacity={1}
                                   fill={`url(#color${testName})`}
@@ -309,9 +309,9 @@ export default function Trends() {
 
       {vitals.length === 0 && labResults.length === 0 && (
         <div className="text-center py-12">
-          <TrendingUp className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-2">No health data to display yet</p>
-          <p className="text-sm text-slate-500">Start logging vitals and lab results to see trends</p>
+          <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-2 text-sm">No health data to display yet</p>
+          <p className="text-xs text-gray-500">Start logging vitals and lab results to see trends</p>
         </div>
       )}
     </div>

@@ -148,18 +148,18 @@ export default function Vitals() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Vitals Tracking</h1>
-          <p className="text-slate-600">Monitor your health vitals over time</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Vitals Tracking</h1>
+          <p className="text-sm text-gray-600">Monitor your health vitals over time</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg"
+          className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Log Vital
         </Button>
       </div>
@@ -167,7 +167,7 @@ export default function Vitals() {
       {/* Profile Filter */}
       <div className="mb-6">
         <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64">
+          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
             <SelectValue placeholder="All Profiles" />
           </SelectTrigger>
           <SelectContent>
@@ -188,9 +188,9 @@ export default function Vitals() {
         </div>
       ) : vitals.length === 0 ? (
         <div className="text-center py-12">
-          <Activity className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-600 mb-4">No vitals recorded yet</p>
-          <Button onClick={() => setDialogOpen(true)} variant="outline">
+          <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No vitals recorded yet</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A]">
             <Plus className="w-4 h-4 mr-2" />
             Log Your First Vital
           </Button>
@@ -201,31 +201,31 @@ export default function Vitals() {
             const profile = profiles.find(p => p.id === vital.profile_id);
             const Icon = getVitalIcon(vital.vital_type);
             return (
-              <Card key={vital.id} className="border-0 shadow-md bg-white/80 backdrop-blur">
+              <Card key={vital.id} className="border-0 shadow-sm rounded-2xl hover:shadow-md transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getVitalColor(vital.vital_type)} flex items-center justify-center shadow-md`}>
-                        <Icon className="w-6 h-6 text-white" />
+                      <div className="w-10 h-10 rounded-xl bg-[#9BB4FF] flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-[#0A0A0A]" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900 capitalize mb-1">
+                        <h3 className="font-semibold text-[#0A0A0A] capitalize mb-1 text-sm">
                           {vital.vital_type.replace(/_/g, ' ')}
                         </h3>
-                        <p className="text-2xl font-bold text-slate-900 mb-2">
+                        <p className="text-xl font-bold text-[#0A0A0A] mb-2">
                           {formatVitalValue(vital)}
                         </p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600">
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
                           {profile && (
-                            <span>👤 {profile.full_name}</span>
+                            <span>{profile.full_name}</span>
                           )}
-                          <span>📅 {format(new Date(vital.measured_at), 'MMM d, yyyy h:mm a')}</span>
+                          <span>{format(new Date(vital.measured_at), 'MMM d, h:mm a')}</span>
                           {vital.source && (
-                            <span className="capitalize">📊 {vital.source}</span>
+                            <span className="capitalize">{vital.source}</span>
                           )}
                         </div>
                         {vital.notes && (
-                          <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
+                          <p className="text-xs text-gray-600 mt-2 bg-[#F4F4F2] p-2 rounded-lg">
                             {vital.notes}
                           </p>
                         )}
@@ -239,7 +239,7 @@ export default function Vitals() {
                           deleteMutation.mutate(vital.id);
                         }
                       }}
-                      className="text-red-600 hover:bg-red-50"
+                      className="text-red-600 hover:bg-red-50 rounded-xl"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
