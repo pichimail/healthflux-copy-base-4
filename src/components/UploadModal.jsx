@@ -59,12 +59,11 @@ export default function UploadModal({ profileId, onSuccess, onCancel }) {
       setUploading(false);
       setProcessing(true);
 
-      // Process with AI (if aiService exists)
+      // Process with enhanced AI
       try {
-        await base44.functions.invoke('aiService', {
+        await base44.functions.invoke('enhancedAIProcessing', {
           document_id: document.id,
           file_url,
-          document_type: formData.document_type,
           profile_id: profileId,
         });
       } catch (error) {
