@@ -59,19 +59,22 @@ export default function UploadModal({ profileId, onSuccess, onCancel }) {
       setUploading(false);
       setProcessing(true);
 
-      // Process with enhanced AI
-      try {
-        await base44.functions.invoke('enhancedAIProcessing', {
-          document_id: document.id,
-          file_url,
-          profile_id: profileId,
-        });
-      } catch (error) {
-        console.log('AI processing not available or failed:', error);
-      }
+      setProcessing(true);
 
-      setProcessing(false);
-      onSuccess?.();
+      // Process with enhanced AI in background
+      base44.functions.invoke('enhancedAIProcessing', {
+        document_id: document.id,
+        file_url,
+        profile_id: profileId,
+      }).catch(error => {
+        console.log('AI processing error:', error);
+      });
+
+      // Don't wait for AI processing to complete
+      setTimeout(() => {
+        setProcessing(false);
+        onSuccess?.();
+      }, 1000);
     } catch (error) {
       console.error('Error uploading document:', error);
       alert('Failed to upload document. Please try again.');

@@ -5,7 +5,7 @@ import { createPageUrl } from '../utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Activity, FileText, Pill, TrendingUp, Users, 
-  Plus, AlertCircle, CheckCircle, ArrowRight, Brain, Sparkles, MessageSquare
+  Plus, AlertCircle, CheckCircle, ArrowRight, Brain, Sparkles, MessageSquare, Bell
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,8 @@ import ProfileSwitcher from '../components/ProfileSwitcher';
 import VitalEntryForm from '../components/VitalEntryForm';
 import UploadModal from '../components/UploadModal';
 import AIHealthChat from '../components/AIHealthChat';
+import MedicationReminders from '../components/medications/MedicationReminders';
+import DrugInteractionWarnings from '../components/medications/DrugInteractionWarnings';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -143,6 +145,7 @@ export default function Dashboard() {
 
   const unreadInsights = insights.filter(i => !i.is_read);
   const criticalInsights = insights.filter(i => i.severity === 'high' || i.severity === 'critical');
+  const predictionInsights = insights.filter(i => i.insight_type === 'trend_analysis');
 
   const stats = [
     { 
@@ -197,18 +200,18 @@ export default function Dashboard() {
           <div className="flex gap-3">
             <Button
               onClick={() => setChatOpen(true)}
-              className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl"
+              className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
             >
               <MessageSquare className="w-4 h-4 mr-2" />
-              Ask AI
+              Ask AI Anything
             </Button>
             <Button
               onClick={generatePredictions}
               disabled={generatingPredictions}
-              className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-xl"
+              className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-xl font-semibold"
             >
-              <Brain className="w-4 h-4 mr-2" />
-              {generatingPredictions ? 'Analyzing...' : 'Generate Insights'}
+              <TrendingUp className="w-4 h-4 mr-2" />
+              {generatingPredictions ? 'Predicting...' : 'Predict Trends'}
             </Button>
             <ProfileSwitcher
               profiles={allProfiles}
@@ -218,6 +221,15 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Drug Interaction Warnings */}
+      <DrugInteractionWarnings profileId={selectedProfileId} />
+
+      {/* Medication Reminders */}
+      <MedicationReminders 
+        medications={upcomingMeds} 
+        profileId={selectedProfileId}
+      />
 
       {/* Alerts Section */}
       {criticalInsights.length > 0 && (
@@ -408,35 +420,59 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* AI Health Predictions */}
+      {predictionInsights.length > 0 && (
+        <div className="mb-6">
+          <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
+            <CardHeader className="border-b border-gray-100">
+              <CardTitle className="text-sm font-semibold text-[#0A0A0A] flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                AI Health Trend Predictions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                {predictionInsights.slice(0, 3).map((insight) => (
+                  <div key={insight.id} className="p-3 bg-white rounded-xl">
+                    <p className="font-semibold text-[#0A0A0A] text-sm mb-1">{insight.title}</p>
+                    <p className="text-xs text-gray-700">{insight.description}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* AI Insights Section */}
-      {unreadInsights.length > 0 && (
+      {unreadInsights.filter(i => i.insight_type !== 'trend_analysis').length > 0 && (
         <div className="mb-6">
           <Card className="border-0 shadow-sm rounded-2xl">
             <CardHeader className="border-b border-gray-100">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-purple-600" />
+                <CardTitle className="text-sm font-semibold text-[#0A0A0A] flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-600" />
                   AI Health Insights
                 </CardTitle>
                 <Link to={createPageUrl('Insights')}>
-                  <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
+                  <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl">
                     View All <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
                 </Link>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-3">
-                {unreadInsights.slice(0, 3).map((insight) => (
-                  <div key={insight.id} className="p-4 bg-[#EDE6F7] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <Brain className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                {unreadInsights.filter(i => i.insight_type !== 'trend_analysis').slice(0, 3).map((insight) => (
+                  <div key={insight.id} className="p-3 bg-[#F4F4F2] rounded-xl">
+                    <div className="flex items-start gap-2">
+                      <Brain className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <p className="font-semibold text-[#0A0A0A] text-sm mb-1">{insight.title}</p>
+                        <p className="font-semibold text-[#0A0A0A] text-xs mb-1">{insight.title}</p>
                         <p className="text-xs text-gray-700">{insight.description}</p>
                       </div>
-                      <Badge className={`text-xs ${
-                        insight.severity === 'high' ? 'bg-red-100 text-red-700' :
+                      <Badge className={`text-xs rounded-lg ${
+                        insight.severity === 'critical' || insight.severity === 'high' ? 'bg-red-100 text-red-700' :
                         insight.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-green-100 text-green-700'
                       }`}>
@@ -669,12 +705,15 @@ export default function Dashboard() {
 
       {/* AI Health Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="max-w-2xl h-[600px] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-4 border-b border-gray-200">
-            <DialogTitle className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-[#9BB4FF]" />
-              AI Health Assistant
+        <DialogContent className="max-w-3xl h-[700px] flex flex-col p-0">
+          <DialogHeader className="p-6 pb-4 border-b border-gray-200" style={{ backgroundColor: '#E9F46A' }}>
+            <DialogTitle className="flex items-center gap-2 text-[#0A0A0A]">
+              <Brain className="w-5 h-5" />
+              AI Health Analytics & Predictions
             </DialogTitle>
+            <p className="text-xs text-gray-700 mt-1">
+              Ask natural language questions about your health data and get AI-driven insights
+            </p>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
             <AIHealthChat profileId={selectedProfileId} />

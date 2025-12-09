@@ -8,10 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Pill, Plus, Edit, Trash2, Clock, Calendar, CheckCircle, XCircle, Bell } from 'lucide-react';
+import { Pill, Plus, Edit, Trash2, Clock, Calendar, CheckCircle, XCircle, Bell, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import DrugInteractionWarnings from '../components/medications/DrugInteractionWarnings';
+import MedicationReminders from '../components/medications/MedicationReminders';
 
 export default function Medications() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -203,6 +205,15 @@ export default function Medications() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Drug Interaction Warnings */}
+      <DrugInteractionWarnings profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+
+      {/* Medication Reminders */}
+      <MedicationReminders 
+        medications={medications} 
+        profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+      />
 
       {/* Medications List */}
       {isLoading ? (
