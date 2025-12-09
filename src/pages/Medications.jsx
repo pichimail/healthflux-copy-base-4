@@ -14,6 +14,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import DrugInteractionWarnings from '../components/medications/DrugInteractionWarnings';
 import MedicationReminders from '../components/medications/MedicationReminders';
+import AdherenceInsights from '../components/medication/AdherenceInsights';
+import SideEffectTracker from '../components/medication/SideEffectTracker';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Medications() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -215,7 +218,16 @@ export default function Medications() {
         profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
       />
 
-      {/* Medications List */}
+      {/* Tabs for different views */}
+      <Tabs defaultValue="medications" className="mb-6">
+        <TabsList>
+          <TabsTrigger value="medications">My Medications</TabsTrigger>
+          <TabsTrigger value="adherence">Adherence Insights</TabsTrigger>
+          <TabsTrigger value="sideeffects">Side Effects</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="medications">
+          {/* Medications List */}
       {isLoading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
