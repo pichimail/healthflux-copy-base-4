@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   LayoutDashboard, FileText, Activity, Pill, TrendingUp, 
-  User, TestTube, Brain, Menu, X
+  User, TestTube, Brain, Menu, X, AlertCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
