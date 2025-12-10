@@ -87,7 +87,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Menu Overlay */}
       {menuOpen &&
       <div className="md:hidden fixed inset-0 bg-black/50 z-40 pt-16" onClick={() => setMenuOpen(false)}>
-          <div className="bg-white rounded-t-3xl p-6 space-y-2" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-rose-200 mx-1 p-6 rounded-[28px] space-y-2" onClick={(e) => e.stopPropagation()}>
             {moreItems.map((item) =>
           <Link
             key={item.page}
@@ -152,31 +152,31 @@ export default function Layout({ children, currentPageName }) {
       }
 
       {/* Desktop Sidebar */}
-      <aside className="bg-cyan-900 text-slate-100 rounded-[28px] hidden md:block fixed left-0 top-0 h-full w-64 border-r border-gray-200 z-40 overflow-y-auto">
+      <aside className="hidden md:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 overflow-y-auto">
         <div className="p-6">
           <Link to={createPageUrl('Dashboard')} className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-[#0A0A0A] rounded-xl flex items-center justify-center flex-shrink-0">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span className="text-zinc-100 text-lg font-bold block">HealthFlux</span>
-              <span className="text-zinc-100 text-xs">Personal Health</span>
+              <span className="text-lg font-bold text-[#0A0A0A] block">HealthFlux</span>
+              <span className="text-xs text-gray-600">Personal Health</span>
             </div>
           </Link>
 
-          <nav className="bg-teal-900 text-zinc-100 space-y-1">
+          <nav className="space-y-1">
             {[...navItems, ...moreItems].map((item) =>
             <Link
               key={item.page}
-              to={createPageUrl(item.page)} className="bg-cyan-900 text-zinc-100 px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all hover:bg-[#F4F4F2]">
+              to={createPageUrl(item.page)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+              isActive(item.page) ?
+              'bg-[#E9F46A] text-[#0A0A0A] font-semibold' :
+              'text-gray-600 hover:bg-[#F4F4F2]'}`
+              }>
 
-
-
-
-
-
-                <item.icon className="text-gray-200 lucide lucide-layout-dashboard w-5 h-5 flex-shrink-0" />
-                <span className="text-gray-50 text-sm">{item.name}</span>
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{item.name}</span>
               </Link>
             )}
           </nav>
@@ -238,7 +238,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-inset-bottom">
-        <div className="flex items-center justify-around px-2 py-2">
+        <div className="px-2 flex items-center justify-around">
           {navItems.map((item) =>
           <Link
             key={item.page}
