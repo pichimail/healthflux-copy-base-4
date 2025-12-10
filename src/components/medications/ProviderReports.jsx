@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, Calendar } from 'lucide-react';
-import { format, subMonths } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { FileText, Download, Calendar, TrendingUp, Activity, Loader2 } from 'lucide-react';
+import { format, subMonths, subDays } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function ProviderReports({ profileId, medications }) {
   const [generating, setGenerating] = useState(false);
+  const [reportPeriod, setReportPeriod] = useState('90');
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', profileId],
+    queryFn: () => base44.entities.Profile.filter({ id: profileId }).then(res => res[0]),
+    enabled: !!profileId,
+  });
 
   const { data: logs = [] } = useQuery({
     queryKey: ['allMedLogs', profileId],
@@ -27,133 +37,153 @@ export default function ProviderReports({ profileId, medications }) {
     enabled: !!profileId,
   });
 
-  const generateComprehensiveReport = () => {
+  const { data: vitals = [] } = useQuery({
+    queryKey: ['reportVitals', profileId],
+    queryFn: () => base44.entities.VitalMeasurement.filter({ profile_id: profileId }, '-measured_at', 500),
+    enabled: !!profileId,
+  });
+
+  const { data: labs = [] } = useQuery({
+    queryKey: ['reportLabs', profileId],
+    queryFn: () => base44.entities.LabResult.filter({ profile_id: profileId }, '-test_date', 200),
+    enabled: !!profileId,
+  });
+
+  const generatePDFMutation = useMutation({
+    mutationFn: async (data) => {
+      const response = await base44.functions.invoke('generateProviderReport', data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.pdfBase64) {
+        const blob = new Blob(
+          [Uint8Array.from(atob(data.pdfBase64), c => c.charCodeAt(0))],
+          { type: 'application/pdf' }
+        );
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `provider-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success('Report generated successfully');
+      }
+      setGenerating(false);
+    },
+    onError: (error) => {
+      console.error('Report generation error:', error);
+      toast.error('Failed to generate report');
+      setGenerating(false);
+    }
+  });
+
+  const generateEnhancedReport = async () => {
     setGenerating(true);
 
+    const periodDays = parseInt(reportPeriod);
+    const startDate = subDays(new Date(), periodDays);
+
+    // Filter data by period
+    const filteredLogs = logs.filter(l => new Date(l.scheduled_time) >= startDate);
+    const filteredSideEffects = sideEffects.filter(se => new Date(se.onset_time) >= startDate);
+    const filteredEffectiveness = effectiveness.filter(e => new Date(e.recorded_at) >= startDate);
+    const filteredVitals = vitals.filter(v => new Date(v.measured_at) >= startDate);
+    const filteredLabs = labs.filter(l => new Date(l.test_date) >= startDate);
+
     // Calculate adherence stats
-    const adherenceStats = {};
-    medications.forEach(med => {
-      const medLogs = logs.filter(l => l.medication_id === med.id);
+    const adherenceStats = medications.map(med => {
+      const medLogs = filteredLogs.filter(l => l.medication_id === med.id);
       const taken = medLogs.filter(l => l.status === 'taken').length;
       const total = medLogs.length;
-      adherenceStats[med.id] = {
+      const medEffectiveness = filteredEffectiveness.filter(e => e.medication_id === med.id);
+      const avgRating = medEffectiveness.length > 0
+        ? (medEffectiveness.reduce((sum, e) => sum + e.rating, 0) / medEffectiveness.length).toFixed(1)
+        : null;
+
+      return {
         name: med.medication_name,
         dosage: med.dosage,
+        frequency: med.frequency?.replace(/_/g, ' '),
+        purpose: med.purpose,
+        prescriber: med.prescriber,
+        start_date: med.start_date,
         adherence: total > 0 ? Math.round((taken / total) * 100) : 0,
         taken,
-        total
+        total,
+        effectiveness_rating: avgRating
       };
     });
 
-    let reportContent = `COMPREHENSIVE MEDICATION REPORT
-Generated: ${format(new Date(), 'PPP')}
-Report Period: Last 90 Days
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-CURRENT MEDICATIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-`;
-
-    medications.forEach((med, idx) => {
-      const stats = adherenceStats[med.id];
-      const medEffectiveness = effectiveness.filter(e => e.medication_id === med.id);
-      const avgRating = medEffectiveness.length > 0
-        ? (medEffectiveness.reduce((sum, e) => sum + e.rating, 0) / medEffectiveness.length).toFixed(1)
-        : 'N/A';
-
-      reportContent += `${idx + 1}. ${med.medication_name}
-   Dosage: ${med.dosage}
-   Frequency: ${med.frequency?.replace(/_/g, ' ')}
-   Start Date: ${format(new Date(med.start_date), 'PPP')}
-   Purpose: ${med.purpose || 'Not specified'}
-   Prescriber: ${med.prescriber || 'Not specified'}
-   
-   Adherence: ${stats.adherence}% (${stats.taken}/${stats.total} doses taken)
-   Effectiveness Rating: ${avgRating}/5.0
-   
-`;
+    // Prepare vitals trends
+    const vitalsTrends = {};
+    filteredVitals.forEach(v => {
+      if (!vitalsTrends[v.vital_type]) {
+        vitalsTrends[v.vital_type] = [];
+      }
+      vitalsTrends[v.vital_type].push({
+        date: v.measured_at,
+        value: v.value,
+        systolic: v.systolic,
+        diastolic: v.diastolic,
+        unit: v.unit
+      });
     });
 
-    reportContent += `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Prepare lab results summary
+    const labSummary = filteredLabs.map(lab => ({
+      test_name: lab.test_name,
+      value: lab.value,
+      unit: lab.unit,
+      flag: lab.flag,
+      reference_low: lab.reference_low,
+      reference_high: lab.reference_high,
+      test_date: lab.test_date,
+      category: lab.test_category
+    }));
 
-DOCUMENTED SIDE EFFECTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Prepare side effects summary
+    const sideEffectsSummary = filteredSideEffects.map(se => {
+      const med = medications.find(m => m.id === se.medication_id);
+      return {
+        medication: med?.medication_name,
+        severity: se.severity,
+        symptom: se.symptom,
+        onset_time: se.onset_time,
+        duration_minutes: se.duration_minutes,
+        notes: se.notes,
+        reported_to_doctor: se.reported_to_doctor
+      };
+    });
 
-`;
+    const reportData = {
+      profile: {
+        name: profile?.full_name || 'Patient',
+        date_of_birth: profile?.date_of_birth,
+        gender: profile?.gender,
+        blood_group: profile?.blood_group,
+        allergies: profile?.allergies,
+        chronic_conditions: profile?.chronic_conditions
+      },
+      report_period: {
+        days: periodDays,
+        start_date: startDate.toISOString(),
+        end_date: new Date().toISOString()
+      },
+      medications: adherenceStats,
+      side_effects: sideEffectsSummary,
+      vitals_trends: vitalsTrends,
+      lab_results: labSummary,
+      summary: {
+        total_medications: medications.length,
+        total_doses_logged: filteredLogs.length,
+        total_side_effects: filteredSideEffects.length,
+        total_effectiveness_reviews: filteredEffectiveness.length,
+        total_vitals_recorded: filteredVitals.length,
+        total_lab_tests: filteredLabs.length
+      }
+    };
 
-    if (sideEffects.length === 0) {
-      reportContent += 'No side effects reported.\n\n';
-    } else {
-      sideEffects.forEach((se, idx) => {
-        const med = medications.find(m => m.id === se.medication_id);
-        reportContent += `${idx + 1}. Medication: ${med?.medication_name || 'Unknown'}
-   Severity: ${se.severity.toUpperCase()}
-   Symptom: ${se.symptom}
-   Onset: ${format(new Date(se.onset_time), 'PPP p')}
-   Duration: ${se.duration_minutes} minutes
-   Action: ${se.action_taken || 'None'}
-   Reported to Doctor: ${se.reported_to_doctor ? 'Yes' : 'No'}
-   
-`;
-      });
-    }
-
-    reportContent += `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-EFFECTIVENESS FEEDBACK
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-`;
-
-    if (effectiveness.length === 0) {
-      reportContent += 'No effectiveness data recorded.\n\n';
-    } else {
-      effectiveness.forEach((eff, idx) => {
-        const med = medications.find(m => m.id === eff.medication_id);
-        reportContent += `${idx + 1}. Medication: ${med?.medication_name || 'Unknown'}
-   Rating: ${eff.rating}/5 stars
-   Improvement: ${eff.improvement_percentage}%
-   Symptoms Before: ${eff.symptoms_before?.join(', ') || 'Not specified'}
-   Symptoms After: ${eff.symptoms_after?.join(', ') || 'Not specified'}
-   Date: ${format(new Date(eff.recorded_at), 'PPP')}
-   Notes: ${eff.notes || 'None'}
-   
-`;
-      });
-    }
-
-    reportContent += `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SUMMARY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Total Active Medications: ${medications.length}
-Total Doses Logged: ${logs.length}
-Side Effects Reported: ${sideEffects.length}
-Effectiveness Reviews: ${effectiveness.length}
-
-This report is intended for healthcare provider review.
-Please discuss all medications, side effects, and concerns with your doctor.
-
----
-Report generated by HealthFlux
-Date: ${format(new Date(), 'PPP')}
-`;
-
-    const blob = new Blob([reportContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `medication-report-${format(new Date(), 'yyyy-MM-dd')}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    setGenerating(false);
+    generatePDFMutation.mutate(reportData);
   };
 
   return (
@@ -166,36 +196,84 @@ Date: ${format(new Date(), 'PPP')}
       </CardHeader>
       <CardContent className="p-3 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
-          <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-            <h3 className="font-semibold text-[#0A0A0A] text-sm mb-2">Comprehensive Report</h3>
+          <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200">
+            <h3 className="font-semibold text-[#0A0A0A] text-sm mb-2">Enhanced Comprehensive Report</h3>
             <p className="text-xs text-gray-700 mb-3">
-              Includes all medications, adherence data, side effects, and effectiveness ratings
+              Includes medications, vitals trends, lab results, side effects, and effectiveness data with visual charts
             </p>
+            
+            <div className="space-y-2 mb-3">
+              <Label className="text-xs text-gray-700">Report Period</Label>
+              <Select value={reportPeriod} onValueChange={setReportPeriod}>
+                <SelectTrigger className="h-10 rounded-2xl bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">Last 30 Days</SelectItem>
+                  <SelectItem value="60">Last 60 Days</SelectItem>
+                  <SelectItem value="90">Last 90 Days</SelectItem>
+                  <SelectItem value="180">Last 6 Months</SelectItem>
+                  <SelectItem value="365">Last Year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <Button
-              onClick={generateComprehensiveReport}
+              onClick={generateEnhancedReport}
               disabled={generating || medications.length === 0}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl active-press shadow-lg h-10 sm:h-11"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl active-press shadow-lg h-10 sm:h-11"
             >
-              <Download className="w-4 h-4 mr-2" />
-              {generating ? 'Generating...' : 'Download Full Report'}
+              {generating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Generate Enhanced PDF Report
+                </>
+              )}
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="p-3 bg-[#F4F4F2] rounded-2xl text-center">
-              <Calendar className="w-4 sm:w-5 h-4 sm:w-5 mx-auto mb-1 text-gray-600" />
-              <p className="text-lg sm:text-xl font-bold text-[#0A0A0A]">{medications.length}</p>
-              <p className="text-xs text-gray-600">Active Meds</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="p-2.5 sm:p-3 bg-[#F4F4F2] rounded-2xl text-center">
+              <FileText className="w-4 h-4 mx-auto mb-1 text-blue-600" />
+              <p className="text-base sm:text-lg font-bold text-[#0A0A0A]">{medications.length}</p>
+              <p className="text-xs text-gray-600">Meds</p>
             </div>
-            <div className="p-3 bg-[#F4F4F2] rounded-2xl text-center">
-              <FileText className="w-4 sm:w-5 h-4 sm:w-5 mx-auto mb-1 text-gray-600" />
-              <p className="text-lg sm:text-xl font-bold text-[#0A0A0A]">{sideEffects.length}</p>
-              <p className="text-xs text-gray-600">Side Effects</p>
+            <div className="p-2.5 sm:p-3 bg-[#F4F4F2] rounded-2xl text-center">
+              <Activity className="w-4 h-4 mx-auto mb-1 text-green-600" />
+              <p className="text-base sm:text-lg font-bold text-[#0A0A0A]">{vitals.length}</p>
+              <p className="text-xs text-gray-600">Vitals</p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-[#F4F4F2] rounded-2xl text-center">
+              <TrendingUp className="w-4 h-4 mx-auto mb-1 text-purple-600" />
+              <p className="text-base sm:text-lg font-bold text-[#0A0A0A]">{labs.length}</p>
+              <p className="text-xs text-gray-600">Labs</p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-[#F4F4F2] rounded-2xl text-center">
+              <Calendar className="w-4 h-4 mx-auto mb-1 text-orange-600" />
+              <p className="text-base sm:text-lg font-bold text-[#0A0A0A]">{sideEffects.length}</p>
+              <p className="text-xs text-gray-600">Effects</p>
             </div>
           </div>
 
-          <p className="text-xs text-gray-600 bg-yellow-50 p-2 sm:p-3 rounded-2xl">
-            💡 Share this report with your doctor during consultations
+          <div className="text-xs text-gray-600 bg-gradient-to-r from-yellow-50 to-amber-50 p-2.5 sm:p-3 rounded-2xl border border-yellow-200">
+            <p className="font-semibold text-[#0A0A0A] mb-1">📋 What's Included:</p>
+            <ul className="space-y-0.5 ml-4 list-disc">
+              <li>Patient profile and medical history</li>
+              <li>Medication adherence with visual charts</li>
+              <li>Vitals trends over time (BP, weight, etc.)</li>
+              <li>Lab results with abnormality highlights</li>
+              <li>Side effects and effectiveness ratings</li>
+              <li>Clinical discussion points</li>
+            </ul>
+          </div>
+
+          <p className="text-xs text-gray-600 bg-blue-50 p-2 sm:p-2.5 rounded-2xl text-center">
+            💡 Professional PDF format optimized for healthcare providers
           </p>
         </div>
       </CardContent>
