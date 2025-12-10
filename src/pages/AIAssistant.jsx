@@ -19,48 +19,48 @@ export default function AIAssistant() {
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['profiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date'),
+    queryFn: () => base44.entities.Profile.list('-created_date')
   });
 
   useEffect(() => {
     if (profiles.length > 0 && !selectedProfile) {
-      const selfProfile = profiles.find(p => p.relationship === 'self');
+      const selfProfile = profiles.find((p) => p.relationship === 'self');
       setSelectedProfile(selfProfile?.id || profiles[0].id);
     }
   }, [profiles]);
 
-  const currentProfile = profiles.find(p => p.id === selectedProfile);
+  const currentProfile = profiles.find((p) => p.id === selectedProfile);
 
   const { data: vitals = [] } = useQuery({
     queryKey: ['vitals', selectedProfile],
     queryFn: () => base44.entities.VitalMeasurement.filter({ profile_id: selectedProfile }, '-measured_at', 30),
-    enabled: !!selectedProfile,
+    enabled: !!selectedProfile
   });
 
   const { data: labResults = [] } = useQuery({
     queryKey: ['labResults', selectedProfile],
     queryFn: () => base44.entities.LabResult.filter({ profile_id: selectedProfile }, '-test_date', 20),
-    enabled: !!selectedProfile,
+    enabled: !!selectedProfile
   });
 
   const { data: medications = [] } = useQuery({
     queryKey: ['medications', selectedProfile],
     queryFn: () => base44.entities.Medication.filter({ profile_id: selectedProfile, is_active: true }),
-    enabled: !!selectedProfile,
+    enabled: !!selectedProfile
   });
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents', selectedProfile],
     queryFn: () => base44.entities.MedicalDocument.filter({ profile_id: selectedProfile }, '-created_date', 10),
-    enabled: !!selectedProfile,
+    enabled: !!selectedProfile
   });
 
   const generateHealthSummary = async () => {
     setGenerating(true);
     try {
-      const vitalsData = vitals.map(v => `${v.vital_type}: ${v.value || `${v.systolic}/${v.diastolic}`} ${v.unit}`).join(', ');
-      const labData = labResults.map(l => `${l.test_name}: ${l.value} ${l.unit} (${l.flag})`).join(', ');
-      const medsData = medications.map(m => `${m.medication_name} ${m.dosage}`).join(', ');
+      const vitalsData = vitals.map((v) => `${v.vital_type}: ${v.value || `${v.systolic}/${v.diastolic}`} ${v.unit}`).join(', ');
+      const labData = labResults.map((l) => `${l.test_name}: ${l.value} ${l.unit} (${l.flag})`).join(', ');
+      const medsData = medications.map((m) => `${m.medication_name} ${m.dosage}`).join(', ');
 
       const prompt = `As a health AI assistant, provide a comprehensive health summary for ${currentProfile?.full_name}:
 
@@ -87,7 +87,7 @@ Keep the language simple, empathetic, and actionable.`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt,
-        add_context_from_internet: false,
+        add_context_from_internet: false
       });
 
       setSummary(response);
@@ -99,14 +99,14 @@ Keep the language simple, empathetic, and actionable.`;
     }
   };
 
-  const abnormalLabs = labResults.filter(r => r.flag !== 'normal');
+  const abnormalLabs = labResults.filter((r) => r.flag !== 'normal');
   const latestVitals = vitals.slice(0, 5);
 
   return (
     <div className="px-4 md:px-6 py-6 pb-24 md:pb-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A0A0A] mb-1">AI Health Assistant</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A0A0A] mb-1">Flux Assistant</h1>
         <p className="text-sm text-gray-600">Personalized insights and health guidance</p>
       </div>
 
@@ -117,38 +117,38 @@ Keep the language simple, empathetic, and actionable.`;
             <SelectValue placeholder="Select Profile" />
           </SelectTrigger>
           <SelectContent>
-            {profiles.map(profile => (
-              <SelectItem key={profile.id} value={profile.id}>
+            {profiles.map((profile) =>
+            <SelectItem key={profile.id} value={profile.id}>
                 {profile.full_name}
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
 
         <div className="flex gap-2">
           <Button
             onClick={() => setChatOpen(true)}
-            className="flex-1 sm:flex-none bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold"
-          >
+            className="flex-1 sm:flex-none bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold">
+
             <MessageSquare className="w-4 h-4 mr-2" />
             Chat with AI
           </Button>
           <Button
             onClick={generateHealthSummary}
             disabled={generating || !selectedProfile}
-            className="flex-1 sm:flex-none bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl font-semibold"
-          >
-            {generating ? (
-              <>
+            className="flex-1 sm:flex-none bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl font-semibold">
+
+            {generating ?
+            <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Analyzing...
-              </>
-            ) : (
-              <>
+              </> :
+
+            <>
                 <Sparkles className="w-4 h-4 mr-2" />
                 Generate Summary
               </>
-            )}
+            }
           </Button>
         </div>
       </div>
@@ -189,8 +189,8 @@ Keep the language simple, empathetic, and actionable.`;
       </div>
 
       {/* AI Health Summary */}
-      {summary && (
-        <Card className="border-0 shadow-sm rounded-2xl mb-6">
+      {summary &&
+      <Card className="border-0 shadow-sm rounded-2xl mb-6">
           <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#E9F46A' }}>
             <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-lg">
               <Brain className="w-5 h-5" />
@@ -205,10 +205,10 @@ Keep the language simple, empathetic, and actionable.`;
             </div>
           </CardContent>
         </Card>
-      )}
+      }
 
-      {!summary && !generating && (
-        <Card className="border-0 shadow-sm rounded-2xl mb-6" style={{ backgroundColor: '#EDE6F7' }}>
+      {!summary && !generating &&
+      <Card className="border-0 shadow-sm rounded-2xl mb-6" style={{ backgroundColor: '#EDE6F7' }}>
           <CardContent className="p-8 md:p-12 text-center">
             <Brain className="w-12 md:w-16 h-12 md:h-16 text-purple-500 mx-auto mb-4" />
             <h3 className="text-base md:text-lg font-semibold text-[#0A0A0A] mb-2">Get Your AI Health Summary</h3>
@@ -217,7 +217,7 @@ Keep the language simple, empathetic, and actionable.`;
             </p>
           </CardContent>
         </Card>
-      )}
+      }
 
       {/* Recent Activity */}
       <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -227,12 +227,12 @@ Keep the language simple, empathetic, and actionable.`;
             <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Recent Vitals</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            {latestVitals.length === 0 ? (
-              <p className="text-center text-gray-600 py-6 text-sm">No vitals logged yet</p>
-            ) : (
-              <div className="space-y-2">
-                {latestVitals.map((vital) => (
-                  <div key={vital.id} className="flex justify-between items-center p-3 bg-[#F4F4F2] rounded-xl">
+            {latestVitals.length === 0 ?
+            <p className="text-center text-gray-600 py-6 text-sm">No vitals logged yet</p> :
+
+            <div className="space-y-2">
+                {latestVitals.map((vital) =>
+              <div key={vital.id} className="flex justify-between items-center p-3 bg-[#F4F4F2] rounded-xl">
                     <div>
                       <p className="text-sm font-semibold text-[#0A0A0A] capitalize">
                         {vital.vital_type.replace(/_/g, ' ')}
@@ -245,9 +245,9 @@ Keep the language simple, empathetic, and actionable.`;
                       {vital.value || `${vital.systolic}/${vital.diastolic}`} {vital.unit}
                     </p>
                   </div>
-                ))}
+              )}
               </div>
-            )}
+            }
           </CardContent>
         </Card>
 
@@ -257,18 +257,18 @@ Keep the language simple, empathetic, and actionable.`;
             <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Current Medications</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            {medications.length === 0 ? (
-              <p className="text-center text-gray-600 py-6 text-sm">No active medications</p>
-            ) : (
-              <div className="space-y-2">
-                {medications.slice(0, 5).map((med) => (
-                  <div key={med.id} className="p-3 bg-[#F4F4F2] rounded-xl">
+            {medications.length === 0 ?
+            <p className="text-center text-gray-600 py-6 text-sm">No active medications</p> :
+
+            <div className="space-y-2">
+                {medications.slice(0, 5).map((med) =>
+              <div key={med.id} className="p-3 bg-[#F4F4F2] rounded-xl">
                     <p className="text-sm font-semibold text-[#0A0A0A]">{med.medication_name}</p>
                     <p className="text-xs text-gray-600">{med.dosage} • {med.frequency.replace(/_/g, ' ')}</p>
                   </div>
-                ))}
+              )}
               </div>
-            )}
+            }
           </CardContent>
         </Card>
       </div>
@@ -310,6 +310,6 @@ Keep the language simple, empathetic, and actionable.`;
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
