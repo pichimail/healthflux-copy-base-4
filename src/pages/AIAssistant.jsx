@@ -188,13 +188,13 @@ Keep the language simple, empathetic, and actionable.`;
         </Card>
       </div>
 
-      {/* AI Health Summary */}
+      {/* Health Summary */}
       {summary &&
       <Card className="border-0 shadow-sm rounded-2xl mb-6">
           <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#E9F46A' }}>
             <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-lg">
               <Brain className="w-5 h-5" />
-              AI Health Summary
+              Health Summary
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
@@ -293,13 +293,13 @@ Keep the language simple, empathetic, and actionable.`;
         </CardContent>
       </Card>
 
-      {/* AI Chat Dialog */}
+      {/* Health Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
         <DialogContent className="max-w-3xl h-[700px] flex flex-col p-0">
           <DialogHeader className="p-6 pb-4 border-b border-gray-200" style={{ backgroundColor: '#E9F46A' }}>
             <DialogTitle className="flex items-center gap-2 text-[#0A0A0A]">
               <Brain className="w-5 h-5" />
-              AI Health Chat
+              Health Chat
             </DialogTitle>
             <p className="text-xs text-gray-700 mt-1">
               Ask questions about your health data and get personalized insights
