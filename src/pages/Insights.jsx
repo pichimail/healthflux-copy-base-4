@@ -96,18 +96,20 @@ Provide clear, actionable insights in a friendly tone.`;
   const abnormalResults = getAbnormalResults();
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Health Insights</h1>
-        <p className="text-sm text-gray-600">AI-powered health analysis and recommendations</p>
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+          💡 Insights
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-600">Smart health analysis</p>
       </div>
 
       {/* Profile Selector */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
-            <SelectValue placeholder="Select Profile" />
+          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
+            <SelectValue placeholder="Profile" />
           </SelectTrigger>
           <SelectContent>
             {profiles.map(profile => (
@@ -121,105 +123,92 @@ Provide clear, actionable insights in a friendly tone.`;
         <Button
           onClick={generateInsights}
           disabled={generating || vitals.length === 0}
-          className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-xl font-semibold"
+          className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12"
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          {generating ? 'Generating...' : 'Generate AI Insights'}
+          {generating ? 'Analyzing...' : 'Generate Insights'}
         </Button>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#9BB4FF' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <Activity className="w-6 h-6 text-[#0A0A0A]" />
-              <div>
-                <p className="text-xs text-[#0A0A0A] opacity-80">Vitals Logged</p>
-                <p className="text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
-              </div>
-            </div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#9BB4FF' }}>
+          <CardContent className="p-3 sm:p-4">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Vitals</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EFF1ED' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <Heart className="w-6 h-6 text-[#0A0A0A]" />
-              <div>
-                <p className="text-xs text-[#0A0A0A] opacity-80">Lab Tests</p>
-                <p className="text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
-              </div>
-            </div>
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#EFF1ED' }}>
+          <CardContent className="p-3 sm:p-4">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Labs</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#F7C9A3' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-6 h-6 text-[#0A0A0A]" />
-              <div>
-                <p className="text-xs text-[#0A0A0A] opacity-80">Alerts</p>
-                <p className="text-2xl font-bold text-[#0A0A0A]">{abnormalResults.length}</p>
-              </div>
-            </div>
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#F7C9A3' }}>
+          <CardContent className="p-3 sm:p-4">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{abnormalResults.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Alerts</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Abnormal Results */}
       {abnormalResults.length > 0 && (
-        <Card className="border-0 shadow-sm rounded-2xl mb-6">
-          <CardHeader className="border-b border-gray-100">
-            <CardTitle className="flex items-center gap-2 text-red-600 text-lg font-semibold">
-              <AlertCircle className="w-5 h-5" />
-              Abnormal Lab Results
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-4 sm:mb-6">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+            <CardTitle className="flex items-center gap-2 text-red-600 text-sm sm:text-base font-semibold">
+              <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5" />
+              Abnormal Results
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-3">
+          <CardContent className="p-3 sm:p-4">
+            <div className="space-y-2 sm:space-y-3">
               {abnormalResults.map((result) => (
-                <div key={result.id} className="flex items-center justify-between p-4 bg-red-50 rounded-xl">
-                  <div>
-                    <p className="font-semibold text-[#0A0A0A] text-sm">{result.test_name}</p>
+                <div key={result.id} className="flex items-center justify-between p-3 sm:p-4 bg-red-50 rounded-2xl">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#0A0A0A] text-sm truncate">{result.test_name}</p>
                     <p className="text-xs text-gray-600">
-                      {result.value} {result.unit} • Ref: {result.reference_low}-{result.reference_high}
+                      {result.value} {result.unit}
                     </p>
                   </div>
-                  <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200 text-xs rounded-lg">
+                  <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200 text-xs rounded-xl flex-shrink-0">
                     {result.flag}
                   </Badge>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-700 mt-4 p-3 bg-yellow-50 rounded-xl">
-              ⚠️ Please consult with your healthcare provider about these results
+            <p className="text-xs text-gray-700 mt-3 sm:mt-4 p-2 sm:p-3 bg-yellow-50 rounded-2xl">
+              ⚠️ Consult your healthcare provider
             </p>
           </CardContent>
         </Card>
       )}
 
-      {/* AI Insights */}
+      {/* Health Insights */}
       {insights && (
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#EDE6F7' }}>
-            <CardTitle className="flex items-center gap-2 text-[#0A0A0A]">
-              <Brain className="w-5 h-5" />
-              AI-Generated Health Insights
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4" style={{ backgroundColor: '#EDE6F7' }}>
+            <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-sm sm:text-base">
+              <Brain className="w-4 sm:w-5 h-4 sm:h-5" />
+              Health Insights
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="prose prose-slate max-w-none">
+          <CardContent className="p-3 sm:p-6">
+            <div className="prose prose-sm sm:prose-base max-w-none">
               <div className="whitespace-pre-wrap text-[#0A0A0A] leading-relaxed text-sm">
                 {insights}
               </div>
             </div>
-            <div className="mt-6 p-4 bg-[#E9F46A] rounded-xl">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-[#E9F46A] rounded-2xl">
               <p className="text-xs text-[#0A0A0A] flex items-start gap-2">
                 <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>
-                  These insights are AI-generated and for informational purposes only. 
-                  Always consult with qualified healthcare professionals for medical advice.
+                  For informational purposes only. Always consult healthcare professionals.
                 </span>
               </p>
             </div>
@@ -228,24 +217,24 @@ Provide clear, actionable insights in a friendly tone.`;
       )}
 
       {!insights && vitals.length === 0 && labResults.length === 0 && (
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardContent className="p-12 text-center">
-            <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">No Data Available</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Start logging vitals and lab results to get personalized AI insights
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardContent className="p-8 sm:p-12 text-center">
+            <Brain className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-[#0A0A0A] mb-2">No Data</h3>
+            <p className="text-sm text-gray-600">
+              Log vitals and labs to get insights
             </p>
           </CardContent>
         </Card>
       )}
 
       {!insights && (vitals.length > 0 || labResults.length > 0) && (
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
-          <CardContent className="p-12 text-center">
-            <Sparkles className="w-16 h-16 text-purple-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">Ready to Generate Insights</h3>
-            <p className="text-sm text-gray-700 mb-6">
-              Click the "Generate AI Insights" button to get personalized health recommendations
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl" style={{ backgroundColor: '#EDE6F7' }}>
+          <CardContent className="p-8 sm:p-12 text-center">
+            <Sparkles className="w-12 sm:w-16 h-12 sm:h-16 text-purple-500 mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-[#0A0A0A] mb-2">Ready for Insights</h3>
+            <p className="text-sm text-gray-700">
+              Tap "Generate Insights" to get recommendations
             </p>
           </CardContent>
         </Card>

@@ -130,12 +130,14 @@ export default function Profiles() {
   };
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Family Profiles</h1>
-          <p className="text-sm text-gray-600">Manage health records for your family members</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+            👨‍👩‍👧‍👦 Profiles
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600">Family health</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -145,36 +147,37 @@ export default function Profiles() {
           }
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-[#0B5A46] hover:bg-[#094A38] text-white rounded-xl font-semibold">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Family Member
+            <Button className="bg-[#0B5A46] hover:bg-[#094A38] text-white rounded-2xl font-semibold shadow-lg active-press h-11 sm:h-12 px-4 sm:px-6">
+              <Plus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Add</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-3xl">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="text-base sm:text-lg">
                 {selectedProfile ? 'Edit Profile' : 'Add Family Member'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name *</Label>
+                <Label htmlFor="full_name" className="text-sm">Full Name *</Label>
                 <Input
                   id="full_name"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  className="h-11 sm:h-12 rounded-2xl"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="relationship">Relationship *</Label>
+                  <Label htmlFor="relationship" className="text-sm">Relationship *</Label>
                   <Select
                     value={formData.relationship}
                     onValueChange={(value) => setFormData({ ...formData, relationship: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -189,25 +192,26 @@ export default function Profiles() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date_of_birth">Date of Birth</Label>
+                  <Label htmlFor="date_of_birth" className="text-sm">Date of Birth</Label>
                   <Input
                     id="date_of_birth"
                     type="date"
                     value={formData.date_of_birth}
                     onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                    className="h-11 sm:h-12 rounded-2xl"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender" className="text-sm">Gender</Label>
                   <Select
                     value={formData.gender}
                     onValueChange={(value) => setFormData({ ...formData, gender: value })}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
+                    <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
+                      <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">Male</SelectItem>
@@ -218,13 +222,13 @@ export default function Profiles() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="blood_group">Blood Group</Label>
+                  <Label htmlFor="blood_group" className="text-sm">Blood Group</Label>
                   <Select
                     value={formData.blood_group}
                     onValueChange={(value) => setFormData({ ...formData, blood_group: value })}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select blood group" />
+                    <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
+                      <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(group => (
@@ -236,31 +240,32 @@ export default function Profiles() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="height">Height (cm)</Label>
+                <Label htmlFor="height" className="text-sm">Height (cm)</Label>
                 <Input
                   id="height"
                   type="number"
                   value={formData.height}
                   onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                  placeholder="e.g., 170"
+                  placeholder="170"
+                  className="h-11 sm:h-12 rounded-2xl"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="grid grid-cols-2 gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setDialogOpen(false)}
-                  className="flex-1"
+                  className="rounded-2xl active-press h-11 sm:h-12"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500"
+                  className="bg-[#0B5A46] hover:bg-[#094A38] text-white rounded-2xl active-press shadow-lg h-11 sm:h-12"
                   disabled={createMutation.isLoading || updateMutation.isLoading}
                 >
-                  {selectedProfile ? 'Update' : 'Add'} Profile
+                  {selectedProfile ? 'Update' : 'Add'}
                 </Button>
               </div>
             </form>
@@ -271,33 +276,33 @@ export default function Profiles() {
       {/* Profiles Grid */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-10 sm:h-12 w-10 sm:w-12 border-b-2 border-blue-600" />
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
           {profiles.map((profile) => {
             const age = calculateAge(profile.date_of_birth);
             return (
-              <Card key={profile.id} className="border-0 shadow-sm rounded-2xl overflow-hidden hover:shadow-md transition-all hover:scale-[1.02]">
+              <Card key={profile.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl overflow-hidden active-press hover:shadow-lg transition-all">
                 <div className="h-1" style={{ backgroundColor: profile.relationship === 'self' ? '#0B5A46' : '#9BB4FF' }} />
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-[#0A0A0A] text-white text-base font-semibold">
+                <CardHeader className="p-4 sm:pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+                        <AvatarFallback className="bg-[#0A0A0A] text-white text-sm sm:text-base font-semibold">
                           {profile.full_name[0]}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <CardTitle className="text-base font-bold text-[#0A0A0A] mb-1">{profile.full_name}</CardTitle>
-                        <Badge variant="outline" className="capitalize text-xs rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-sm sm:text-base font-bold text-[#0A0A0A] mb-1 truncate">{profile.full_name}</CardTitle>
+                        <Badge variant="outline" className="capitalize text-xs rounded-xl">
                           {profile.relationship}
                         </Badge>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-1.5 sm:space-y-2 px-4 pb-4">
                   {age && (
                     <div className="flex items-center gap-2 text-xs">
                       <User className="w-4 h-4 text-gray-500" />
@@ -317,12 +322,12 @@ export default function Profiles() {
                     </div>
                   )}
 
-                  <div className="flex gap-2 pt-4">
+                  <div className="grid grid-cols-2 gap-2 pt-3 sm:pt-4">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(profile)}
-                      className="flex-1 rounded-xl text-xs"
+                      className="rounded-2xl text-xs active-press h-10"
                     >
                       <Edit className="w-3 h-3 mr-1" />
                       Edit
@@ -332,7 +337,7 @@ export default function Profiles() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(profile)}
-                        className="text-red-600 hover:bg-red-50 rounded-xl"
+                        className="text-red-600 hover:bg-red-50 rounded-2xl active-press h-10"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -346,12 +351,12 @@ export default function Profiles() {
       )}
 
       {profiles.length === 0 && !isLoading && (
-        <div className="text-center py-12">
-          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4 text-sm">No family profiles yet</p>
-          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#0B5A46] hover:bg-[#094A38] text-white">
+        <div className="text-center py-8 sm:py-12">
+          <Users className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No profiles yet</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-2xl bg-[#0B5A46] hover:bg-[#094A38] text-white active-press shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
-            Add Your First Profile
+            Add Profile
           </Button>
         </div>
       )}

@@ -187,37 +187,52 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-2">
-          <div>
-            <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">
-              Welcome, {currentProfile?.full_name.split(' ')[0]}
-            </h1>
-            <p className="text-sm text-gray-600">Your personal health dashboard</p>
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+                Hey, {currentProfile?.full_name.split(' ')[0]} 👋
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-600">Your health dashboard</p>
+            </div>
+            <div className="hidden sm:block">
+              <ProfileSwitcher
+                profiles={allProfiles}
+                selectedProfile={selectedProfileId}
+                onProfileChange={setSelectedProfileId}
+              />
+            </div>
           </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setChatOpen(true)}
-              className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Ask Anything
-            </Button>
-            <Button
-              onClick={generatePredictions}
-              disabled={generatingPredictions}
-              className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-xl font-semibold"
-            >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              {generatingPredictions ? 'Predicting...' : 'Predict Trends'}
-            </Button>
+          
+          <div className="sm:hidden">
             <ProfileSwitcher
               profiles={allProfiles}
               selectedProfile={selectedProfileId}
               onProfileChange={setSelectedProfileId}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => setChatOpen(true)}
+              className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Ask Anything</span>
+              <span className="sm:hidden">Chat</span>
+            </Button>
+            <Button
+              onClick={generatePredictions}
+              disabled={generatingPredictions}
+              className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">{generatingPredictions ? 'Analyzing...' : 'Predict'}</span>
+              <span className="sm:hidden">Trends</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -256,136 +271,128 @@ export default function Dashboard() {
       )}
 
       {/* Feature Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-6">
         {/* Hero Card - Upload Document */}
         <div
           onClick={() => setUploadDialogOpen(true)}
-          className="lg:col-span-12 rounded-2xl p-6 h-52 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
+          className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 h-44 sm:h-52 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
           style={{ backgroundColor: '#E9F46A' }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
-          <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-            Medical Records<br />Upload & Auto Processing
+          <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1 opacity-90">
+            Medical Records<br />Auto Processing
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
+          <div className="text-lg sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
             Upload Document
           </div>
-          <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
-            <Plus className="w-4 h-4 text-[#0A0A0A]" />
-          </button>
+          <div className="absolute bottom-5 sm:bottom-6 right-5 sm:right-6 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 rounded-2xl flex items-center justify-center shadow-md">
+            <Plus className="w-5 h-5 text-[#0A0A0A]" />
+          </div>
         </div>
 
-        {/* Vitals Card */}
-        <div
-          onClick={() => setVitalDialogOpen(true)}
-          className="lg:col-span-6 rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
-          style={{ backgroundColor: '#9BB4FF' }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-        >
-          <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-            Track Daily<br />Blood Pressure, Weight & More
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          {/* Vitals Card */}
+          <div
+            onClick={() => setVitalDialogOpen(true)}
+            className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 h-36 sm:h-48 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
+            style={{ backgroundColor: '#9BB4FF' }}
+          >
+            <div className="text-xs text-[#0A0A0A] mb-1 opacity-90">
+              Track Daily<br />BP, Weight
+            </div>
+            <div className="text-base sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
+              Vitals
+            </div>
+            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 rounded-2xl flex items-center justify-center shadow-md">
+              <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A0A0A]" />
+            </div>
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
-            Log Vitals
-          </div>
-          <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
-            <Activity className="w-4 h-4 text-[#0A0A0A]" />
-          </button>
+
+          {/* Medications Card */}
+          <Link to={createPageUrl('Medications')}>
+            <div
+              className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 h-36 sm:h-48 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
+              style={{ backgroundColor: '#F7C9A3' }}
+            >
+              <div className="text-xs text-[#0A0A0A] mb-1 opacity-90">
+                Med Tracking<br />Reminders
+              </div>
+              <div className="text-base sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
+                Meds
+              </div>
+              <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 rounded-2xl flex items-center justify-center shadow-md">
+                <Pill className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A0A0A]" />
+              </div>
+            </div>
+          </Link>
         </div>
 
-        {/* Medications Card */}
-        <Link to={createPageUrl('Medications')} className="lg:col-span-6">
-          <div
-            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
-            style={{ backgroundColor: '#F7C9A3' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-          >
-            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-              Medication Tracking<br />Schedule & Reminders
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* Lab Results Card */}
+          <Link to={createPageUrl('LabResults')}>
+            <div
+              className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 h-28 sm:h-36 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
+              style={{ backgroundColor: '#EDE6F7' }}
+            >
+              <div className="text-xs text-[#0A0A0A] mb-1 opacity-90">
+                Lab<br />Tests
+              </div>
+              <div className="text-sm sm:text-base font-semibold text-[#0A0A0A] mt-auto">
+                Labs
+              </div>
+              <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 bg-white/90 rounded-xl flex items-center justify-center shadow-md">
+                <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
-              Medications
-            </div>
-            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200 hover:bg-white transition-colors">
-              <Pill className="w-4 h-4 text-[#0A0A0A]" />
-            </button>
-          </div>
-        </Link>
+          </Link>
 
-        {/* Lab Results Card */}
-        <Link to={createPageUrl('LabResults')} className="lg:col-span-4">
-          <div
-            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
-            style={{ backgroundColor: '#EDE6F7' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-          >
-            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-              Test Results<br />Lab Reports
+          {/* Trends Card */}
+          <Link to={createPageUrl('Trends')}>
+            <div
+              className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 h-28 sm:h-36 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
+              style={{ backgroundColor: '#EFF1ED' }}
+            >
+              <div className="text-xs text-[#0A0A0A] mb-1 opacity-90">
+                Health<br />Charts
+              </div>
+              <div className="text-sm sm:text-base font-semibold text-[#0A0A0A] mt-auto">
+                Trends
+              </div>
+              <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 bg-white/90 rounded-xl flex items-center justify-center shadow-md">
+                <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
+              </div>
             </div>
-            <div className="text-lg sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
-              Lab Results
-            </div>
-            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200">
-              <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
-            </button>
-          </div>
-        </Link>
+          </Link>
 
-        {/* Trends Card */}
-        <Link to={createPageUrl('Trends')} className="lg:col-span-4">
-          <div
-            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
-            style={{ backgroundColor: '#EFF1ED' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-          >
-            <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-              Health Analytics<br />Visual Insights
+          {/* Profiles Card */}
+          <Link to={createPageUrl('Profiles')}>
+            <div
+              className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 h-28 sm:h-36 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
+              style={{ backgroundColor: '#0B5A46' }}
+            >
+              <div className="text-xs text-white/90 mb-1">
+                Family<br />Members
+              </div>
+              <div className="text-sm sm:text-base font-semibold text-white mt-auto">
+                Profiles
+              </div>
+              <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                <Users className="w-4 h-4 text-white" />
+              </div>
             </div>
-            <div className="text-lg sm:text-xl font-semibold text-[#0A0A0A] mt-auto">
-              Health Trends
-            </div>
-            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center border border-gray-200">
-              <TrendingUp className="w-4 h-4 text-[#0A0A0A]" />
-            </button>
-          </div>
-        </Link>
-
-        {/* Profiles Card */}
-        <Link to={createPageUrl('Profiles')} className="lg:col-span-4">
-          <div
-            className="rounded-2xl p-6 h-48 flex flex-col relative cursor-pointer transition-all hover:scale-[1.02]"
-            style={{ backgroundColor: '#0B5A46' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-          >
-            <div className="text-xs sm:text-sm text-white/90 mb-1">
-              Family Members<br />Manage Profiles
-            </div>
-            <div className="text-lg sm:text-xl font-semibold text-white mt-auto">
-              My Profiles
-            </div>
-            <button className="absolute bottom-6 right-6 w-9 h-9 bg-white/15 rounded-full flex items-center justify-center border border-white/20">
-              <Users className="w-4 h-4 text-white" />
-            </button>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
 
       {/* Health Trends Charts */}
-      <div className="grid lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid gap-3 sm:gap-4 mb-4 sm:mb-6">
         {/* Blood Pressure Trend */}
         {bpChartData.length > 0 && (
-          <Card className="border-0 shadow-sm rounded-2xl">
-            <CardHeader className="border-b border-gray-100">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Blood Pressure Trend</CardTitle>
+          <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+            <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Blood Pressure</CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <ResponsiveContainer width="100%" height={200}>
+            <CardContent className="p-3 sm:p-4">
+              <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={bpChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#0A0A0A" />
@@ -401,12 +408,12 @@ export default function Dashboard() {
 
         {/* Weight Trend */}
         {weightChartData.length > 0 && (
-          <Card className="border-0 shadow-sm rounded-2xl">
-            <CardHeader className="border-b border-gray-100">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Weight Trend</CardTitle>
+          <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+            <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Weight</CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <ResponsiveContainer width="100%" height={200}>
+            <CardContent className="p-3 sm:p-4">
+              <ResponsiveContainer width="100%" height={180}>
                 <AreaChart data={weightChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#0A0A0A" />
@@ -487,60 +494,60 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid gap-3 sm:gap-4">
         {/* Latest Vitals */}
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Latest Vitals</CardTitle>
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Latest Vitals</CardTitle>
               <Link to={createPageUrl('Vitals')}>
-                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
-                  View All <ArrowRight className="w-3 h-3 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl active-press h-8">
+                  View <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4">
             {vitals.length === 0 ? (
-              <p className="text-center text-gray-600 py-8 text-sm">No vitals recorded yet</p>
+              <p className="text-center text-gray-600 py-6 sm:py-8 text-xs sm:text-sm">No vitals yet</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {latestBP && (
-                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
+                  <div className="flex justify-between items-center p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
                     <div>
-                      <p className="font-semibold text-[#0A0A0A]">Blood Pressure</p>
+                      <p className="font-semibold text-[#0A0A0A] text-sm">BP</p>
                       <p className="text-xs text-gray-600">
-                        {format(new Date(latestBP.measured_at), 'MMM d, h:mm a')}
+                        {format(new Date(latestBP.measured_at), 'MMM d')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-[#0A0A0A]">
+                    <p className="text-lg sm:text-xl font-bold text-[#0A0A0A]">
                       {latestBP.systolic}/{latestBP.diastolic}
                     </p>
                   </div>
                 )}
                 {latestHR && (
-                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
+                  <div className="flex justify-between items-center p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
                     <div>
-                      <p className="font-semibold text-[#0A0A0A]">Heart Rate</p>
+                      <p className="font-semibold text-[#0A0A0A] text-sm">Heart Rate</p>
                       <p className="text-xs text-gray-600">
-                        {format(new Date(latestHR.measured_at), 'MMM d, h:mm a')}
+                        {format(new Date(latestHR.measured_at), 'MMM d')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-[#0A0A0A]">
-                      {latestHR.value} <span className="text-sm text-gray-600">bpm</span>
+                    <p className="text-lg sm:text-xl font-bold text-[#0A0A0A]">
+                      {latestHR.value} <span className="text-xs sm:text-sm text-gray-600">bpm</span>
                     </p>
                   </div>
                 )}
                 {latestWeight && (
-                  <div className="flex justify-between items-center p-4 bg-[#F4F4F2] rounded-xl">
+                  <div className="flex justify-between items-center p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
                     <div>
-                      <p className="font-semibold text-[#0A0A0A]">Weight</p>
+                      <p className="font-semibold text-[#0A0A0A] text-sm">Weight</p>
                       <p className="text-xs text-gray-600">
-                        {format(new Date(latestWeight.measured_at), 'MMM d, h:mm a')}
+                        {format(new Date(latestWeight.measured_at), 'MMM d')}
                       </p>
                     </div>
-                    <p className="text-xl font-bold text-[#0A0A0A]">
-                      {latestWeight.value} <span className="text-sm text-gray-600">{latestWeight.unit}</span>
+                    <p className="text-lg sm:text-xl font-bold text-[#0A0A0A]">
+                      {latestWeight.value} <span className="text-xs sm:text-sm text-gray-600">{latestWeight.unit}</span>
                     </p>
                   </div>
                 )}
@@ -550,34 +557,34 @@ export default function Dashboard() {
         </Card>
 
         {/* Upcoming Medications */}
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Active Medications</CardTitle>
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Active Meds</CardTitle>
               <Link to={createPageUrl('Medications')}>
-                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
-                  View All <ArrowRight className="w-3 h-3 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl active-press h-8">
+                  View <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4">
             {upcomingMeds.length === 0 ? (
-              <p className="text-center text-gray-600 py-8 text-sm">No active medications</p>
+              <p className="text-center text-gray-600 py-6 sm:py-8 text-xs sm:text-sm">No meds</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {upcomingMeds.map((med) => (
-                  <div key={med.id} className="flex items-start justify-between p-4 bg-[#F4F4F2] rounded-xl">
-                    <div className="flex-1">
-                      <p className="font-semibold text-[#0A0A0A]">{med.medication_name}</p>
-                      <p className="text-xs text-gray-600">{med.dosage} • {med.frequency.replace(/_/g, ' ')}</p>
+                  <div key={med.id} className="flex items-start justify-between p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-[#0A0A0A] text-sm truncate">{med.medication_name}</p>
+                      <p className="text-xs text-gray-600">{med.dosage}</p>
                       {med.times && med.times.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 mt-1 truncate">
                           {med.times.join(', ')}
                         </p>
                       )}
                     </div>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs rounded-xl flex-shrink-0 ml-2">
                       Active
                     </Badge>
                   </div>

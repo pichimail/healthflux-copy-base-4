@@ -102,18 +102,20 @@ export default function Trends() {
   };
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Health Trends</h1>
-        <p className="text-sm text-gray-600">Visualize your health data over time</p>
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+          📈 Trends
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-600">Health over time</p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
-            <SelectValue placeholder="Select Profile" />
+          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
+            <SelectValue placeholder="Profile" />
           </SelectTrigger>
           <SelectContent>
             {profiles.map(profile => (
@@ -125,47 +127,47 @@ export default function Trends() {
         </Select>
 
         <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
+          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 3 months</SelectItem>
-            <SelectItem value="365">Last year</SelectItem>
+            <SelectItem value="7">7 days</SelectItem>
+            <SelectItem value="30">30 days</SelectItem>
+            <SelectItem value="90">3 months</SelectItem>
+            <SelectItem value="365">1 year</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Vital Signs Charts */}
-      <div className="space-y-6 mb-6">
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Vital Signs Trends</CardTitle>
+      <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
+              <CardTitle className="text-base sm:text-lg font-semibold text-[#0A0A0A]">Vital Signs</CardTitle>
               <Select value={vitalType} onValueChange={setVitalType}>
-                <SelectTrigger className="w-48 rounded-xl border-gray-200">
+                <SelectTrigger className="w-full sm:w-48 h-10 sm:h-11 rounded-2xl border-gray-200 text-xs sm:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="blood_pressure">Blood Pressure</SelectItem>
+                  <SelectItem value="blood_pressure">BP</SelectItem>
                   <SelectItem value="heart_rate">Heart Rate</SelectItem>
                   <SelectItem value="weight">Weight</SelectItem>
-                  <SelectItem value="blood_glucose">Blood Glucose</SelectItem>
-                  <SelectItem value="temperature">Temperature</SelectItem>
-                  <SelectItem value="oxygen_saturation">Oxygen Saturation</SelectItem>
+                  <SelectItem value="blood_glucose">Glucose</SelectItem>
+                  <SelectItem value="temperature">Temp</SelectItem>
+                  <SelectItem value="oxygen_saturation">O2</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-6">
             {chartData.length === 0 ? (
-              <div className="text-center py-12">
-                <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm">No data available for the selected period</p>
+              <div className="text-center py-8 sm:py-12">
+                <Activity className="w-10 sm:w-12 h-10 sm:h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 text-xs sm:text-sm">No data for this period</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={400}>
+              <ResponsiveContainer width="100%" height={300}>
                 {vitalType === 'blood_pressure' ? (
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E3" />
@@ -236,8 +238,8 @@ export default function Trends() {
       {/* Lab Results by Category */}
       {Object.keys(labCategories).length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Lab Results</h2>
-          <div className="grid lg:grid-cols-2 gap-4">
+          <h2 className="text-base sm:text-lg font-bold text-[#0A0A0A] mb-3 sm:mb-4">Lab Results</h2>
+          <div className="grid gap-3 sm:gap-4">
             {Object.entries(labCategories).map(([category, tests]) => {
               const uniqueTests = {};
               tests.forEach(test => {
@@ -248,14 +250,14 @@ export default function Trends() {
               });
 
               return (
-                <Card key={category} className="border-0 shadow-sm rounded-2xl">
-                  <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-base font-semibold text-[#0A0A0A] capitalize">
-                      {category.replace(/_/g, ' ')} Tests
+                <Card key={category} className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+                  <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+                    <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A] capitalize">
+                      {category.replace(/_/g, ' ')}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
+                  <CardContent className="p-3 sm:p-6">
+                    <div className="space-y-3 sm:space-y-4">
                       {Object.entries(uniqueTests).map(([testName, testData]) => {
                         const chartData = testData.map(t => ({
                           date: format(new Date(t.test_date), 'MMM d'),
@@ -265,8 +267,8 @@ export default function Trends() {
 
                         return (
                           <div key={testName} className="space-y-2">
-                            <h4 className="font-semibold text-[#0A0A0A] text-sm">{testName}</h4>
-                            <ResponsiveContainer width="100%" height={150}>
+                            <h4 className="font-semibold text-[#0A0A0A] text-xs sm:text-sm">{testName}</h4>
+                            <ResponsiveContainer width="100%" height={120}>
                               <AreaChart data={chartData}>
                                 <defs>
                                   <linearGradient id={`color${testName}`} x1="0" y1="0" x2="0" y2="1">
@@ -308,10 +310,10 @@ export default function Trends() {
       )}
 
       {vitals.length === 0 && labResults.length === 0 && (
-        <div className="text-center py-12">
-          <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-2 text-sm">No health data to display yet</p>
-          <p className="text-xs text-gray-500">Start logging vitals and lab results to see trends</p>
+        <div className="text-center py-8 sm:py-12">
+          <TrendingUp className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+          <p className="text-gray-600 mb-2 text-sm">No data yet</p>
+          <p className="text-xs text-gray-500">Log vitals to see trends</p>
         </div>
       )}
     </div>

@@ -103,17 +103,17 @@ Keep the language simple, empathetic, and actionable.`;
   const latestVitals = vitals.slice(0, 5);
 
   return (
-    <div className="px-4 md:px-6 py-6 pb-24 md:pb-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A0A0A] mb-1">Flux Assistant</h1>
-        <p className="text-sm text-gray-600">Personalized insights and health guidance</p>
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 max-w-7xl mx-auto">
+      {/* Mobile-First Header */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">🤖 Flux Assistant</h1>
+        <p className="text-xs sm:text-sm text-gray-600">Health guidance</p>
       </div>
 
       {/* Profile Selector */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="flex flex-col gap-2 sm:gap-3 mb-4 sm:mb-6">
         <Select value={selectedProfile || ''} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64 rounded-2xl border-gray-200">
+          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200">
             <SelectValue placeholder="Select Profile" />
           </SelectTrigger>
           <SelectContent>
@@ -125,28 +125,26 @@ Keep the language simple, empathetic, and actionable.`;
           </SelectContent>
         </Select>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <Button
             onClick={() => setChatOpen(true)}
-            className="flex-1 sm:flex-none bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold">
-
+            className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12">
             <MessageSquare className="w-4 h-4 mr-2" />
-            Start Chat
+            Chat
           </Button>
           <Button
             onClick={generateHealthSummary}
             disabled={generating || !selectedProfile}
-            className="flex-1 sm:flex-none bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl font-semibold">
-
+            className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12">
             {generating ?
             <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing...
+                <span className="hidden sm:inline">Analyzing...</span>
               </> :
-
             <>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Generate Summary
+                <span className="hidden sm:inline">Summary</span>
+                <span className="sm:hidden">Gen</span>
               </>
             }
           </Button>
@@ -154,35 +152,35 @@ Keep the language simple, empathetic, and actionable.`;
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#9BB4FF' }}>
-          <CardContent className="p-4">
-            <Activity className="w-5 h-5 text-[#0A0A0A] mb-2" />
-            <p className="text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Vitals Logged</p>
+      <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#9BB4FF' }}>
+          <CardContent className="p-3 sm:p-4">
+            <Activity className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Vitals</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#F7C9A3' }}>
-          <CardContent className="p-4">
-            <Pill className="w-5 h-5 text-[#0A0A0A] mb-2" />
-            <p className="text-2xl font-bold text-[#0A0A0A]">{medications.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Active Meds</p>
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#F7C9A3' }}>
+          <CardContent className="p-3 sm:p-4">
+            <Pill className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{medications.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Meds</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EFF1ED' }}>
-          <CardContent className="p-4">
-            <Heart className="w-5 h-5 text-[#0A0A0A] mb-2" />
-            <p className="text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Lab Tests</p>
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#EFF1ED' }}>
+          <CardContent className="p-3 sm:p-4">
+            <Heart className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">Labs</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
-          <CardContent className="p-4">
-            <AlertCircle className="w-5 h-5 text-[#0A0A0A] mb-2" />
-            <p className="text-2xl font-bold text-[#0A0A0A]">{abnormalLabs.length}</p>
+        <Card className="border-0 card-shadow rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
+          <CardContent className="p-3 sm:p-4">
+            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{abnormalLabs.length}</p>
             <p className="text-xs text-[#0A0A0A] opacity-80">Alerts</p>
           </CardContent>
         </Card>
@@ -220,29 +218,29 @@ Keep the language simple, empathetic, and actionable.`;
       }
 
       {/* Recent Activity */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
+      <div className="grid gap-3 sm:gap-4 mb-4 sm:mb-6">
         {/* Latest Vitals */}
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Recent Vitals</CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             {latestVitals.length === 0 ?
-            <p className="text-center text-gray-600 py-6 text-sm">No vitals logged yet</p> :
+            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">No vitals yet</p> :
 
             <div className="space-y-2">
                 {latestVitals.map((vital) =>
-              <div key={vital.id} className="flex justify-between items-center p-3 bg-[#F4F4F2] rounded-xl">
-                    <div>
-                      <p className="text-sm font-semibold text-[#0A0A0A] capitalize">
+              <div key={vital.id} className="flex justify-between items-center p-2 sm:p-3 bg-[#F4F4F2] rounded-2xl">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm font-semibold text-[#0A0A0A] capitalize truncate">
                         {vital.vital_type.replace(/_/g, ' ')}
                       </p>
                       <p className="text-xs text-gray-600">
-                        {format(new Date(vital.measured_at), 'MMM d, h:mm a')}
+                        {format(new Date(vital.measured_at), 'MMM d')}
                       </p>
                     </div>
-                    <p className="text-sm font-bold text-[#0A0A0A]">
-                      {vital.value || `${vital.systolic}/${vital.diastolic}`} {vital.unit}
+                    <p className="text-sm font-bold text-[#0A0A0A] flex-shrink-0">
+                      {vital.value || `${vital.systolic}/${vital.diastolic}`}
                     </p>
                   </div>
               )}
@@ -252,19 +250,19 @@ Keep the language simple, empathetic, and actionable.`;
         </Card>
 
         {/* Current Medications */}
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
-            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Current Medications</CardTitle>
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Medications</CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             {medications.length === 0 ?
-            <p className="text-center text-gray-600 py-6 text-sm">No active medications</p> :
+            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">No meds</p> :
 
             <div className="space-y-2">
                 {medications.slice(0, 5).map((med) =>
-              <div key={med.id} className="p-3 bg-[#F4F4F2] rounded-xl">
-                    <p className="text-sm font-semibold text-[#0A0A0A]">{med.medication_name}</p>
-                    <p className="text-xs text-gray-600">{med.dosage} • {med.frequency.replace(/_/g, ' ')}</p>
+              <div key={med.id} className="p-2 sm:p-3 bg-[#F4F4F2] rounded-2xl">
+                    <p className="text-xs sm:text-sm font-semibold text-[#0A0A0A] truncate">{med.medication_name}</p>
+                    <p className="text-xs text-gray-600 truncate">{med.dosage}</p>
                   </div>
               )}
               </div>

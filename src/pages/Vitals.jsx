@@ -148,26 +148,28 @@ export default function Vitals() {
   };
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Vitals Tracking</h1>
-          <p className="text-sm text-gray-600">Monitor your health vitals over time</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+            ❤️ Vitals
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600">Track daily</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
+          className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold shadow-lg active-press h-11 sm:h-12 px-4 sm:px-6"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Log Vital
+          <Plus className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Log</span>
         </Button>
       </div>
 
       {/* Profile Filter */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-64 rounded-xl border-gray-200">
+          <SelectTrigger className="w-full rounded-2xl border-gray-200 h-11 sm:h-12">
             <SelectValue placeholder="All Profiles" />
           </SelectTrigger>
           <SelectContent>
@@ -184,48 +186,45 @@ export default function Vitals() {
       {/* Vitals List */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-10 sm:h-12 w-10 sm:w-12 border-b-2 border-blue-600" />
         </div>
       ) : vitals.length === 0 ? (
-        <div className="text-center py-12">
-          <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4 text-sm">No vitals recorded yet</p>
-          <Button onClick={() => setDialogOpen(true)} className="rounded-xl bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A]">
+        <div className="text-center py-8 sm:py-12">
+          <Activity className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+          <p className="text-gray-600 mb-4 text-sm">No vitals recorded</p>
+          <Button onClick={() => setDialogOpen(true)} className="rounded-2xl bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] active-press shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
-            Log Your First Vital
+            Log First Vital
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-2 sm:gap-3">
           {vitals.map((vital) => {
             const profile = profiles.find(p => p.id === vital.profile_id);
             const Icon = getVitalIcon(vital.vital_type);
             return (
-              <Card key={vital.id} className="border-0 shadow-sm rounded-2xl hover:shadow-md transition-all">
-                <CardContent className="p-6">
+              <Card key={vital.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl active-press hover:shadow-lg transition-all">
+                <CardContent className="p-4 sm:p-5">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="w-10 h-10 rounded-xl bg-[#9BB4FF] flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-[#0A0A0A]" />
+                    <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#9BB4FF] flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A]" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-[#0A0A0A] capitalize mb-1 text-sm">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-[#0A0A0A] capitalize mb-1 text-sm truncate">
                           {vital.vital_type.replace(/_/g, ' ')}
                         </h3>
-                        <p className="text-xl font-bold text-[#0A0A0A] mb-2">
+                        <p className="text-lg sm:text-xl font-bold text-[#0A0A0A] mb-1 sm:mb-2">
                           {formatVitalValue(vital)}
                         </p>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
+                        <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-gray-600">
                           {profile && (
-                            <span>{profile.full_name}</span>
+                            <span className="truncate">{profile.full_name}</span>
                           )}
                           <span>{format(new Date(vital.measured_at), 'MMM d, h:mm a')}</span>
-                          {vital.source && (
-                            <span className="capitalize">{vital.source}</span>
-                          )}
                         </div>
                         {vital.notes && (
-                          <p className="text-xs text-gray-600 mt-2 bg-[#F4F4F2] p-2 rounded-lg">
+                          <p className="text-xs text-gray-600 mt-2 bg-[#F4F4F2] p-2 rounded-xl">
                             {vital.notes}
                           </p>
                         )}
@@ -233,13 +232,13 @@ export default function Vitals() {
                     </div>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => {
-                        if (confirm('Delete this vital measurement?')) {
+                        if (confirm('Delete this vital?')) {
                           deleteMutation.mutate(vital.id);
                         }
                       }}
-                      className="text-red-600 hover:bg-red-50 rounded-xl"
+                      className="text-red-600 hover:bg-red-50 rounded-2xl h-10 w-10 active-press flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -251,20 +250,20 @@ export default function Vitals() {
         </div>
       )}
 
-      {/* Add Vital Dialog */}
+      {/* Add Vital Dialog - Mobile Optimized */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Log Vital Measurement</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Log Vital Measurement</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="vital_type">Vital Type *</Label>
+              <Label htmlFor="vital_type" className="text-sm">Vital Type *</Label>
               <Select
                 value={formData.vital_type}
                 onValueChange={handleTypeChange}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -280,90 +279,96 @@ export default function Vitals() {
             </div>
 
             {formData.vital_type === 'blood_pressure' ? (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="systolic">Systolic *</Label>
+                  <Label htmlFor="systolic" className="text-sm">Systolic *</Label>
                   <Input
                     id="systolic"
                     type="number"
                     value={formData.systolic}
                     onChange={(e) => setFormData({ ...formData, systolic: e.target.value })}
-                    placeholder="e.g., 120"
+                    placeholder="120"
+                    className="h-11 sm:h-12 rounded-2xl"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="diastolic">Diastolic *</Label>
+                  <Label htmlFor="diastolic" className="text-sm">Diastolic *</Label>
                   <Input
                     id="diastolic"
                     type="number"
                     value={formData.diastolic}
                     onChange={(e) => setFormData({ ...formData, diastolic: e.target.value })}
-                    placeholder="e.g., 80"
+                    placeholder="80"
+                    className="h-11 sm:h-12 rounded-2xl"
                     required
                   />
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="value">Value *</Label>
+                  <Label htmlFor="value" className="text-sm">Value *</Label>
                   <Input
                     id="value"
                     type="number"
                     step="0.1"
                     value={formData.value}
                     onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                    placeholder="Enter value"
+                    placeholder="Value"
+                    className="h-11 sm:h-12 rounded-2xl"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="unit">Unit</Label>
+                  <Label htmlFor="unit" className="text-sm">Unit</Label>
                   <Input
                     id="unit"
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                     placeholder="Unit"
+                    className="h-11 sm:h-12 rounded-2xl"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="measured_at">Date & Time *</Label>
+              <Label htmlFor="measured_at" className="text-sm">Date & Time *</Label>
               <Input
                 id="measured_at"
                 type="datetime-local"
                 value={formData.measured_at}
                 onChange={(e) => setFormData({ ...formData, measured_at: e.target.value })}
+                className="h-11 sm:h-12 rounded-2xl"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes" className="text-sm">Notes</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Any additional observations"
                 rows={3}
+                className="rounded-2xl"
               />
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="grid grid-cols-2 gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
-                className="flex-1"
+                className="rounded-2xl active-press h-11 sm:h-12"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500"
+                className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl active-press shadow-lg h-11 sm:h-12"
                 disabled={createMutation.isLoading}
               >
                 Log Vital
