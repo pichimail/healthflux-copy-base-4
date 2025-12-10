@@ -45,7 +45,7 @@ export default function DocumentChat({ document, profileId }) {
       <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 border-b">
         <h3 className="font-semibold text-[#0A0A0A] flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-violet-600" />
-          Ask AI About This Document
+          Ask About This Document
         </h3>
         <p className="text-xs text-gray-600 mt-1">Get instant answers about {document.title}</p>
       </div>

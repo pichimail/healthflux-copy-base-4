@@ -30,7 +30,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
           <TabsList className="grid w-full grid-cols-4 mx-4 sm:mx-6 mt-2 rounded-2xl">
             <TabsTrigger value="preview" className="text-xs sm:text-sm rounded-xl">Preview</TabsTrigger>
             <TabsTrigger value="details" className="text-xs sm:text-sm rounded-xl">Details</TabsTrigger>
-            <TabsTrigger value="chat" className="text-xs sm:text-sm rounded-xl">Ask AI</TabsTrigger>
+            <TabsTrigger value="chat" className="text-xs sm:text-sm rounded-xl">Chat</TabsTrigger>
             {document.ai_summary && (
               <TabsTrigger value="ai" className="text-xs sm:text-sm rounded-xl">Analysis</TabsTrigger>
             )}
@@ -178,7 +178,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
                               style={{ width: `${document.health_score}%` }}
                             />
                           </div>
-                          <p className="text-xs text-blue-700 mt-1">AI Analysis</p>
+                          <p className="text-xs text-blue-700 mt-1">Smart Analysis</p>
                         </div>
                       </div>
                     </div>

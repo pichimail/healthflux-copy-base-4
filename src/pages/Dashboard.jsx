@@ -203,7 +203,7 @@ export default function Dashboard() {
               className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
             >
               <MessageSquare className="w-4 h-4 mr-2" />
-              Ask AI Anything
+              Ask Anything
             </Button>
             <Button
               onClick={generatePredictions}
@@ -266,7 +266,7 @@ export default function Dashboard() {
           onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
           <div className="text-xs sm:text-sm text-[#0A0A0A] mb-1">
-            Medical Records<br />Upload & AI Processing
+            Medical Records<br />Upload & Auto Processing
           </div>
           <div className="text-xl sm:text-2xl font-semibold text-[#0A0A0A] mt-auto">
             Upload Document
@@ -420,14 +420,14 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* AI Health Predictions */}
+      {/* Health Predictions */}
       {predictionInsights.length > 0 && (
         <div className="mb-6">
           <Card className="border-0 shadow-sm rounded-2xl" style={{ backgroundColor: '#EDE6F7' }}>
             <CardHeader className="border-b border-gray-100">
               <CardTitle className="text-sm font-semibold text-[#0A0A0A] flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                AI Health Trend Predictions
+                Health Trend Predictions
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
@@ -444,7 +444,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* AI Insights Section */}
+      {/* Health Insights Section */}
       {unreadInsights.filter(i => i.insight_type !== 'trend_analysis').length > 0 && (
         <div className="mb-6">
           <Card className="border-0 shadow-sm rounded-2xl">
@@ -452,7 +452,7 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-sm font-semibold text-[#0A0A0A] flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
-                  AI Health Insights
+                  Health Insights
                 </CardTitle>
                 <Link to={createPageUrl('Insights')}>
                   <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl">
@@ -703,16 +703,16 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* AI Health Chat Dialog */}
+      {/* Health Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
         <DialogContent className="max-w-3xl h-[700px] flex flex-col p-0">
           <DialogHeader className="p-6 pb-4 border-b border-gray-200" style={{ backgroundColor: '#E9F46A' }}>
             <DialogTitle className="flex items-center gap-2 text-[#0A0A0A]">
               <Brain className="w-5 h-5" />
-              AI Health Analytics & Predictions
+              Health Analytics & Predictions
             </DialogTitle>
             <p className="text-xs text-gray-700 mt-1">
-              Ask natural language questions about your health data and get AI-driven insights
+              Ask natural language questions about your health data and get intelligent insights
             </p>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">

@@ -24,10 +24,10 @@ export default function AIHealthChat({ profileId }) {
         profile_id: profileId
       });
 
-      const aiMessage = { role: 'assistant', content: data.answer };
-      setMessages(prev => [...prev, aiMessage]);
+      const assistantMessage = { role: 'assistant', content: data.answer };
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('AI chat error:', error);
+      console.error('Health chat error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: 'Sorry, I encountered an error. Please try again.' 
@@ -43,7 +43,7 @@ export default function AIHealthChat({ profileId }) {
         {messages.length === 0 && (
           <div className="text-center py-12">
             <Bot className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-sm text-gray-600">Ask me anything about your health data</p>
+            <p className="text-sm text-gray-600">Ask anything about your health data</p>
             <p className="text-xs text-gray-500 mt-2">
               Example: "What's my average blood pressure this month?"
             </p>

@@ -96,7 +96,7 @@ export default function DocumentCard({ document, compact = false, onView, onDele
               <DropdownMenuItem onClick={() => onView(document)}>View Details</DropdownMenuItem>
               {document.status === 'failed' && onReprocess && (
                 <DropdownMenuItem onClick={() => onReprocess(document)} className="text-blue-600">
-                  Reprocess with AI
+                  Reprocess Document
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="text-red-600" onClick={() => onDelete(document)}>

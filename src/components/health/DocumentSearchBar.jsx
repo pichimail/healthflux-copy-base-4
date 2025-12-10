@@ -55,7 +55,7 @@ export default function DocumentSearchBar({ profileId, onResultClick }) {
         <div className="relative flex-grow">
           <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-violet-500" />
           <Input
-            placeholder="AI Search documents..."
+            placeholder="Smart search documents..."
             className="pl-10 h-11 sm:h-12 rounded-2xl border-2 border-violet-200 focus-visible:ring-violet-300 text-sm"
             value={query}
             onChange={(e) => setQuery(e.target.value)}

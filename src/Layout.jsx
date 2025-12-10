@@ -50,7 +50,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Documents', page: 'Documents', icon: FileText },
     { name: 'Vitals', page: 'Vitals', icon: Activity },
     { name: 'Meds', page: 'Medications', icon: Pill },
-    { name: 'AI', page: 'AIAssistant', icon: Brain },
+    { name: 'Chat', page: 'AIAssistant', icon: Brain },
   ];
 
   const moreItems = [
