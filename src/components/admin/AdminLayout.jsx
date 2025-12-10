@@ -17,7 +17,7 @@ export default function AdminLayout({ children, currentPageName }) {
 
   const navItems = [
     { name: 'Dashboard', page: 'AdminDashboard', icon: LayoutDashboard },
-    { name: 'Users', page: 'AdminDashboard', icon: Users },
+    { name: 'User Management', page: 'AdminUsers', icon: Users },
     { name: 'Documents', page: 'AdminDashboard', icon: FileText },
     { name: 'Analytics', page: 'AdminDashboard', icon: Activity },
     { name: 'Settings', page: 'AdminDashboard', icon: Settings },
