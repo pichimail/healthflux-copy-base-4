@@ -16,6 +16,7 @@ import DrugInteractionWarnings from '../components/medications/DrugInteractionWa
 import MedicationReminders from '../components/medications/MedicationReminders';
 import AdherenceInsights from '../components/medication/AdherenceInsights';
 import SideEffectTracker from '../components/medication/SideEffectTracker';
+import MedicationHistory from '../components/medication/MedicationHistory';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Medications() {
@@ -334,7 +335,21 @@ export default function Medications() {
         </TabsContent>
 
         <TabsContent value="adherence">
-          <AdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+          <Tabs defaultValue="insights" className="mt-4">
+            <TabsList>
+              <TabsTrigger value="insights">AI Insights</TabsTrigger>
+              <TabsTrigger value="history">Medication History</TabsTrigger>
+            </TabsList>
+            <TabsContent value="insights" className="mt-4">
+              <AdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+            </TabsContent>
+            <TabsContent value="history" className="mt-4">
+              <MedicationHistory 
+                profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+                medications={medications}
+              />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="sideeffects">

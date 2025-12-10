@@ -51,6 +51,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Trends', page: 'Trends', icon: TrendingUp },
     { name: 'Health Insights', page: 'Insights', icon: Brain },
     { name: 'My Profiles', page: 'Profiles', icon: User },
+    { name: 'Emergency Profile', page: 'EmergencyProfile', icon: AlertCircle },
   ];
 
   const isActive = (page) => currentPageName === page;
