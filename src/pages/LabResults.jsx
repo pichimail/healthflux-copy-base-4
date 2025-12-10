@@ -122,9 +122,9 @@ export default function LabResults() {
   };
 
   const getFlagIcon = (flag) => {
-    if (flag === 'high') return <AlertCircle className="w-4 h-4" />;
-    if (flag === 'low') return <AlertCircle className="w-4 h-4" />;
-    return <CheckCircle className="w-4 h-4" />;
+    if (flag === 'high') return <AlertCircle key="icon-high" className="w-4 h-4" />;
+    if (flag === 'low') return <AlertCircle key="icon-low" className="w-4 h-4" />;
+    return <CheckCircle key="icon-normal" className="w-4 h-4" />;
   };
 
   const getCategoryColor = (category) => {
