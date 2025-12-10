@@ -460,6 +460,7 @@ export default function Documents() {
         document={selectedDocument}
         open={!!selectedDocument}
         onClose={() => setSelectedDocument(null)}
+        profileId={selectedProfileId}
       />
     </div>
   );

@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import DocumentChat from './DocumentChat';
 
-export default function DocumentViewer({ document, open, onClose }) {
+export default function DocumentViewer({ document, open, onClose, profileId }) {
   if (!document) return null;
 
   return (
@@ -26,22 +27,29 @@ export default function DocumentViewer({ document, open, onClose }) {
         </DialogHeader>
 
         <Tabs defaultValue="preview" className="flex-grow flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="preview">Preview</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="chat">Ask AI</TabsTrigger>
             {document.ai_summary && (
-              <TabsTrigger value="ai">AI Analysis</TabsTrigger>
+              <TabsTrigger value="ai">Analysis</TabsTrigger>
             )}
           </TabsList>
 
           <ScrollArea className="flex-grow mt-4 overflow-y-auto">
             <TabsContent value="preview" className="mt-0 p-4">
               {document.file_type?.includes('pdf') ? (
-                <iframe
-                  src={document.file_url}
+                <object
+                  data={document.file_url}
+                  type="application/pdf"
                   className="w-full h-[600px] rounded-lg border"
-                  title="Document Preview"
-                />
+                >
+                  <embed
+                    src={document.file_url}
+                    type="application/pdf"
+                    className="w-full h-[600px] rounded-lg border"
+                  />
+                </object>
               ) : document.file_type?.includes('image') ? (
                 <img
                   src={document.file_url}
@@ -140,6 +148,10 @@ export default function DocumentViewer({ document, open, onClose }) {
                   </div>
                 )}
               </div>
+            </TabsContent>
+
+            <TabsContent value="chat" className="mt-0 h-[600px]">
+              <DocumentChat document={document} profileId={profileId} />
             </TabsContent>
 
             {document.ai_summary && (

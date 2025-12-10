@@ -18,9 +18,110 @@ Deno.serve(async (req) => {
     let extractedData = {};
     let aiAnalysis = {};
     let aiModelUsed = '';
+    let extractionMethod = 'none';
 
-    // Step 1: Extract data using Base44's built-in extraction (best for PDFs)
-    if (file_type.includes('pdf') || file_type.includes('image')) {
+    // Determine if this is a medical image (X-RAY, MRI, CT, ECG)
+    const isMedicalImage = file_type.includes('image');
+    
+    // Step 1: Try OpenAI Vision first for medical images (best for X-RAY, MRI, CT, ECG)
+    if (isMedicalImage) {
+      try {
+        const visionPrompt = `Analyze this medical image in detail. This could be an X-RAY, MRI, CT scan, ECG, or other medical imaging.
+
+Extract ALL information including:
+- Document title and type (x-ray, mri, ct_scan, ecg, ultrasound, etc.)
+- Date of the scan/test
+- Facility name and doctor name
+- Body part or area examined
+- Key findings and observations
+- Any measurements, abnormalities, or pathologies
+- Impression or diagnosis if stated
+- Recommendations
+- Technical details (views, sequences, contrast, etc.)
+
+For lab reports or prescriptions in image form:
+- All medications with dosage, frequency, instructions
+- All lab test results with values, units, reference ranges
+- Vital signs if present
+
+Output as detailed JSON with all available information.`;
+
+        const openaiExtraction = await base44.integrations.Core.InvokeLLM({
+          prompt: visionPrompt,
+          file_urls: [file_url],
+          response_json_schema: {
+            type: "object",
+            properties: {
+              document_title: { type: "string" },
+              document_type: { type: "string" },
+              document_date: { type: "string" },
+              facility_name: { type: "string" },
+              doctor_name: { type: "string" },
+              body_part_examined: { type: "string" },
+              imaging_type: { type: "string" },
+              technical_details: { type: "string" },
+              key_findings: { type: "array", items: { type: "string" } },
+              measurements: { type: "array", items: { type: "string" } },
+              abnormalities: { type: "array", items: { type: "string" } },
+              impression: { type: "string" },
+              recommendations: { type: "string" },
+              summary: { type: "string" },
+              medications: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    dosage: { type: "string" },
+                    frequency: { type: "string" },
+                    instructions: { type: "string" }
+                  }
+                }
+              },
+              vitals: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    type: { type: "string" },
+                    value: { type: "number" },
+                    unit: { type: "string" },
+                    systolic: { type: "number" },
+                    diastolic: { type: "number" }
+                  }
+                }
+              },
+              lab_results: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    test_name: { type: "string" },
+                    test_category: { type: "string" },
+                    value: { type: "number" },
+                    unit: { type: "string" },
+                    reference_min: { type: "number" },
+                    reference_max: { type: "number" },
+                    status: { type: "string" }
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        if (openaiExtraction && openaiExtraction.document_title) {
+          extractedData = openaiExtraction;
+          aiModelUsed = 'OpenAI Vision (Medical Image Analysis)';
+          extractionMethod = 'openai_vision';
+        }
+      } catch (e) {
+        console.warn("OpenAI Vision failed for medical image, trying Base44:", e.message);
+      }
+    }
+
+    // Step 2: Try Base44 extraction if OpenAI failed or for PDFs
+    if (extractionMethod === 'none' && (file_type.includes('pdf') || file_type.includes('image'))) {
       try {
         const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
           file_url: file_url,
@@ -83,16 +184,24 @@ Deno.serve(async (req) => {
         if (result.status === 'success' && result.output) {
           extractedData = result.output;
           aiModelUsed = 'Base44 ExtractDataFromUploadedFile';
+          extractionMethod = 'base44_extract';
         }
       } catch (e) {
-        console.warn("Base44 extraction failed, will use LLM:", e.message);
+        console.warn("Base44 extraction failed:", e.message);
       }
     }
 
-    // Fallback: Use InvokeLLM with file attachment for vision/OCR
-    if (!extractedData.document_title && !extractedData.summary) {
+    // Step 3: Fallback to comprehensive LLM with vision
+    if (extractionMethod === 'none') {
       try {
-        const llmPrompt = `Analyze this medical document image/PDF. Extract all relevant information including:
+        const llmPrompt = `Analyze this medical document comprehensively. This could be:
+- Medical imaging: X-RAY, MRI, CT scan, ECG, ultrasound
+- Lab reports with test results
+- Prescription documents
+- Discharge summaries
+- Consultation notes
+
+Extract ALL information including:
 - Document title, type, and date
 - Facility name and doctor name
 - Any medications with dosage, frequency, and instructions
@@ -164,18 +273,30 @@ Output as JSON matching this schema structure.`;
 
         extractedData = extracted;
         aiModelUsed = 'Base44 InvokeLLM with Vision';
+        extractionMethod = 'base44_llm_vision';
       } catch (e) {
-        console.error("LLM extraction failed:", e.message);
+        console.error("All extraction methods failed:", e.message);
         return Response.json({ 
           success: false, 
-          message: 'Failed to extract data from document.' 
+          message: 'Failed to extract data from document using all available AI models.' 
         }, { status: 500 });
       }
     }
 
-    // Step 2: Generate AI health analysis and insights
+    // Ensure we have at least basic data
+    if (!extractedData.document_title) {
+      extractedData.document_title = 'Medical Document';
+    }
+    if (!extractedData.document_type) {
+      extractedData.document_type = 'other';
+    }
+    if (!extractedData.document_date) {
+      extractedData.document_date = new Date().toISOString().split('T')[0];
+    }
+
+    // Step 4: Generate comprehensive AI health analysis
     try {
-      const analysisPrompt = `Based on this extracted medical document data:
+      const analysisPrompt = `You are a medical AI assistant analyzing health documents. Based on this extracted medical document data:
 
 ${JSON.stringify(extractedData, null, 2)}
 
