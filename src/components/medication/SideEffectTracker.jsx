@@ -116,23 +116,24 @@ Notes: ${sideEffect.notes || 'None'}`;
   const unreportedCount = sideEffects.filter(se => !se.reported_to_doctor).length;
 
   return (
-    <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
-      <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-            <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5 text-orange-600" />
-            Side Effects
-            {unreportedCount > 0 && (
-              <Badge variant="destructive" className="text-xs">{unreportedCount}</Badge>
-            )}
-          </CardTitle>
-          <Button onClick={() => setShowForm(true)} size="sm" className="rounded-2xl text-xs active-press h-9 sm:h-10 shadow-lg">
-            <Plus className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
-            Log
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-3 sm:p-4">
+    <>
+      <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+        <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5 text-orange-600" />
+              Side Effects
+              {unreportedCount > 0 && (
+                <Badge variant="destructive" className="text-xs">{unreportedCount}</Badge>
+              )}
+            </CardTitle>
+            <Button onClick={() => setShowForm(true)} size="sm" className="rounded-2xl text-xs active-press h-9 sm:h-10 shadow-lg">
+              <Plus className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
+              Log
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4">
         {sideEffects.length === 0 ? (
           <div className="text-center py-6 sm:py-8">
             <AlertCircle className="h-10 sm:h-12 w-10 sm:w-12 text-gray-300 mx-auto mb-3" />
@@ -305,5 +306,6 @@ Notes: ${sideEffect.notes || 'None'}`;
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
