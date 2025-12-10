@@ -1,145 +1,186 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import OpenAI from 'npm:openai';
+
+const openai = new OpenAI({
+  apiKey: Deno.env.get("OPENAI_API_KEY"),
+});
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
+
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { profile_id } = await req.json();
 
-    // Fetch data
-    const medications = await base44.asServiceRole.entities.Medication.filter({ 
-      profile_id, 
-      is_active: true 
-    });
-    
-    const logs = await base44.asServiceRole.entities.MedicationLog.filter({ 
-      profile_id 
-    }, '-created_date', 500);
+    // Fetch all relevant data
+    const [medications, logs, sideEffects, profile] = await Promise.all([
+      base44.entities.Medication.filter({ profile_id, is_active: true }),
+      base44.entities.MedicationLog.filter({ profile_id }, '-scheduled_time', 100),
+      base44.entities.SideEffect.filter({ profile_id }, '-onset_time', 50),
+      base44.entities.Profile.filter({ id: profile_id }).then(p => p[0]),
+    ]);
 
-    const sideEffects = await base44.asServiceRole.entities.SideEffect.filter({ 
-      profile_id 
-    }, '-onset_time', 100);
+    if (medications.length === 0) {
+      return Response.json({
+        overall_adherence: 0,
+        medications: [],
+        insights: [],
+        recommendations: [],
+        side_effect_summary: [],
+        barriers: [],
+      });
+    }
 
     // Calculate adherence per medication
-    const adherenceData = medications.map(med => {
+    const medicationAdherence = medications.map(med => {
       const medLogs = logs.filter(l => l.medication_id === med.id);
-      const taken = medLogs.filter(l => l.status === 'taken').length;
-      const total = medLogs.length;
-      const adherenceRate = total > 0 ? (taken / total) * 100 : 0;
-      
-      const skipped = medLogs.filter(l => l.status === 'skipped').length;
-      const snoozed = medLogs.filter(l => l.status === 'snoozed').length;
-      
+      const takenLogs = medLogs.filter(l => l.status === 'taken');
+      const adherenceRate = medLogs.length > 0 
+        ? (takenLogs.length / medLogs.length) * 100 
+        : 0;
+
+      // Calculate streak
+      const recentLogs = medLogs.slice(0, 10).reverse();
+      let currentStreak = 0;
+      for (const log of recentLogs) {
+        if (log.status === 'taken') {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+
+      // Find common skip reasons
+      const skipReasons = medLogs
+        .filter(l => l.status === 'skipped' && l.reason)
+        .map(l => l.reason);
+
       return {
         medication_id: med.id,
         medication_name: med.medication_name,
+        dosage: med.dosage,
         adherence_rate: Math.round(adherenceRate),
-        total_doses: total,
-        taken_doses: taken,
-        skipped_doses: skipped,
-        snoozed_doses: snoozed,
-        recent_logs: medLogs.slice(0, 10)
+        total_doses: medLogs.length,
+        taken_doses: takenLogs.length,
+        missed_doses: medLogs.filter(l => l.status === 'skipped').length,
+        current_streak: currentStreak,
+        skip_reasons: [...new Set(skipReasons)],
       };
     });
 
-    const overallAdherence = adherenceData.length > 0
-      ? Math.round(adherenceData.reduce((acc, m) => acc + m.adherence_rate, 0) / adherenceData.length)
+    // Overall adherence
+    const overallAdherence = medicationAdherence.length > 0
+      ? Math.round(medicationAdherence.reduce((sum, m) => sum + m.adherence_rate, 0) / medicationAdherence.length)
       : 0;
 
-    // Prepare AI prompt
-    const promptData = {
-      medications: medications.map(m => ({
-        name: m.medication_name,
-        dosage: m.dosage,
-        frequency: m.frequency,
-        purpose: m.purpose
-      })),
-      adherence: adherenceData,
-      side_effects: sideEffects.map(se => ({
-        medication: medications.find(m => m.id === se.medication_id)?.medication_name,
+    // Side effects summary
+    const sideEffectSummary = {};
+    sideEffects.forEach(se => {
+      if (!sideEffectSummary[se.severity]) {
+        sideEffectSummary[se.severity] = [];
+      }
+      const med = medications.find(m => m.id === se.medication_id);
+      sideEffectSummary[se.severity].push({
+        medication_name: med?.medication_name || 'Unknown',
         symptom: se.symptom,
-        severity: se.severity,
-        date: se.onset_time
-      })),
-      overall_adherence: overallAdherence
-    };
-
-    // Generate AI insights
-    const aiPrompt = `Analyze this medication adherence data and provide personalized recommendations:
-
-Overall Adherence Rate: ${overallAdherence}%
-
-Medications and Adherence:
-${adherenceData.map(m => `- ${m.medication_name}: ${m.adherence_rate}% (${m.taken_doses}/${m.total_doses} doses taken, ${m.skipped_doses} skipped)`).join('\n')}
-
-Recent Side Effects:
-${sideEffects.slice(0, 5).map(se => `- ${se.symptom} (${se.severity}) on medication`).join('\n') || 'None reported'}
-
-Provide:
-1. **Adherence Assessment** - Brief analysis of adherence patterns
-2. **Barriers Identified** - Potential reasons for missed doses based on patterns
-3. **Personalized Strategies** - 3-5 specific, actionable strategies to improve adherence
-4. **Motivational Message** - Encouraging, personalized message
-5. **Risk Factors** - Any concerns based on the data
-6. **Side Effect Concerns** - Analysis of reported side effects and recommendations
-
-Keep the tone supportive, non-judgmental, and actionable.`;
-
-    const openaiKey = Deno.env.get('OPENAI_API_KEY');
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a compassionate medication adherence coach who helps patients develop better medication habits.'
-          },
-          {
-            role: 'user',
-            content: aiPrompt
-          }
-        ],
-        temperature: 0.7
-      })
+        onset_time: se.onset_time,
+        reported: se.reported_to_doctor,
+      });
     });
 
-    const aiData = await openaiResponse.json();
-    const aiInsights = aiData.choices[0].message.content;
+    // Find common skip patterns
+    const skipPatterns = {};
+    logs.filter(l => l.status === 'skipped').forEach(log => {
+      const hour = new Date(log.scheduled_time).getHours();
+      const timeOfDay = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+      skipPatterns[timeOfDay] = (skipPatterns[timeOfDay] || 0) + 1;
+    });
 
-    // Identify patterns
-    const patterns = {
-      common_miss_time: findMostCommonMissTime(logs),
-      longest_streak: calculateLongestStreak(logs),
-      recent_trend: calculateRecentTrend(logs),
-      side_effect_correlation: correlateSideEffects(logs, sideEffects)
-    };
+    // Prepare AI prompt
+    const prompt = `You are a healthcare AI assistant analyzing medication adherence data. Provide personalized insights and strategies.
+
+Patient Profile:
+- Name: ${profile.full_name}
+- Age: ${profile.date_of_birth ? Math.floor((new Date() - new Date(profile.date_of_birth)) / 31557600000) : 'Unknown'}
+- Chronic Conditions: ${profile.chronic_conditions?.join(', ') || 'None'}
+
+Medications (${medications.length}):
+${medications.map(m => `- ${m.medication_name} (${m.dosage}) - ${m.frequency.replace(/_/g, ' ')} - Purpose: ${m.purpose || 'Not specified'}`).join('\n')}
+
+Adherence Summary:
+- Overall Adherence Rate: ${overallAdherence}%
+- Total Medication Logs: ${logs.length}
+
+Per-Medication Adherence:
+${medicationAdherence.map(m => `- ${m.medication_name}: ${m.adherence_rate}% (${m.taken_doses}/${m.total_doses} doses taken, ${m.current_streak} day streak)${m.skip_reasons.length > 0 ? ` - Common reasons: ${m.skip_reasons.join(', ')}` : ''}`).join('\n')}
+
+Side Effects Reported (${sideEffects.length} total):
+${Object.entries(sideEffectSummary).map(([severity, effects]) => 
+  `${severity.toUpperCase()}: ${effects.length} incidents\n${effects.slice(0, 3).map(e => `  - ${e.medication_name}: ${e.symptom}${e.reported ? ' (Reported to doctor)' : ' (Not reported)'}`).join('\n')}`
+).join('\n')}
+
+Skip Patterns:
+${Object.entries(skipPatterns).map(([time, count]) => `- ${time}: ${count} skips`).join('\n')}
+
+Based on this data, provide:
+1. 3-5 key insights about adherence patterns
+2. 5-7 personalized strategies to improve adherence
+3. Identify 2-3 main barriers to adherence
+4. Proactive suggestions for managing side effects
+5. Recommendations for timing adjustments if needed
+
+Format your response as JSON:
+{
+  "insights": ["insight1", "insight2", ...],
+  "strategies": [
+    {"title": "strategy title", "description": "detailed description", "priority": "high|medium|low"}
+  ],
+  "barriers": ["barrier1", "barrier2", ...],
+  "side_effect_management": [
+    {"medication": "med name", "suggestion": "proactive suggestion", "severity_risk": "low|medium|high"}
+  ],
+  "timing_recommendations": [
+    {"medication": "med name", "current_time": "time", "suggested_time": "time", "reason": "reason"}
+  ]
+}`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a healthcare AI assistant specializing in medication adherence analysis. Provide evidence-based, personalized recommendations."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const aiAnalysis = JSON.parse(response.choices[0].message.content);
 
     return Response.json({
       overall_adherence: overallAdherence,
-      adherence_by_medication: adherenceData,
-      ai_insights: aiInsights,
-      patterns,
-      side_effects_summary: {
-        total: sideEffects.length,
-        by_severity: {
-          mild: sideEffects.filter(se => se.severity === 'mild').length,
-          moderate: sideEffects.filter(se => se.severity === 'moderate').length,
-          severe: sideEffects.filter(se => se.severity === 'severe').length,
-          life_threatening: sideEffects.filter(se => se.severity === 'life_threatening').length
-        },
-        unreported: sideEffects.filter(se => !se.reported_to_doctor).length
-      },
-      recommendations: generateRecommendations(adherenceData, sideEffects)
+      medications: medicationAdherence,
+      side_effect_summary: Object.entries(sideEffectSummary).map(([severity, effects]) => ({
+        severity,
+        count: effects.length,
+        effects: effects.slice(0, 5),
+      })),
+      skip_patterns: skipPatterns,
+      ai_analysis: aiAnalysis,
+      total_logs: logs.length,
+      date_range: {
+        start: logs.length > 0 ? logs[logs.length - 1].scheduled_time : null,
+        end: logs.length > 0 ? logs[0].scheduled_time : null,
+      }
     });
 
   } catch (error) {
@@ -147,124 +188,3 @@ Keep the tone supportive, non-judgmental, and actionable.`;
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
-
-function findMostCommonMissTime(logs) {
-  const skippedLogs = logs.filter(l => l.status === 'skipped' && l.scheduled_time);
-  if (skippedLogs.length === 0) return null;
-  
-  const hours = skippedLogs.map(l => new Date(l.scheduled_time).getHours());
-  const hourCounts = {};
-  hours.forEach(h => hourCounts[h] = (hourCounts[h] || 0) + 1);
-  
-  const mostCommon = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0];
-  return mostCommon ? { hour: parseInt(mostCommon[0]), count: mostCommon[1] } : null;
-}
-
-function calculateLongestStreak(logs) {
-  const sortedLogs = logs.filter(l => l.status === 'taken').sort((a, b) => 
-    new Date(a.taken_at) - new Date(b.taken_at)
-  );
-  
-  let longestStreak = 0;
-  let currentStreak = 0;
-  
-  for (let i = 0; i < sortedLogs.length; i++) {
-    if (i === 0) {
-      currentStreak = 1;
-    } else {
-      const prevDate = new Date(sortedLogs[i - 1].taken_at);
-      const currDate = new Date(sortedLogs[i].taken_at);
-      const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
-      
-      if (dayDiff === 1) {
-        currentStreak++;
-      } else {
-        longestStreak = Math.max(longestStreak, currentStreak);
-        currentStreak = 1;
-      }
-    }
-  }
-  
-  return Math.max(longestStreak, currentStreak);
-}
-
-function calculateRecentTrend(logs) {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  
-  const recentLogs = logs.filter(l => new Date(l.scheduled_time) > sevenDaysAgo);
-  const previousLogs = logs.filter(l => {
-    const date = new Date(l.scheduled_time);
-    return date > fourteenDaysAgo && date <= sevenDaysAgo;
-  });
-  
-  const recentAdherence = recentLogs.length > 0 
-    ? (recentLogs.filter(l => l.status === 'taken').length / recentLogs.length) * 100 
-    : 0;
-  const previousAdherence = previousLogs.length > 0 
-    ? (previousLogs.filter(l => l.status === 'taken').length / previousLogs.length) * 100 
-    : 0;
-  
-  const change = recentAdherence - previousAdherence;
-  
-  return {
-    recent_adherence: Math.round(recentAdherence),
-    previous_adherence: Math.round(previousAdherence),
-    change: Math.round(change),
-    trend: change > 5 ? 'improving' : change < -5 ? 'declining' : 'stable'
-  };
-}
-
-function correlateSideEffects(logs, sideEffects) {
-  const correlations = [];
-  
-  sideEffects.forEach(se => {
-    const medLogs = logs.filter(l => 
-      l.medication_id === se.medication_id && 
-      l.taken_at &&
-      Math.abs(new Date(se.onset_time) - new Date(l.taken_at)) < 4 * 60 * 60 * 1000 // Within 4 hours
-    );
-    
-    if (medLogs.length > 0) {
-      correlations.push({
-        side_effect: se.symptom,
-        severity: se.severity,
-        likely_related_to_dose: true
-      });
-    }
-  });
-  
-  return correlations;
-}
-
-function generateRecommendations(adherenceData, sideEffects) {
-  const recommendations = [];
-  
-  // Check for low adherence
-  adherenceData.forEach(med => {
-    if (med.adherence_rate < 70) {
-      recommendations.push({
-        type: 'adherence',
-        priority: 'high',
-        medication: med.medication_name,
-        message: `Your adherence to ${med.medication_name} is ${med.adherence_rate}%. Consider setting more frequent reminders or linking it to a daily habit.`
-      });
-    }
-  });
-  
-  // Check for unreported severe side effects
-  const unreportedSevere = sideEffects.filter(se => 
-    !se.reported_to_doctor && (se.severity === 'severe' || se.severity === 'life_threatening')
-  );
-  
-  if (unreportedSevere.length > 0) {
-    recommendations.push({
-      type: 'safety',
-      priority: 'urgent',
-      message: `You have ${unreportedSevere.length} severe side effect(s) that haven't been reported to your doctor. Please report them immediately.`
-    });
-  }
-  
-  return recommendations;
-}

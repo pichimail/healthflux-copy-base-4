@@ -13,6 +13,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Demo from './pages/Demo';
 import AIAssistant from './pages/AIAssistant';
+import EmergencyProfile from './pages/EmergencyProfile';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "Demo": Demo,
     "AIAssistant": AIAssistant,
+    "EmergencyProfile": EmergencyProfile,
 }
 
 export const pagesConfig = {
