@@ -342,7 +342,7 @@ export default function Medications() {
         <TabsContent value="adherence" className="mt-4">
           <Tabs defaultValue="insights">
             <TabsList className="grid w-full grid-cols-2 rounded-2xl h-11">
-              <TabsTrigger value="insights" className="text-xs sm:text-sm rounded-xl">AI Insights</TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs sm:text-sm rounded-xl">Insights</TabsTrigger>
               <TabsTrigger value="history" className="text-xs sm:text-sm rounded-xl">History</TabsTrigger>
             </TabsList>
             <TabsContent value="insights" className="mt-3 sm:mt-4">

@@ -33,7 +33,7 @@ export default function AdherenceInsights({ profileId }) {
         <CardContent className="p-8 text-center">
           <Sparkles className="h-16 w-16 text-violet-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-violet-900 mb-2">
-            AI Adherence Analysis
+            Adherence Analysis
           </h3>
           <p className="text-sm text-violet-700 mb-6">
             Get personalized insights and strategies to improve your medication adherence

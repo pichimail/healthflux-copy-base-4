@@ -159,7 +159,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
                   <div className="p-3 sm:p-4 bg-violet-50 rounded-xl sm:rounded-2xl border-2 border-violet-200">
                     <h3 className="font-semibold text-violet-900 mb-2 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      AI-Generated Summary
+                      Document Summary
                     </h3>
                     <ReactMarkdown className="prose prose-sm max-w-none text-violet-800">
                       {document.ai_summary}

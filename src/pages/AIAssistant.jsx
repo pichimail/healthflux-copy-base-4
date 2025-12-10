@@ -131,7 +131,7 @@ Keep the language simple, empathetic, and actionable.`;
             className="flex-1 sm:flex-none bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold">
 
             <MessageSquare className="w-4 h-4 mr-2" />
-            Chat with AI
+            Start Chat
           </Button>
           <Button
             onClick={generateHealthSummary}
@@ -211,7 +211,7 @@ Keep the language simple, empathetic, and actionable.`;
       <Card className="border-0 shadow-sm rounded-2xl mb-6" style={{ backgroundColor: '#EDE6F7' }}>
           <CardContent className="p-8 md:p-12 text-center">
             <Brain className="w-12 md:w-16 h-12 md:h-16 text-purple-500 mx-auto mb-4" />
-            <h3 className="text-base md:text-lg font-semibold text-[#0A0A0A] mb-2">Get Your AI Health Summary</h3>
+            <h3 className="text-base md:text-lg font-semibold text-[#0A0A0A] mb-2">Get Your Health Summary</h3>
             <p className="text-sm text-gray-700 mb-6">
               Click "Generate Summary" to get personalized health insights, trend analysis, and recommendations based on your data.
             </p>
