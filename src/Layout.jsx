@@ -4,9 +4,16 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   LayoutDashboard, FileText, Activity, Pill, TrendingUp, 
-  User, TestTube, Brain, Menu, X, AlertCircle
+  User, TestTube, Brain, Menu, X, AlertCircle, MoreVertical, Settings, Shield, LogOut
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
@@ -92,30 +99,52 @@ export default function Layout({ children, currentPageName }) {
               </Link>
             ))}
             {user && (
-              <>
-                <div className="border-t border-gray-200 my-4" />
-                <div className="p-3 bg-[#F4F4F2] rounded-xl mb-3">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-[#0A0A0A] text-white font-semibold">
-                        {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0A0A0A]">
-                        {currentProfile?.full_name || user.full_name}
-                      </p>
-                      <p className="text-xs text-gray-600">{user.email}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-sm font-medium text-[#0A0A0A] bg-white hover:bg-gray-50 py-2 px-3 rounded-lg"
-                  >
-                    Sign Out
-                  </button>
+            <>
+            <div className="border-t border-gray-200 my-4" />
+            <div className="p-3 bg-[#F4F4F2] rounded-xl mb-3">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-[#0A0A0A] text-white font-semibold">
+                    {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#0A0A0A] truncate">
+                    {currentProfile?.full_name || user.full_name}
+                  </p>
+                  <p className="text-xs text-gray-600 truncate">{user.email}</p>
                 </div>
-              </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors">
+                      <MoreVertical className="w-4 h-4 text-[#0A0A0A]" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to={createPageUrl('Settings')} className="cursor-pointer" onClick={() => setMenuOpen(false)}>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    {user.role === 'admin' && (
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer" onClick={() => setMenuOpen(false)}>
+                          <Shield className="w-4 h-4 mr-2" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+            </>
             )}
           </div>
         </div>
@@ -154,7 +183,7 @@ export default function Layout({ children, currentPageName }) {
           {user && (
             <div className="mt-8">
               <div className="px-3 py-3 bg-[#F4F4F2] rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-[#0A0A0A] text-white text-xs font-semibold">
                       {currentProfile?.full_name?.[0] || user.full_name?.[0] || 'U'}
@@ -166,13 +195,35 @@ export default function Layout({ children, currentPageName }) {
                     </p>
                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors">
+                        <MoreVertical className="w-4 h-4 text-[#0A0A0A]" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Settings')} className="cursor-pointer">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      {user.role === 'admin' && (
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
+                            <Shield className="w-4 h-4 mr-2" />
+                            Admin Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-xs font-medium text-[#0A0A0A] bg-white hover:bg-gray-50 py-2 px-3 rounded-lg"
-                >
-                  Sign Out
-                </button>
               </div>
             </div>
           )}

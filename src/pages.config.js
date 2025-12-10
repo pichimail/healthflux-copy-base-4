@@ -18,6 +18,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminPackages from './pages/AdminPackages';
 import AdminNotifications from './pages/AdminNotifications';
 import AdminRoles from './pages/AdminRoles';
+import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "AdminPackages": AdminPackages,
     "AdminNotifications": AdminNotifications,
     "AdminRoles": AdminRoles,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {
