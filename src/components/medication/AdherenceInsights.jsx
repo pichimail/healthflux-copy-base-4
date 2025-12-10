@@ -60,7 +60,7 @@ export default function AdherenceInsights({ profileId }) {
     );
   }
 
-  const { overall_adherence, medications, ai_analysis, side_effect_summary, skip_patterns } = analysis;
+  const { overall_adherence = 0, medications = [], ai_analysis, side_effect_summary, skip_patterns } = analysis || {};
 
   const getTrendIcon = () => {
     if (overall_adherence >= 80) return <TrendingUp className="w-5 h-5 text-green-600" />;
