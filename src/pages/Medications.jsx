@@ -18,6 +18,8 @@ import AdherenceInsights from '../components/medication/AdherenceInsights';
 import SideEffectTracker from '../components/medication/SideEffectTracker';
 import MedicationHistory from '../components/medication/MedicationHistory';
 import RefillManager from '../components/medications/RefillManager';
+import EffectivenessTracker from '../components/medications/EffectivenessTracker';
+import ProviderReports from '../components/medications/ProviderReports';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Medications() {
@@ -116,13 +118,34 @@ export default function Medications() {
     setDialogOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const profileId = selectedProfile || profiles.find(p => p.relationship === 'self')?.id;
     
     if (!profileId) {
       alert('Please select a profile');
       return;
+    }
+
+    // Check drug interactions for new medications
+    if (!selectedMed) {
+      try {
+        const { data: interactionCheck } = await base44.functions.invoke('checkDrugInteractions', {
+          profile_id: profileId,
+          medication_name: formData.medication_name
+        });
+
+        if (interactionCheck.analysis.overall_severity === 'major' || interactionCheck.analysis.overall_severity === 'severe') {
+          const proceed = confirm(
+            `⚠️ WARNING: Potential ${interactionCheck.analysis.overall_severity} drug interaction detected!\n\n` +
+            `${interactionCheck.analysis.interactions.map(i => i.description).join('\n\n')}\n\n` +
+            'Do you want to proceed anyway? Please consult your doctor.'
+          );
+          if (!proceed) return;
+        }
+      } catch (error) {
+        console.error('Interaction check failed:', error);
+      }
     }
 
     const data = {
@@ -224,10 +247,11 @@ export default function Medications() {
 
       {/* Mobile-First Tabs */}
       <Tabs defaultValue="medications" className="mb-4 sm:mb-6">
-        <TabsList className="grid w-full grid-cols-3 rounded-2xl h-11 sm:h-12">
+        <TabsList className="grid w-full grid-cols-4 rounded-2xl h-11 sm:h-12">
           <TabsTrigger value="medications" className="text-xs sm:text-sm rounded-xl">Meds</TabsTrigger>
-          <TabsTrigger value="adherence" className="text-xs sm:text-sm rounded-xl">Insights</TabsTrigger>
-          <TabsTrigger value="sideeffects" className="text-xs sm:text-sm rounded-xl">Effects</TabsTrigger>
+          <TabsTrigger value="adherence" className="text-xs sm:text-sm rounded-xl">Track</TabsTrigger>
+          <TabsTrigger value="sideeffects" className="text-xs sm:text-sm rounded-xl">Side FX</TabsTrigger>
+          <TabsTrigger value="reports" className="text-xs sm:text-sm rounded-xl">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="medications" className="mt-4">
@@ -287,6 +311,8 @@ export default function Medications() {
                   </div>
 
                   <RefillManager medication={med} profileId={med.profile_id} />
+                  
+                  <EffectivenessTracker medication={med} profileId={med.profile_id} />
 
                   <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                     <div className="flex items-center gap-2 text-xs">
@@ -359,6 +385,13 @@ export default function Medications() {
 
         <TabsContent value="sideeffects" className="mt-4">
           <SideEffectTracker 
+            profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+            medications={medications}
+          />
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-4">
+          <ProviderReports 
             profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
             medications={medications}
           />
