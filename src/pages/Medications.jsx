@@ -20,6 +20,8 @@ import MedicationHistory from '../components/medication/MedicationHistory';
 import RefillManager from '../components/medications/RefillManager';
 import EffectivenessTracker from '../components/medications/EffectivenessTracker';
 import ProviderReports from '../components/medications/ProviderReports';
+import MedicationReconciliation from '../components/medications/MedicationReconciliation';
+import PrescriptionScanner from '../components/medications/PrescriptionScanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Medications() {
@@ -234,6 +236,19 @@ export default function Medications() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Smart Features */}
+      <div className="space-y-3 mb-4 sm:mb-6">
+        <PrescriptionScanner 
+          profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+          onMedicationsExtracted={() => queryClient.invalidateQueries(['medications'])}
+        />
+        
+        <MedicationReconciliation 
+          profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
+          medications={medications}
+        />
       </div>
 
       {/* Drug Interaction Warnings */}
