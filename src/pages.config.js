@@ -15,6 +15,7 @@ import Demo from './pages/Demo';
 import AIAssistant from './pages/AIAssistant';
 import EmergencyProfile from './pages/EmergencyProfile';
 import AdminUsers from './pages/AdminUsers';
+import AdminPackages from './pages/AdminPackages';
 import __Layout from './Layout.jsx';
 
 
@@ -36,6 +37,7 @@ export const PAGES = {
     "AIAssistant": AIAssistant,
     "EmergencyProfile": EmergencyProfile,
     "AdminUsers": AdminUsers,
+    "AdminPackages": AdminPackages,
 }
 
 export const pagesConfig = {
