@@ -45,36 +45,39 @@ export default function DocumentCard({ document, compact = false, onView, onDele
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow border-gray-200 rounded-2xl">
+    <Card className="active-press card-shadow hover:shadow-lg transition-all border-gray-200 rounded-2xl sm:rounded-3xl overflow-hidden">
       <CardContent className="p-0">
-        <div className="flex justify-between items-start">
-          <div className="flex-grow cursor-pointer" onClick={() => onView(document)}>
+        <div className="flex">
+          <div 
+            className="flex-grow cursor-pointer" 
+            onClick={() => onView(document)}
+          >
             <div className={cn(
-              "flex items-center gap-3 p-4",
-              compact ? "flex-row justify-between" : "flex-col items-start"
+              "flex items-center gap-2 sm:gap-3 p-3 sm:p-4",
+              compact ? "flex-row" : "flex-col items-start"
             )}>
-              <div className={compact ? "flex items-center gap-3 flex-1" : "mb-3 w-full"}>
-                <div className="flex-shrink-0">
+              <div className={compact ? "flex items-center gap-2 sm:gap-3 flex-1 min-w-0" : "mb-2 sm:mb-3 w-full"}>
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
                   {getFileIcon(document.file_type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={cn("font-medium text-[#0A0A0A] truncate", compact ? "" : "text-lg")}>
+                  <p className={cn("font-semibold text-[#0A0A0A] truncate", compact ? "text-sm" : "text-sm sm:text-base")}>
                     {document.title}
                   </p>
                   {!compact && document.facility_name && (
-                    <p className="text-sm text-gray-500 mt-1">{document.facility_name}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 truncate">{document.facility_name}</p>
                   )}
                 </div>
               </div>
-              <div className={cn("flex flex-col gap-2", compact ? "items-end" : "w-full")}>
-                <div className="flex gap-2 flex-wrap">
+              <div className={cn("flex flex-col gap-1.5 sm:gap-2", compact ? "items-end flex-shrink-0" : "w-full")}>
+                <div className="flex gap-1.5 flex-wrap">
                   {document.document_date && (
-                    <Badge variant="outline" className="text-xs">
-                      {format(new Date(document.document_date), 'MMM d, yyyy')}
+                    <Badge variant="outline" className="text-xs border-gray-300">
+                      {format(new Date(document.document_date), compact ? 'MMM d' : 'MMM d, yyyy')}
                     </Badge>
                   )}
-                  {document.document_type && (
-                    <Badge variant="outline" className="text-xs capitalize">
+                  {!compact && document.document_type && (
+                    <Badge variant="outline" className="text-xs capitalize border-gray-300">
                       {document.document_type.replace(/_/g, ' ')}
                     </Badge>
                   )}
@@ -85,15 +88,15 @@ export default function DocumentCard({ document, compact = false, onView, onDele
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 mt-2 mr-2">
+              <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-12 sm:w-12 m-2 rounded-xl flex-shrink-0">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => onView(document)}>View Details</DropdownMenuItem>
               {document.status === 'failed' && onReprocess && (
-                <DropdownMenuItem onClick={() => onReprocess(document)}>
-                  Reprocess
+                <DropdownMenuItem onClick={() => onReprocess(document)} className="text-blue-600">
+                  Reprocess with AI
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="text-red-600" onClick={() => onDelete(document)}>

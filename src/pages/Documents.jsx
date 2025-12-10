@@ -256,31 +256,43 @@ export default function Documents() {
   }
 
   return (
-    <div className="px-6 py-6">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1 flex items-center gap-3">
-            <span className="text-3xl">📄</span>
-            Documents
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+      {/* Mobile-First Header */}
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] flex items-center gap-2">
+            <span className="text-2xl sm:text-3xl">📄</span>
+            <span className="hidden sm:inline">Documents</span>
           </h1>
-          <p className="text-sm text-gray-600">
-            {documents.length} document{documents.length !== 1 ? 's' : ''} • AI-powered search & categorization
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
+            {documents.length} doc{documents.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex gap-3">
-          <ProfileSwitcher
-            profiles={profiles}
-            selectedProfile={selectedProfileId}
-            onProfileChange={setSelectedProfileId}
-          />
+        <div className="flex gap-2">
+          <div className="hidden sm:block">
+            <ProfileSwitcher
+              profiles={profiles}
+              selectedProfile={selectedProfileId}
+              onProfileChange={setSelectedProfileId}
+            />
+          </div>
           <Button 
             onClick={() => setShowUploadModal(true)}
-            className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-xl font-semibold"
+            className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl font-semibold shadow-lg active-press h-12 px-4 sm:px-6"
           >
-            <Upload className="h-5 w-5 mr-2" />
-            Upload
+            <Upload className="h-5 w-5 sm:mr-2" />
+            <span className="hidden sm:inline">Upload</span>
           </Button>
         </div>
+      </div>
+
+      {/* Mobile Profile Selector */}
+      <div className="sm:hidden mb-4">
+        <ProfileSwitcher
+          profiles={profiles}
+          selectedProfile={selectedProfileId}
+          onProfileChange={setSelectedProfileId}
+        />
       </div>
 
       <DocumentSearchBar 
@@ -288,22 +300,23 @@ export default function Documents() {
         onResultClick={(doc) => setSelectedDocument(doc)}
       />
 
-      <div className="bg-white rounded-2xl p-4 border border-gray-200 mb-6">
-        <div className="flex flex-col gap-3 w-full">
-          <div className="relative flex-1">
+      {/* Mobile-First Filters */}
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-gray-200 mb-4 sm:mb-6 shadow-sm">
+        <div className="flex flex-col gap-2 sm:gap-3 w-full">
+          <div className="relative">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Filter by title..."
+              placeholder="Search documents..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 rounded-xl"
+              className="pl-10 h-11 sm:h-12 rounded-xl border-gray-200"
             />
           </div>
           
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="flex-1 h-11 rounded-xl">
-                <SelectValue placeholder="Document Type" />
+              <SelectTrigger className="h-11 sm:h-12 rounded-xl text-xs sm:text-sm">
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
                 {documentTypes.map(type => (
@@ -315,12 +328,12 @@ export default function Documents() {
             </Select>
 
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="flex-1 h-11 rounded-xl">
+              <SelectTrigger className="h-11 sm:h-12 rounded-xl text-xs sm:text-sm">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="completed">Processed</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="completed">Done</SelectItem>
                 <SelectItem value="processing">Processing</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="failed">Failed</SelectItem>
@@ -328,34 +341,34 @@ export default function Documents() {
             </Select>
 
             <Select value={viewMode} onValueChange={setViewMode}>
-              <SelectTrigger className="w-32 h-11 rounded-xl">
+              <SelectTrigger className="h-11 sm:h-12 rounded-xl text-xs sm:text-sm">
                 <SelectValue placeholder="View" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="icon">Icon View</SelectItem>
-                <SelectItem value="list">List View</SelectItem>
-                <SelectItem value="kanban">Kanban View</SelectItem>
+                <SelectItem value="icon">Grid</SelectItem>
+                <SelectItem value="list">List</SelectItem>
+                <SelectItem value="kanban">Board</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
         {(filterType !== 'all' || filterStatus !== 'all' || searchQuery) && (
-          <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
             {searchQuery && (
-              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
-                Search: {searchQuery}
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs active-press">
+                {searchQuery.substring(0, 15)}{searchQuery.length > 15 ? '...' : ''}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
               </Badge>
             )}
             {filterType !== 'all' && (
-              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs active-press">
                 {documentTypes.find(t => t.value === filterType)?.label}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setFilterType('all')} />
               </Badge>
             )}
             {filterStatus !== 'all' && (
-              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs active-press capitalize">
                 {filterStatus}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setFilterStatus('all')} />
               </Badge>
@@ -365,35 +378,38 @@ export default function Documents() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="h-64 bg-white rounded-xl animate-pulse" />
+            <div key={i} className="h-40 sm:h-56 bg-white rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredDocuments.length === 0 ? (
-        <Card className="text-center py-16">
-          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#0A0A0A] mb-2">No documents found</h3>
-          <p className="text-gray-600 mb-6">
+        <Card className="text-center py-12 sm:py-16 rounded-3xl card-shadow">
+          <FileText className="h-12 sm:h-16 w-12 sm:w-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+          <h3 className="text-base sm:text-lg font-semibold text-[#0A0A0A] mb-2">No documents found</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">
             {searchQuery || filterType !== 'all' || filterStatus !== 'all'
               ? 'Try adjusting your filters'
-              : 'Upload your first medical document to get started'}
+              : 'Upload your first medical document'}
           </p>
-          <Button onClick={() => setShowUploadModal(true)} className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A]">
+          <Button 
+            onClick={() => setShowUploadModal(true)} 
+            className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-2xl active-press h-12 px-6 shadow-lg"
+          >
             <Upload className="h-4 w-4 mr-2" />
             Upload Document
           </Button>
         </Card>
       ) : viewMode === 'kanban' ? (
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 smooth-scroll -mx-3 px-3 sm:mx-0 sm:px-0">
           {['pending', 'processing', 'completed', 'failed'].map(status => {
             const statusDocs = filteredDocuments.filter(d => d.status === status);
             return (
-              <div key={status} className="flex-shrink-0 w-80">
-                <div className="bg-gray-100 rounded-2xl p-4">
-                  <h3 className="font-bold text-[#0A0A0A] mb-3 flex items-center justify-between">
+              <div key={status} className="flex-shrink-0 w-72 sm:w-80">
+                <div className="bg-[#F4F4F2] rounded-2xl sm:rounded-3xl p-3 sm:p-4">
+                  <h3 className="font-bold text-[#0A0A0A] text-sm sm:text-base mb-3 flex items-center justify-between">
                     <span className="capitalize">{status}</span>
-                    <Badge>{statusDocs.length}</Badge>
+                    <Badge className="text-xs">{statusDocs.length}</Badge>
                   </h3>
                   <div className="space-y-2">
                     {statusDocs.map(doc => (
@@ -403,7 +419,7 @@ export default function Documents() {
                         compact={true}
                         onView={setSelectedDocument}
                         onDelete={(doc) => {
-                          if (confirm('Are you sure you want to delete this document?')) {
+                          if (confirm('Delete this document?')) {
                             deleteDocumentMutation.mutate(doc.id);
                           }
                         }}
@@ -417,17 +433,17 @@ export default function Documents() {
           })}
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-4 sm:space-y-6">
           {Object.entries(groupedDocuments).map(([month, docs]) => (
             <div key={month}>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
+              <h2 className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 sm:mb-3 flex items-center gap-2 px-1">
+                <Calendar className="h-3 sm:h-4 w-3 sm:w-4" />
                 {month}
               </h2>
               <div className={cn(
                 viewMode === 'icon' 
-                  ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                  : "space-y-3"
+                  ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3"
+                  : "space-y-2 sm:space-y-3"
               )}>
                 {docs.map(doc => (
                   <DocumentCard
@@ -436,7 +452,7 @@ export default function Documents() {
                     compact={viewMode === 'list'}
                     onView={setSelectedDocument}
                     onDelete={(doc) => {
-                      if (confirm('Are you sure you want to delete this document?')) {
+                      if (confirm('Delete this document?')) {
                         deleteDocumentMutation.mutate(doc.id);
                       }
                     }}
