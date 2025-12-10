@@ -152,31 +152,31 @@ export default function Layout({ children, currentPageName }) {
       }
 
       {/* Desktop Sidebar */}
-      <aside className="bg-[#ffe4db] rounded-[28px] hidden md:block fixed left-0 top-0 h-full w-64 border-r border-gray-200 z-40 overflow-y-auto">
+      <aside className="bg-cyan-900 text-slate-100 rounded-[28px] hidden md:block fixed left-0 top-0 h-full w-64 border-r border-gray-200 z-40 overflow-y-auto">
         <div className="p-6">
           <Link to={createPageUrl('Dashboard')} className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-[#0A0A0A] rounded-xl flex items-center justify-center flex-shrink-0">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span className="text-lg font-bold text-[#0A0A0A] block">HealthFlux</span>
-              <span className="text-xs text-gray-600">Personal Health</span>
+              <span className="text-zinc-100 text-lg font-bold block">HealthFlux</span>
+              <span className="text-zinc-100 text-xs">Personal Health</span>
             </div>
           </Link>
 
-          <nav className="space-y-1">
+          <nav className="bg-teal-900 text-zinc-100 space-y-1">
             {[...navItems, ...moreItems].map((item) =>
             <Link
               key={item.page}
-              to={createPageUrl(item.page)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-              isActive(item.page) ?
-              'bg-[#E9F46A] text-[#0A0A0A] font-semibold' :
-              'text-gray-600 hover:bg-[#F4F4F2]'}`
-              }>
+              to={createPageUrl(item.page)} className="bg-cyan-900 text-zinc-100 px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all hover:bg-[#F4F4F2]">
 
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{item.name}</span>
+
+
+
+
+
+                <item.icon className="text-gray-200 lucide lucide-layout-dashboard w-5 h-5 flex-shrink-0" />
+                <span className="text-gray-50 text-sm">{item.name}</span>
               </Link>
             )}
           </nav>
