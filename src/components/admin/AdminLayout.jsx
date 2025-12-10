@@ -17,10 +17,10 @@ export default function AdminLayout({ children, currentPageName }) {
 
   const navItems = [
     { name: 'Dashboard', page: 'AdminDashboard', icon: LayoutDashboard },
-    { name: 'User Management', page: 'AdminUsers', icon: Users },
-    { name: 'Documents', page: 'AdminDashboard', icon: FileText },
-    { name: 'Analytics', page: 'AdminDashboard', icon: Activity },
-    { name: 'Settings', page: 'AdminDashboard', icon: Settings },
+    { name: 'Users', page: 'AdminUsers', icon: Users },
+    { name: 'Packages', page: 'AdminPackages', icon: FileText },
+    { name: 'Notifications', page: 'AdminNotifications', icon: Activity },
+    { name: 'Roles', page: 'AdminRoles', icon: Settings },
   ];
 
   const isActive = (page) => currentPageName === page;
