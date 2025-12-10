@@ -1,509 +1,305 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, Eye, Trash2, Search, Filter, Plus, Download, Sparkles, Brain, Pill, Activity } from 'lucide-react';
+import { 
+  Upload, Search, Filter, Grid, List, FileText, 
+  SlidersHorizontal, Calendar, Building2, X
+} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from 'date-fns';
-import { Textarea } from '@/components/ui/textarea';
-import ExtractedDataReview from '../components/ExtractedDataReview';
-import { toast } from 'sonner';
-
-const calculateFlag = (value, refLow, refHigh) => {
-  const val = parseFloat(value);
-  const low = refLow ? parseFloat(refLow) : null;
-  const high = refHigh ? parseFloat(refHigh) : null;
-
-  if (isNaN(val)) return 'normal';
-  if (low !== null && val < low) return 'low';
-  if (high !== null && val > high) return 'high';
-  return 'normal';
-};
+import { cn } from "@/lib/utils";
+import ProfileSwitcher from '../components/ProfileSwitcher';
+import DocumentCard from '../components/health/DocumentCard';
+import UploadModal from '../components/UploadModal';
+import DocumentViewer from '../components/health/DocumentViewer';
+import DocumentSearchBar from '../components/health/DocumentSearchBar';
 
 export default function Documents() {
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [viewDoc, setViewDoc] = useState(null);
-  const [reviewDoc, setReviewDoc] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [currentProfile, setCurrentProfile] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [formData, setFormData] = useState({
-    title: '',
-    document_type: 'lab_report',
-    document_date: '',
-    facility_name: '',
-    notes: '',
-    file: null,
-  });
-
+  const [filterStatus, setFilterStatus] = useState('all');
   const queryClient = useQueryClient();
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['profiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date'),
+    queryFn: () => base44.entities.Profile.list('-created_date')
   });
+
+  useEffect(() => {
+    if (profiles.length > 0 && !currentProfile) {
+      const primary = profiles.find(p => p.relationship === 'self') || profiles[0];
+      setCurrentProfile(primary);
+    }
+  }, [profiles, currentProfile]);
 
   const { data: documents = [], isLoading } = useQuery({
-    queryKey: ['documents', selectedProfile],
-    queryFn: () => selectedProfile 
-      ? base44.entities.MedicalDocument.filter({ profile_id: selectedProfile }, '-created_date')
-      : base44.entities.MedicalDocument.list('-created_date'),
+    queryKey: ['documents', currentProfile?.id],
+    queryFn: () => base44.entities.MedicalDocument.filter({ profile_id: currentProfile?.id }, '-created_date'),
+    enabled: !!currentProfile?.id
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: async (data) => {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: data.file });
-      return base44.entities.MedicalDocument.create({
-        ...data,
-        file_url,
-        file_name: data.file.name,
-        file_type: data.file.type,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['documents']);
-      setUploadOpen(false);
-      resetForm();
-    },
-  });
-
-  const deleteMutation = useMutation({
+  const deleteDocumentMutation = useMutation({
     mutationFn: (id) => base44.entities.MedicalDocument.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['documents']);
-    },
+      queryClient.invalidateQueries(['documents', currentProfile?.id]);
+    }
   });
-
-  const generateAISummary = useMutation({
-    mutationFn: async (doc) => {
-      const summary = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this medical document and provide a brief summary (2-3 sentences) highlighting key findings, test results, or recommendations. Document: ${doc.title}, Type: ${doc.document_type}, Date: ${doc.document_date || 'Not specified'}, Facility: ${doc.facility_name || 'Unknown'}, Notes: ${doc.notes || 'None'}`,
-        add_context_from_internet: false,
-      });
-      
-      return base44.entities.MedicalDocument.update(doc.id, {
-        ai_summary: summary,
-        status: 'processed',
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['documents']);
-    },
-  });
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      document_type: 'lab_report',
-      document_date: '',
-      facility_name: '',
-      notes: '',
-      file: null,
-    });
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, file, title: formData.title || file.name });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.file) {
-      alert('Please select a file');
-      return;
-    }
-
-    const profileId = selectedProfile || profiles.find(p => p.relationship === 'self')?.id;
-    if (!profileId) {
-      alert('Please select a profile');
-      return;
-    }
-
-    setUploading(true);
-    try {
-      await uploadMutation.mutateAsync({
-        ...formData,
-        profile_id: profileId,
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDelete = (doc) => {
-    if (confirm('Are you sure you want to delete this document?')) {
-      deleteMutation.mutate(doc.id);
-    }
-  };
 
   const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doc.facility_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !searchQuery || 
+      doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.facility_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.doctor_name?.toLowerCase().includes(searchQuery.toLowerCase());
+    
     const matchesType = filterType === 'all' || doc.document_type === filterType;
-    return matchesSearch && matchesType;
+    const matchesStatus = filterStatus === 'all' || doc.status === filterStatus;
+
+    return matchesSearch && matchesType && matchesStatus;
   });
 
-  const getTypeColor = (type) => {
-    const colors = {
-      lab_report: 'bg-blue-100 text-blue-700 border-blue-200',
-      prescription: 'bg-purple-100 text-purple-700 border-purple-200',
-      imaging: 'bg-green-100 text-green-700 border-green-200',
-      discharge_summary: 'bg-orange-100 text-orange-700 border-orange-200',
-      consultation: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-      vaccination: 'bg-pink-100 text-pink-700 border-pink-200',
-      insurance: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      other: 'bg-slate-100 text-slate-700 border-slate-200',
-    };
-    return colors[type] || colors.other;
-  };
+  const groupedDocuments = filteredDocuments.reduce((acc, doc) => {
+    const month = doc.document_date 
+      ? format(new Date(doc.document_date), 'MMMM yyyy')
+      : 'No Date';
+    if (!acc[month]) acc[month] = [];
+    acc[month].push(doc);
+    return acc;
+  }, {});
+
+  const documentTypes = [
+    { value: 'all', label: 'All Types' },
+    { value: 'lab_report', label: 'Lab Reports' },
+    { value: 'prescription', label: 'Prescriptions' },
+    { value: 'discharge_summary', label: 'Discharge Summary' },
+    { value: 'imaging', label: 'Imaging' },
+    { value: 'vaccination', label: 'Vaccination' },
+    { value: 'consultation', label: 'Consultation' },
+    { value: 'other', label: 'Other' }
+  ];
 
   return (
-    <div className="px-6 py-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">Medical Documents</h1>
-          <p className="text-sm text-gray-600">Upload and manage your medical records</p>
-        </div>
-        <Button
-          onClick={() => setUploadOpen(true)}
-          className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-xl font-semibold"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          Upload Document
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <Input
-            placeholder="Search documents..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 rounded-xl border-gray-200"
-          />
-        </div>
-        <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
-            <SelectValue placeholder="All Profiles" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Profiles</SelectItem>
-            {profiles.map(profile => (
-              <SelectItem key={profile.id} value={profile.id}>
-                {profile.full_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-full sm:w-48 rounded-xl border-gray-200">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="lab_report">Lab Report</SelectItem>
-            <SelectItem value="prescription">Prescription</SelectItem>
-            <SelectItem value="imaging">Imaging</SelectItem>
-            <SelectItem value="discharge_summary">Discharge Summary</SelectItem>
-            <SelectItem value="consultation">Consultation</SelectItem>
-            <SelectItem value="vaccination">Vaccination</SelectItem>
-            <SelectItem value="insurance">Insurance</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Documents Grid */}
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-        </div>
-      ) : filteredDocuments.length === 0 ? (
-        <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4 text-sm">No documents found</p>
-          <Button onClick={() => setUploadOpen(true)} className="rounded-xl bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A]">
-            <Plus className="w-4 h-4 mr-2" />
-            Upload Your First Document
-          </Button>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredDocuments.map((doc) => {
-            const profile = profiles.find(p => p.id === doc.profile_id);
-            return (
-              <Card key={doc.id} className="border-0 shadow-sm rounded-2xl overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02]">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 bg-[#9BB4FF] rounded-xl flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-[#0A0A0A]" />
-                    </div>
-                    <Badge variant="outline" className="text-xs capitalize rounded-lg">
-                      {doc.document_type.replace(/_/g, ' ')}
-                    </Badge>
-                  </div>
-
-                  <h3 className="font-semibold text-[#0A0A0A] mb-2 line-clamp-2 text-sm">{doc.title}</h3>
-                  
-                  {profile && (
-                    <p className="text-xs text-gray-600 mb-1">
-                      {profile.full_name}
-                    </p>
-                  )}
-
-                  {doc.document_date && (
-                    <p className="text-xs text-gray-500 mb-1">
-                      {format(new Date(doc.document_date), 'MMM d, yyyy')}
-                    </p>
-                  )}
-
-                  {doc.facility_name && (
-                    <p className="text-xs text-gray-500 mb-3">{doc.facility_name}</p>
-                  )}
-
-                  {doc.ai_summary && (
-                    <div className="mb-3 p-3 bg-[#EDE6F7] rounded-xl">
-                      <p className="text-xs text-[#0A0A0A]">{doc.ai_summary}</p>
-                    </div>
-                  )}
-
-                  {doc.doctor_name && (
-                    <p className="text-xs text-gray-600 mb-2">👨‍⚕️ {doc.doctor_name}</p>
-                  )}
-
-                  {(doc.extracted_medications?.length > 0 || doc.extracted_lab_results?.length > 0 || doc.extracted_vitals?.length > 0) && (
-                    <div className="flex gap-2 mb-3">
-                      {doc.extracted_medications?.length > 0 && (
-                        <Badge className="bg-[#F7C9A3] text-[#0A0A0A] border-none text-xs rounded-lg">
-                          <Pill className="w-3 h-3 mr-1" />
-                          {doc.extracted_medications.length} meds
-                        </Badge>
-                      )}
-                      {doc.extracted_lab_results?.length > 0 && (
-                        <Badge className="bg-[#EFF1ED] text-[#0A0A0A] border-none text-xs rounded-lg">
-                          <Activity className="w-3 h-3 mr-1" />
-                          {doc.extracted_lab_results.length} labs
-                        </Badge>
-                      )}
-                      {doc.extracted_vitals?.length > 0 && (
-                        <Badge className="bg-[#9BB4FF] text-[#0A0A0A] border-none text-xs rounded-lg">
-                          {doc.extracted_vitals.length} vitals
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(doc.file_url, '_blank')}
-                      className="flex-1 rounded-xl text-xs"
-                    >
-                      <Eye className="w-3 h-3 mr-1" />
-                      View
-                    </Button>
-                    {(doc.extracted_medications?.length > 0 || doc.extracted_lab_results?.length > 0 || doc.extracted_vitals?.length > 0) && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setReviewDoc(doc)}
-                        className="flex-1 rounded-xl text-xs bg-[#E9F46A] hover:bg-[#D9E45A] border-none"
-                      >
-                        <Brain className="w-3 h-3 mr-1" />
-                        Review
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(doc)}
-                      className="text-red-600 hover:bg-red-50 rounded-xl"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Extracted Data Review Dialog */}
-      <Dialog open={!!reviewDoc} onOpenChange={(open) => !open && setReviewDoc(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>AI Extracted Data - {reviewDoc?.title}</DialogTitle>
-          </DialogHeader>
-          {reviewDoc && (
-            <ExtractedDataReview
-              document={reviewDoc}
-              onAddMedication={async (med) => {
-                await base44.entities.Medication.create({
-                  profile_id: reviewDoc.profile_id,
-                  medication_name: med.name,
-                  dosage: med.dosage,
-                  frequency: med.frequency || 'as_needed',
-                  times: med.times || [],
-                  start_date: reviewDoc.document_date || new Date().toISOString().split('T')[0],
-                  is_active: true,
-                  purpose: med.purpose,
-                  prescriber: reviewDoc.doctor_name
-                });
-                queryClient.invalidateQueries(['documents']);
-              }}
-              onAddVital={async (vital) => {
-                await base44.entities.VitalMeasurement.create({
-                  profile_id: reviewDoc.profile_id,
-                  vital_type: vital.type,
-                  systolic: vital.systolic,
-                  diastolic: vital.diastolic,
-                  value: vital.value,
-                  unit: vital.unit,
-                  measured_at: reviewDoc.document_date ? new Date(reviewDoc.document_date).toISOString() : new Date().toISOString(),
-                  source: 'document'
-                });
-                queryClient.invalidateQueries(['documents']);
-              }}
-              onAddLabResult={async (lab) => {
-                await base44.entities.LabResult.create({
-                  profile_id: reviewDoc.profile_id,
-                  document_id: reviewDoc.id,
-                  test_name: lab.name,
-                  test_category: lab.category || 'other',
-                  value: parseFloat(lab.value),
-                  unit: lab.unit,
-                  reference_low: lab.reference_low ? parseFloat(lab.reference_low) : null,
-                  reference_high: lab.reference_high ? parseFloat(lab.reference_high) : null,
-                  flag: calculateFlag(lab.value, lab.reference_low, lab.reference_high),
-                  test_date: reviewDoc.document_date || new Date().toISOString().split('T')[0],
-                  facility: reviewDoc.facility_name
-                });
-                queryClient.invalidateQueries(['documents']);
-              }}
+    <div className="min-h-screen bg-slate-50">
+      <header className="bg-white border-b border-slate-200 py-3 sm:py-6 sticky top-0 z-40 lg:relative">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <ProfileSwitcher
+              profiles={profiles}
+              selectedProfile={currentProfile?.id}
+              onProfileChange={(id) => setCurrentProfile(profiles.find(p => p.id === id))}
             />
+            
+            <Button 
+              onClick={() => setShowUploadModal(true)}
+              className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] font-semibold rounded-xl"
+              size="lg"
+            >
+              <Upload className="h-5 w-5 sm:mr-2" />
+              <span className="hidden sm:inline">Upload</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 pb-20 lg:pb-8">
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-xl sm:text-4xl font-bold text-slate-900 mb-1 sm:mb-2 flex items-center gap-2 sm:gap-3">
+            <span className="text-4xl sm:text-5xl">📄</span>
+            Documents
+          </h1>
+          <p className="text-sm sm:text-lg text-slate-600">
+            {documents.length} document{documents.length !== 1 ? 's' : ''} • AI-powered organization
+          </p>
+        </div>
+
+        <DocumentSearchBar 
+          profileId={currentProfile?.id}
+          onResultClick={(doc) => setSelectedDocument(doc)}
+        />
+
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 border-slate-900 mb-4 sm:mb-6">
+          <div className="flex flex-col gap-3 sm:gap-4 w-full">
+            <div className="relative flex-1">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Filter by title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-11 rounded-xl"
+              />
+            </div>
+            
+            <div className="flex gap-2 sm:gap-4">
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="flex-1 sm:w-48 h-11 rounded-xl">
+                  <SelectValue placeholder="Document Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {documentTypes.map(type => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="flex-1 sm:w-40 h-11 rounded-xl">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="processed">Processed</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="uploaded">Uploaded</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={viewMode} onValueChange={setViewMode}>
+                <SelectTrigger className="w-32 h-11 rounded-xl">
+                  <SelectValue placeholder="View" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="icon">Icon View</SelectItem>
+                  <SelectItem value="list">List View</SelectItem>
+                  <SelectItem value="kanban">Kanban View</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {(filterType !== 'all' || filterStatus !== 'all' || searchQuery) && (
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+              {searchQuery && (
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                  Search: {searchQuery}
+                  <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
+                </Badge>
+              )}
+              {filterType !== 'all' && (
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                  {documentTypes.find(t => t.value === filterType)?.label}
+                  <X className="h-3 w-3 cursor-pointer" onClick={() => setFilterType('all')} />
+                </Badge>
+              )}
+              {filterStatus !== 'all' && (
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs">
+                  {filterStatus}
+                  <X className="h-3 w-3 cursor-pointer" onClick={() => setFilterStatus('all')} />
+                </Badge>
+              )}
+            </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      {/* Upload Dialog */}
-      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Upload Medical Document</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="file">Document File *</Label>
-              <Input
-                id="file"
-                type="file"
-                onChange={handleFileChange}
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                required
-              />
-              <p className="text-xs text-slate-500">Supported: PDF, JPG, PNG, DOC, DOCX</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="title">Document Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Blood Test Report - Jan 2024"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="document_type">Document Type *</Label>
-                <Select
-                  value={formData.document_type}
-                  onValueChange={(value) => setFormData({ ...formData, document_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lab_report">Lab Report</SelectItem>
-                    <SelectItem value="prescription">Prescription</SelectItem>
-                    <SelectItem value="imaging">Imaging</SelectItem>
-                    <SelectItem value="discharge_summary">Discharge Summary</SelectItem>
-                    <SelectItem value="consultation">Consultation</SelectItem>
-                    <SelectItem value="vaccination">Vaccination</SelectItem>
-                    <SelectItem value="insurance">Insurance</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+        {isLoading ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="h-40 sm:h-64 bg-white rounded-xl sm:rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        ) : filteredDocuments.length === 0 ? (
+          <Card className="text-center py-12 sm:py-16 border-0 shadow-sm rounded-2xl">
+            <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-slate-300 mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">No documents found</h3>
+            <p className="text-sm sm:text-base text-slate-500 mb-4 sm:mb-6 px-4">
+              {searchQuery || filterType !== 'all' || filterStatus !== 'all'
+                ? 'Try adjusting your filters'
+                : 'Upload your first medical document to get started'}
+            </p>
+            <Button onClick={() => setShowUploadModal(true)} className="bg-[#E9F46A] hover:bg-[#D9E45A] text-[#0A0A0A] rounded-xl">
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Document
+            </Button>
+          </Card>
+        ) : viewMode === 'kanban' ? (
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {['uploaded', 'processing', 'processed', 'failed'].map(status => {
+              const statusDocs = filteredDocuments.filter(d => d.status === status);
+              return (
+                <div key={status} className="flex-shrink-0 w-80">
+                  <div className="bg-slate-100 rounded-2xl p-4">
+                    <h3 className="font-bold text-slate-900 mb-3 flex items-center justify-between">
+                      <span className="capitalize">{status}</span>
+                      <Badge>{statusDocs.length}</Badge>
+                    </h3>
+                    <div className="space-y-2">
+                      {statusDocs.map(doc => (
+                        <DocumentCard
+                          key={doc.id}
+                          document={doc}
+                          compact={true}
+                          onView={setSelectedDocument}
+                          onDelete={(doc) => {
+                            if (confirm('Delete this document?')) {
+                              deleteDocumentMutation.mutate(doc.id);
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-6 sm:space-y-8 w-full">
+            {Object.entries(groupedDocuments).map(([month, docs]) => (
+              <div key={month}>
+                <h2 className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                  {month}
+                </h2>
+                <div className={cn(
+                  viewMode === 'icon' 
+                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
+                    : "space-y-2 sm:space-y-3"
+                )}>
+                  {docs.map(doc => (
+                    <DocumentCard
+                      key={doc.id}
+                      document={doc}
+                      compact={viewMode === 'list'}
+                      onView={setSelectedDocument}
+                      onDelete={(doc) => {
+                        if (confirm('Delete this document?')) {
+                          deleteDocumentMutation.mutate(doc.id);
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
+            ))}
+          </div>
+        )}
+      </main>
 
-              <div className="space-y-2">
-                <Label htmlFor="document_date">Document Date</Label>
-                <Input
-                  id="document_date"
-                  type="date"
-                  value={formData.document_date}
-                  onChange={(e) => setFormData({ ...formData, document_date: e.target.value })}
-                />
-              </div>
-            </div>
+      <UploadModal
+        profileId={currentProfile?.id}
+        onSuccess={() => {
+          setShowUploadModal(false);
+          queryClient.invalidateQueries(['documents']);
+        }}
+        onCancel={() => setShowUploadModal(false)}
+      />
 
-            <div className="space-y-2">
-              <Label htmlFor="facility_name">Healthcare Facility</Label>
-              <Input
-                id="facility_name"
-                value={formData.facility_name}
-                onChange={(e) => setFormData({ ...formData, facility_name: e.target.value })}
-                placeholder="e.g., City Hospital"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Additional notes or observations"
-                rows={3}
-              />
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setUploadOpen(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500"
-                disabled={uploading}
-              >
-                {uploading ? 'Uploading...' : 'Upload Document'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <DocumentViewer
+        document={selectedDocument}
+        open={!!selectedDocument}
+        onClose={() => setSelectedDocument(null)}
+      />
     </div>
   );
 }
