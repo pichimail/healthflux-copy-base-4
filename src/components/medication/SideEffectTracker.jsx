@@ -116,195 +116,194 @@ Notes: ${sideEffect.notes || 'None'}`;
   const unreportedCount = sideEffects.filter(se => !se.reported_to_doctor).length;
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-600" />
-              Side Effects Tracker
-              {unreportedCount > 0 && (
-                <Badge variant="destructive">{unreportedCount} Unreported</Badge>
-              )}
-            </CardTitle>
-            <Button onClick={() => setShowForm(true)} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Log Side Effect
-            </Button>
+    <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+      <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+            <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5 text-orange-600" />
+            Side Effects
+            {unreportedCount > 0 && (
+              <Badge variant="destructive" className="text-xs">{unreportedCount}</Badge>
+            )}
+          </CardTitle>
+          <Button onClick={() => setShowForm(true)} size="sm" className="rounded-2xl text-xs active-press h-9 sm:h-10 shadow-lg">
+            <Plus className="h-3 sm:h-4 w-3 sm:w-4 mr-1" />
+            Log
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="p-3 sm:p-4">
+        {sideEffects.length === 0 ? (
+          <div className="text-center py-6 sm:py-8">
+            <AlertCircle className="h-10 sm:h-12 w-10 sm:w-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-xs sm:text-sm text-gray-600">No side effects logged</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          {sideEffects.length === 0 ? (
-            <div className="text-center py-8">
-              <AlertCircle className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-sm text-gray-600">No side effects logged</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Track any side effects to share with your doctor
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {sideEffects.map(se => {
-                const medication = medications.find(m => m.id === se.medication_id);
-                return (
-                  <Card key={se.id} className="border-gray-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className={getSeverityColor(se.severity)}>
-                              {se.severity}
+        ) : (
+          <div className="space-y-2 sm:space-y-3">
+            {sideEffects.map(se => {
+              const medication = medications.find(m => m.id === se.medication_id);
+              return (
+                <Card key={se.id} className="border-gray-200 rounded-2xl">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                          <Badge variant="outline" className={`${getSeverityColor(se.severity)} text-xs rounded-xl`}>
+                            {se.severity}
+                          </Badge>
+                          {se.reported_to_doctor && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 text-xs rounded-xl">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Reported
                             </Badge>
-                            {se.reported_to_doctor && (
-                              <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Reported
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="font-semibold text-slate-900">{se.symptom}</p>
-                          <p className="text-sm text-slate-600">
-                            {medication?.medication_name} • {format(new Date(se.onset_time), 'MMM d, h:mm a')}
-                          </p>
-                          {se.duration_minutes && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              <Clock className="h-3 w-3 inline mr-1" />
-                              Duration: {se.duration_minutes} minutes
-                            </p>
-                          )}
-                          {se.notes && (
-                            <p className="text-xs text-slate-600 mt-2 bg-slate-50 p-2 rounded">
-                              {se.notes}
-                            </p>
                           )}
                         </div>
-                        {!se.reported_to_doctor && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => reportMutation.mutate(se.id)}
-                            disabled={reportMutation.isPending}
-                          >
-                            <Send className="h-3 w-3 mr-1" />
-                            Report
-                          </Button>
+                        <p className="font-semibold text-[#0A0A0A] text-sm truncate">{se.symptom}</p>
+                        <p className="text-xs text-gray-600 truncate">
+                          {medication?.medication_name} • {format(new Date(se.onset_time), 'MMM d')}
+                        </p>
+                        {se.duration_minutes && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            <Clock className="h-3 w-3 inline mr-1" />
+                            {se.duration_minutes}m
+                          </p>
+                        )}
+                        {se.notes && (
+                          <p className="text-xs text-gray-600 mt-2 bg-gray-50 p-2 rounded-xl">
+                            {se.notes}
+                          </p>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                      {!se.reported_to_doctor && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => reportMutation.mutate(se.id)}
+                          disabled={reportMutation.isPending}
+                          className="rounded-2xl text-xs active-press h-9 flex-shrink-0 ml-2"
+                        >
+                          <Send className="h-3 w-3 mr-1" />
+                          Report
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
 
-      {/* Form Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Log Side Effect</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Medication *</Label>
-              <Select
-                value={formData.medication_id}
-                onValueChange={(value) => setFormData({ ...formData, medication_id: value })}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select medication" />
-                </SelectTrigger>
-                <SelectContent>
-                  {medications.map(med => (
-                    <SelectItem key={med.id} value={med.id}>
-                      {med.medication_name} {med.dosage}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    <Dialog open={showForm} onOpenChange={setShowForm}>
+      <DialogContent className="w-[95vw] sm:max-w-2xl p-4 sm:p-6 rounded-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-base sm:text-lg">Log Side Effect</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label className="text-sm">Medication *</Label>
+            <Select
+              value={formData.medication_id}
+              onValueChange={(value) => setFormData({ ...formData, medication_id: value })}
+              required
+            >
+              <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                {medications.map(med => (
+                  <SelectItem key={med.id} value={med.id}>
+                    {med.medication_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Severity *</Label>
-              <Select
-                value={formData.severity}
-                onValueChange={(value) => setFormData({ ...formData, severity: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mild">Mild - Minor discomfort</SelectItem>
-                  <SelectItem value="moderate">Moderate - Noticeable symptoms</SelectItem>
-                  <SelectItem value="severe">Severe - Significant impact</SelectItem>
-                  <SelectItem value="life_threatening">Life Threatening - Emergency</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label className="text-sm">Severity *</Label>
+            <Select
+              value={formData.severity}
+              onValueChange={(value) => setFormData({ ...formData, severity: value })}
+            >
+              <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mild">Mild</SelectItem>
+                <SelectItem value="moderate">Moderate</SelectItem>
+                <SelectItem value="severe">Severe</SelectItem>
+                <SelectItem value="life_threatening">Life Threatening</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
+          <div className="space-y-2">
+            <Label className="text-sm">Symptom *</Label>
+            <Input
+              value={formData.symptom}
+              onChange={(e) => setFormData({ ...formData, symptom: e.target.value })}
+              placeholder="Nausea, Headache"
+              className="h-11 sm:h-12 rounded-2xl"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label>Symptom/Side Effect *</Label>
+              <Label className="text-sm">When? *</Label>
               <Input
-                value={formData.symptom}
-                onChange={(e) => setFormData({ ...formData, symptom: e.target.value })}
-                placeholder="e.g., Nausea, Headache, Dizziness"
+                type="datetime-local"
+                value={formData.onset_time}
+                onChange={(e) => setFormData({ ...formData, onset_time: e.target.value })}
+                className="h-11 sm:h-12 rounded-2xl"
                 required
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>When did it start? *</Label>
-                <Input
-                  type="datetime-local"
-                  value={formData.onset_time}
-                  onChange={(e) => setFormData({ ...formData, onset_time: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Duration (minutes)</Label>
-                <Input
-                  type="number"
-                  value={formData.duration_minutes}
-                  onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
-                  placeholder="Optional"
-                />
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label>Additional Notes</Label>
-              <Textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Any additional details..."
-                rows={3}
+              <Label className="text-sm">Duration (min)</Label>
+              <Input
+                type="number"
+                value={formData.duration_minutes}
+                onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
+                placeholder="30"
+                className="h-11 sm:h-12 rounded-2xl"
               />
             </div>
+          </div>
 
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowForm(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={createMutation.isPending}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-              >
-                {createMutation.isPending ? 'Saving...' : 'Log Side Effect'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+          <div className="space-y-2">
+            <Label className="text-sm">Notes</Label>
+            <Textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              placeholder="Details..."
+              rows={3}
+              className="rounded-2xl"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+              className="rounded-2xl active-press h-11"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-2xl active-press shadow-lg h-11"
+            >
+              {createMutation.isPending ? 'Saving...' : 'Log'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
