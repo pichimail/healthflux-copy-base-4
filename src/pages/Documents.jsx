@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { 
   Upload, Search, Filter, Grid, List, FileText, 
   Calendar, X
@@ -17,6 +18,7 @@ import DocumentCard from '../components/health/DocumentCard';
 import UploadModal from '../components/health/UploadModal';
 import DocumentViewer from '../components/health/DocumentViewer';
 import DocumentSearchBar from '../components/health/DocumentSearchBar';
+import ShareRecordButton from '../components/ShareRecordButton';
 
 export default function Documents() {
   const [user, setUser] = useState(null);

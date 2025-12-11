@@ -29,6 +29,7 @@ import Wearables from './pages/Wearables';
 import FamilyProfiles from './pages/FamilyProfiles';
 import Insurance from './pages/Insurance';
 import OnboardingDocUpload from './pages/OnboardingDocUpload';
+import SharedRecord from './pages/SharedRecord';
 import __Layout from './Layout.jsx';
 
 
@@ -64,6 +65,7 @@ export const PAGES = {
     "FamilyProfiles": FamilyProfiles,
     "Insurance": Insurance,
     "OnboardingDocUpload": OnboardingDocUpload,
+    "SharedRecord": SharedRecord,
 }
 
 export const pagesConfig = {
