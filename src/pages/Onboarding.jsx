@@ -39,7 +39,7 @@ export default function Onboarding() {
       });
       
       if (profiles.length > 0) {
-        navigate(createPageUrl('Dashboard'));
+        navigate(createPageUrl('OnboardingDocUpload'));
       }
     } catch (error) {
       console.error('Error checking profile:', error);

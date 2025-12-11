@@ -27,6 +27,8 @@ import Analytics from './pages/Analytics';
 import FamilySharing from './pages/FamilySharing';
 import Wearables from './pages/Wearables';
 import FamilyProfiles from './pages/FamilyProfiles';
+import Insurance from './pages/Insurance';
+import OnboardingDocUpload from './pages/OnboardingDocUpload';
 import __Layout from './Layout.jsx';
 
 
@@ -60,6 +62,8 @@ export const PAGES = {
     "FamilySharing": FamilySharing,
     "Wearables": Wearables,
     "FamilyProfiles": FamilyProfiles,
+    "Insurance": Insurance,
+    "OnboardingDocUpload": OnboardingDocUpload,
 }
 
 export const pagesConfig = {

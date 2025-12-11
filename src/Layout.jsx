@@ -64,7 +64,8 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Wellness Insights', page: 'WellnessInsights', icon: TrendingUp },
     { name: 'Smart Insights', page: 'Insights', icon: Brain },
     { name: 'Family Profiles', page: 'FamilyProfiles', icon: Users },
-    { name: 'Wearables', page: 'Wearables', icon: Activity },
+    { name: 'Wearables', page: 'Wearables', icon: Watch },
+    { name: 'Insurance', page: 'Insurance', icon: Shield },
     { name: 'Emergency Profile', page: 'EmergencyProfile', icon: AlertCircle },
   ];
 
