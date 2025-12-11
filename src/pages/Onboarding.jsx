@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Activity, ArrowRight } from 'lucide-react';
 import LanguageSelector from '../components/LanguageSelector';
-import { createPageUrl } from './utils';
+import { createPageUrl } from '../utils';
 import i18n from '../components/i18n/i18nSetup';
 import { translations } from '../components/i18n/translations';
 
