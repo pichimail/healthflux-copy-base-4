@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, TrendingUp, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
-export default function EffectivenessTracker({ medication, profileId }) {
+export default function EffectivenessTracker({ medication, profileId, effectivenessData: providedData }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     rating: 3,

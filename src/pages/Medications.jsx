@@ -333,9 +333,15 @@ export default function Medications() {
                     </div>
                   </div>
 
-                  <RefillManager medication={med} profileId={med.profile_id} />
-                  
-                  <EffectivenessTracker medication={med} profileId={med.profile_id} />
+                  <RefillManager 
+                    medication={med} 
+                    profileId={med.profile_id}
+                    reminders={allRefillReminders.filter(r => r.medication_id === med.id)} />
+
+                  <EffectivenessTracker 
+                    medication={med} 
+                    profileId={med.profile_id}
+                    effectivenessData={allEffectiveness.filter(e => e.medication_id === med.id)} />
 
                   <AIEnhancedFeatures medication={med} profileId={med.profile_id} />
 

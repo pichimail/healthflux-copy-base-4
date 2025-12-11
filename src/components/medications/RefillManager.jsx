@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Calendar, Phone, CheckCircle, AlertCircle, Package } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
-export default function RefillManager({ medication, profileId }) {
+export default function RefillManager({ medication, profileId, reminders: providedReminders }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     pharmacy_name: '',
