@@ -149,7 +149,7 @@ export default function LabResults() {
   };
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Mobile-First Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
@@ -217,10 +217,14 @@ export default function LabResults() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-          {labResults.map((result) => {
+          {labResults.map((result, index) => {
             const profile = profiles.find(p => p.id === result.profile_id);
             return (
-              <Card key={result.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl overflow-hidden active-press hover:shadow-lg transition-all">
+              <Card 
+                key={result.id} 
+                className="border-0 card-shadow rounded-2xl sm:rounded-3xl overflow-hidden card-interactive hover:shadow-lg fade-in-up"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
                 <div className="h-1" style={{ backgroundColor: result.flag === 'normal' ? '#EFF1ED' : result.flag === 'high' ? '#F7C9A3' : '#E9F46A' }} />
                 <CardContent className="p-4 sm:p-5">
                   <div className="flex justify-between items-start mb-3 sm:mb-4">

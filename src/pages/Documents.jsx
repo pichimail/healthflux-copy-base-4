@@ -256,7 +256,7 @@ export default function Documents() {
   }
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Mobile-First Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div className="flex-1">
@@ -445,9 +445,11 @@ export default function Documents() {
                   ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3"
                   : "space-y-2 sm:space-y-3"
               )}>
-                {docs.map(doc => (
+                {docs.map((doc, index) => (
                   <DocumentCard
                     key={doc.id}
+                    className="fade-in-up"
+                    style={{ animationDelay: `${index * 0.05}s` }}
                     document={doc}
                     compact={viewMode === 'list'}
                     onView={setSelectedDocument}
