@@ -27,8 +27,10 @@ export default function EffectivenessTracker({ medication, profileId, effectiven
     queryFn: () => base44.entities.MedicationEffectiveness.filter({ 
       medication_id: medication.id 
     }, '-recorded_at'),
-    enabled: !!medication?.id,
+    enabled: !!medication?.id && !providedData,
   });
+
+  const finalEffectiveness = providedData || effectiveness;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.MedicationEffectiveness.create(data),
@@ -63,12 +65,12 @@ export default function EffectivenessTracker({ medication, profileId, effectiven
     });
   };
 
-  const avgRating = effectiveness.length > 0
-    ? (effectiveness.reduce((sum, e) => sum + e.rating, 0) / effectiveness.length).toFixed(1)
+  const avgRating = finalEffectiveness.length > 0
+    ? (finalEffectiveness.reduce((sum, e) => sum + e.rating, 0) / finalEffectiveness.length).toFixed(1)
     : 0;
 
-  const avgImprovement = effectiveness.length > 0
-    ? Math.round(effectiveness.reduce((sum, e) => sum + e.improvement_percentage, 0) / effectiveness.length)
+  const avgImprovement = finalEffectiveness.length > 0
+    ? Math.round(finalEffectiveness.reduce((sum, e) => sum + e.improvement_percentage, 0) / finalEffectiveness.length)
     : 0;
 
   return (
@@ -90,7 +92,7 @@ export default function EffectivenessTracker({ medication, profileId, effectiven
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
-          {effectiveness.length === 0 ? (
+          {finalEffectiveness.length === 0 ? (
             <p className="text-center text-gray-600 py-4 text-xs">No ratings yet</p>
           ) : (
             <div className="grid grid-cols-2 gap-3">

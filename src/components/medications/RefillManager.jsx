@@ -28,8 +28,10 @@ export default function RefillManager({ medication, profileId, reminders: provid
       medication_id: medication.id,
       status: 'pending'
     }, '-refill_due_date'),
-    enabled: !!medication?.id,
+    enabled: !!medication?.id && !providedReminders,
   });
+
+  const finalRefills = providedReminders || refills;
 
   const createReminderMutation = useMutation({
     mutationFn: (data) => base44.entities.RefillReminder.create(data),
@@ -55,7 +57,7 @@ export default function RefillManager({ medication, profileId, reminders: provid
     });
   };
 
-  const dueRefills = refills.filter(r => {
+  const dueRefills = finalRefills.filter(r => {
     const daysUntil = Math.ceil((new Date(r.refill_due_date) - new Date()) / (1000 * 60 * 60 * 24));
     return daysUntil <= 7;
   });
