@@ -65,20 +65,29 @@ Format as JSON:
       messages: [
         {
           role: "system",
-          content: "You are a nutrition analysis AI that provides accurate, health-conscious meal assessments. Always respond with valid JSON."
+          content: "You are a nutrition analysis AI. You MUST respond with ONLY valid JSON, no markdown, no code blocks, just raw JSON."
         },
         {
           role: "user",
           content: [
-            { type: "text", text: prompt },
+            { 
+              type: "text", 
+              text: prompt + "\n\nIMPORTANT: Return ONLY the JSON object, no markdown formatting, no code blocks." 
+            },
             { type: "image_url", image_url: { url: image_url } }
           ]
         }
       ],
+      response_format: { type: "json_object" },
       max_tokens: 1500,
     });
 
-    const analysis = JSON.parse(response.choices[0].message.content);
+    let content = response.choices[0].message.content;
+    
+    // Remove markdown code blocks if present
+    content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    const analysis = JSON.parse(content);
 
     return Response.json({
       success: true,
