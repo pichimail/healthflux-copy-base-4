@@ -22,6 +22,7 @@ import Settings from './pages/Settings';
 import WellnessInsights from './pages/WellnessInsights';
 import SymptomChecker from './pages/SymptomChecker';
 import HealthTrends from './pages/HealthTrends';
+import MealLogging from './pages/MealLogging';
 import __Layout from './Layout.jsx';
 
 
@@ -50,6 +51,7 @@ export const PAGES = {
     "WellnessInsights": WellnessInsights,
     "SymptomChecker": SymptomChecker,
     "HealthTrends": HealthTrends,
+    "MealLogging": MealLogging,
 }
 
 export const pagesConfig = {
