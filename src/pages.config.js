@@ -20,6 +20,7 @@ import AdminNotifications from './pages/AdminNotifications';
 import AdminRoles from './pages/AdminRoles';
 import Settings from './pages/Settings';
 import WellnessInsights from './pages/WellnessInsights';
+import SymptomChecker from './pages/SymptomChecker';
 import __Layout from './Layout.jsx';
 
 
@@ -46,6 +47,7 @@ export const PAGES = {
     "AdminRoles": AdminRoles,
     "Settings": Settings,
     "WellnessInsights": WellnessInsights,
+    "SymptomChecker": SymptomChecker,
 }
 
 export const pagesConfig = {
