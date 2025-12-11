@@ -83,10 +83,25 @@ export default function Settings() {
         <p className="text-xs sm:text-sm text-gray-600">Account preferences</p>
       </div>
 
+      {/* Language Section */}
+      <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-3 sm:mb-4">
+        <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
+          <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">
+            {t('settings.language')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4">
+          <Label className="text-xs text-gray-600 mb-2 block">{t('settings.language_preference')}</Label>
+          <LanguageSwitcher showLabel={false} />
+        </CardContent>
+      </Card>
+
       {/* Account Info */}
       <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-3 sm:mb-4">
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-          <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Account</CardTitle>
+          <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">
+            {t('settings.account_info')}
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
           <div className="space-y-3 sm:space-y-4">
@@ -111,7 +126,7 @@ export default function Settings() {
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
           <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A] flex items-center gap-2">
             <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
-            Notifications
+            {t('settings.notifications')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
