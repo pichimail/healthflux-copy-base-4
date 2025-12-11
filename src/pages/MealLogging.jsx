@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +21,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function MealLogging() {
+  const { t } = useTranslation();
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -200,9 +202,9 @@ export default function MealLogging() {
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-          🍽️ Meal Logging
+          🍽️ {t('meal_logging.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Flux's nutrition tracking</p>
+        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{t('meal_logging.subtitle')}</p>
         
         {profiles.length > 0 &&
         <ProfileSwitcher
@@ -219,7 +221,7 @@ export default function MealLogging() {
           <div className="flex justify-between items-center">
             <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Daily Goals - {format(new Date(selectedDate), 'MMM d')}
+              {t('meal_logging.daily_goals')} - {format(new Date(selectedDate), 'MMM d')}
             </CardTitle>
             {!nutritionGoal &&
             <Button
@@ -228,7 +230,7 @@ export default function MealLogging() {
               className="bg-[#0A0A0A] text-white rounded-xl text-xs">
 
                 <Sparkles className="w-3 h-3 mr-1" />
-                Generate
+                {t('common.generate') || 'Generate'}
               </Button>
             }
           </div>
@@ -238,11 +240,11 @@ export default function MealLogging() {
           <div className="space-y-3">
               <div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm font-semibold">Calories</span>
+                  <span className="text-sm font-semibold">{t('meal_logging.calories')}</span>
                   <span className="text-sm">
                     {dailyTotals.calories} / {nutritionGoal.daily_calories}
                     <span className="text-xs ml-2 text-gray-600">
-                      ({remainingCalories > 0 ? remainingCalories : 0} left)
+                      ({remainingCalories > 0 ? remainingCalories : 0} {t('meal_logging.left') || 'left'})
                     </span>
                   </span>
                 </div>
@@ -251,17 +253,17 @@ export default function MealLogging() {
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="bg-white/80 p-2 rounded-xl">
-                  <div className="text-xs text-gray-600">Protein</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.protein')}</div>
                   <div className="text-sm font-bold">{dailyTotals.protein}g / {nutritionGoal.daily_protein}g</div>
                   <Progress value={dailyTotals.protein / nutritionGoal.daily_protein * 100} className="h-1 mt-1" />
                 </div>
                 <div className="bg-white/80 p-2 rounded-xl">
-                  <div className="text-xs text-gray-600">Carbs</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.carbs')}</div>
                   <div className="text-sm font-bold">{dailyTotals.carbs}g / {nutritionGoal.daily_carbs}g</div>
                   <Progress value={dailyTotals.carbs / nutritionGoal.daily_carbs * 100} className="h-1 mt-1" />
                 </div>
                 <div className="bg-white/80 p-2 rounded-xl">
-                  <div className="text-xs text-gray-600">Fat</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.fat')}</div>
                   <div className="text-sm font-bold">{dailyTotals.fat}g / {nutritionGoal.daily_fat}g</div>
                   <Progress value={dailyTotals.fat / nutritionGoal.daily_fat * 100} className="h-1 mt-1" />
                 </div>
@@ -269,15 +271,15 @@ export default function MealLogging() {
 
               {nutritionGoal.is_ai_generated && nutritionGoal.rationale &&
             <div className="bg-white/50 p-3 rounded-xl text-xs">
-                  <p className="font-semibold mb-1">Flux Recommendation:</p>
-                  <p className="text-gray-700">{nutritionGoal.rationale}</p>
-                </div>
+                <p className="font-semibold mb-1">{t('meal_logging.flux_recommendation') || 'Flux Recommendation'}:</p>
+                <p className="text-gray-700">{nutritionGoal.rationale}</p>
+              </div>
             }
             </div> :
 
           <div className="text-center py-4">
               <Target className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600 mb-3">No nutrition goals set</p>
+              <p className="text-sm text-gray-600 mb-3">{t('meal_logging.no_goals')}</p>
               <Button
               onClick={() => setShowGoalCalc(true)}
               className="bg-[#0A0A0A] text-white rounded-2xl"
@@ -286,12 +288,12 @@ export default function MealLogging() {
                 {calculateGoalMutation.isLoading ?
               <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Calculating...
+                    {t('meal_logging.calculating')}
                   </> :
 
               <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Calculate My Goals
+                    {t('meal_logging.calc_goals')}
                   </>
               }
               </Button>
@@ -304,9 +306,9 @@ export default function MealLogging() {
       {showGoalCalc &&
       <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-4" style={{ backgroundColor: '#EDE6F7' }}>
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-2">Generate Personalized Goals</h3>
+            <h3 className="font-semibold mb-2">{t('meal_logging.generate_goals')}</h3>
             <p className="text-xs text-gray-700 mb-3">
-              Our AI will analyze your health data (vitals, trends, conditions) to calculate optimal daily nutrition goals.
+              {t('meal_logging.goals_desc')}
             </p>
             <div className="flex gap-2">
               <Button
@@ -317,10 +319,10 @@ export default function MealLogging() {
                 {calculateGoalMutation.isLoading ?
               <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Calculating...
+                    {t('meal_logging.calculating')}
                   </> :
 
-              'Generate Goals'
+              t('meal_logging.generate_goals')
               }
               </Button>
               <Button
@@ -328,7 +330,7 @@ export default function MealLogging() {
               onClick={() => setShowGoalCalc(false)}
               className="rounded-2xl">
 
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </CardContent>
@@ -340,7 +342,7 @@ export default function MealLogging() {
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
           <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-2">
             <Camera className="w-5 h-5" />
-            Log a Meal
+            {t('meal_logging.log_meal')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
@@ -361,16 +363,16 @@ export default function MealLogging() {
               {uploading ?
               <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  {analyzing ? 'Analyzing...' : 'Uploading...'}
+                  {analyzing ? t('symptoms.analyzing') : t('meal_logging.uploading')}
                 </> :
 
               <>
                   <Camera className="w-5 h-5" />
-                  Take Photo / Upload
+                  {t('meal_logging.take_photo')}
                 </>
               }
             </label>
-            <p className="text-xs text-gray-600 mt-2">Flux will analyze nutrition instantly</p>
+            <p className="text-xs text-gray-600 mt-2">{t('meal_logging.analyze_desc')}</p>
           </div>
         </CardContent>
       </Card>
@@ -379,7 +381,7 @@ export default function MealLogging() {
       {analysisResult &&
       <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-4" style={{ backgroundColor: '#F7C9A3' }}>
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-            <CardTitle className="text-sm sm:text-base font-semibold">Analysis Results</CardTitle>
+            <CardTitle className="text-sm sm:text-base font-semibold">{t('meal_logging.analysis_results')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
             <div className="space-y-3">
@@ -400,31 +402,31 @@ export default function MealLogging() {
               <div className="grid grid-cols-4 gap-2">
                 <div className="bg-white/80 p-2 rounded-xl text-center">
                   <Flame className="w-4 h-4 mx-auto mb-1 text-orange-600" />
-                  <div className="text-xs text-gray-600">Calories</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.calories')}</div>
                   <div className="text-sm font-bold">{analysisResult.calories}</div>
                 </div>
                 <div className="bg-white/80 p-2 rounded-xl text-center">
-                  <div className="text-xs text-gray-600">Protein</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.protein')}</div>
                   <div className="text-sm font-bold">{analysisResult.protein}g</div>
                 </div>
                 <div className="bg-white/80 p-2 rounded-xl text-center">
-                  <div className="text-xs text-gray-600">Carbs</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.carbs')}</div>
                   <div className="text-sm font-bold">{analysisResult.carbs}g</div>
                 </div>
                 <div className="bg-white/80 p-2 rounded-xl text-center">
-                  <div className="text-xs text-gray-600">Fat</div>
+                  <div className="text-xs text-gray-600">{t('meal_logging.fat')}</div>
                   <div className="text-sm font-bold">{analysisResult.fat}g</div>
                 </div>
               </div>
 
               <div className="bg-white/50 p-3 rounded-xl">
-                <p className="text-xs font-semibold mb-1">Health Feedback:</p>
+                <p className="text-xs font-semibold mb-1">{t('meal_logging.health_feedback')}:</p>
                 <p className="text-xs text-gray-700">{analysisResult.health_feedback}</p>
               </div>
 
               {analysisResult.recommendations && analysisResult.recommendations.length > 0 &&
             <div className="bg-white/50 p-3 rounded-xl">
-                  <p className="text-xs font-semibold mb-2">Recommendations:</p>
+                  <p className="text-xs font-semibold mb-2">{t('symptoms.recommendations')}:</p>
                   <ul className="space-y-1">
                     {analysisResult.recommendations.map((rec, idx) =>
                 <li key={idx} className="text-xs text-gray-700 flex items-start gap-2">
@@ -438,7 +440,7 @@ export default function MealLogging() {
 
               {analysisResult.warnings && analysisResult.warnings.length > 0 &&
             <div className="bg-red-50 p-3 rounded-xl">
-                  <p className="text-xs font-semibold mb-2 text-red-700">⚠️ Warnings:</p>
+                  <p className="text-xs font-semibold mb-2 text-red-700">⚠️ {t('meal_logging.warnings') || 'Warnings'}:</p>
                   <ul className="space-y-1">
                     {analysisResult.warnings.map((warn, idx) =>
                 <li key={idx} className="text-xs text-red-700">{warn}</li>
@@ -455,10 +457,10 @@ export default function MealLogging() {
                 {saveMealMutation.isLoading ?
               <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
+                    {t('meal_logging.saving')}
                   </> :
 
-              'Save Meal'
+              t('meal_logging.save_meal')
               }
               </Button>
             </div>
@@ -479,7 +481,7 @@ export default function MealLogging() {
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              7-Day Calorie Trend
+              {t('meal_logging.7day_trend')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
@@ -489,8 +491,8 @@ export default function MealLogging() {
                 <XAxis dataKey="date" style={{ fontSize: '11px' }} />
                 <YAxis style={{ fontSize: '11px' }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="calories" stroke="#F7C9A3" strokeWidth={2} name="Actual" />
-                <Line type="monotone" dataKey="goal" stroke="#0B5A46" strokeWidth={2} strokeDasharray="5 5" name="Goal" />
+                <Line type="monotone" dataKey="calories" stroke="#F7C9A3" strokeWidth={2} name={t('meal_logging.actual') || 'Actual'} />
+                <Line type="monotone" dataKey="goal" stroke="#0B5A46" strokeWidth={2} strokeDasharray="5 5" name={t('meal_logging.goal') || 'Goal'} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -501,7 +503,7 @@ export default function MealLogging() {
       <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-4">
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-sm sm:text-base font-semibold">Today's Meals</CardTitle>
+            <CardTitle className="text-sm sm:text-base font-semibold">{t('meal_logging.todays_meals')}</CardTitle>
             <Input
               type="date"
               value={selectedDate}
@@ -513,7 +515,7 @@ export default function MealLogging() {
         <CardContent className="p-3 sm:p-4">
           {todayMeals.length === 0 ?
           <div className="text-center py-8 text-gray-500 text-sm">
-              No meals logged yet today
+              {t('meal_logging.no_meals')}
             </div> :
 
           <div className="space-y-2">
@@ -575,20 +577,20 @@ export default function MealLogging() {
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">Avg Daily</div>
+            <div className="text-xs text-gray-600 mb-1">{t('meal_logging.avg_daily')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {avgDailyCalories}
             </div>
-            <div className="text-xs text-gray-600">cal/day</div>
+            <div className="text-xs text-gray-600">{t('meal_logging.cal_day')}</div>
           </CardContent>
         </Card>
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">This Month</div>
+            <div className="text-xs text-gray-600 mb-1">{t('meal_logging.this_month')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {monthMeals.length}
             </div>
-            <div className="text-xs text-gray-600">meals logged</div>
+            <div className="text-xs text-gray-600">{t('meal_logging.meals_logged')}</div>
           </CardContent>
         </Card>
       </div>
