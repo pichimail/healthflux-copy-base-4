@@ -154,7 +154,7 @@ export default function Vitals() {
   };
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Mobile-First Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>

@@ -187,7 +187,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Mobile-First Header */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col gap-3 sm:gap-4">

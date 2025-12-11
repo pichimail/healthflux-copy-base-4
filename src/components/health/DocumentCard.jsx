@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
 
-export default function DocumentCard({ document, compact = false, onView, onDelete, onReprocess }) {
+export default function DocumentCard({ document, compact = false, onView, onDelete, onReprocess, className, style }) {
   const getFileIcon = (fileType) => {
     if (fileType?.includes('image')) return <Image className="h-6 w-6 text-blue-500" />;
     if (fileType?.includes('pdf')) return <FileText className="h-6 w-6 text-red-500" />;
@@ -45,7 +45,7 @@ export default function DocumentCard({ document, compact = false, onView, onDele
   };
 
   return (
-    <Card className="active-press card-shadow hover:shadow-lg transition-all border-gray-200 rounded-2xl sm:rounded-3xl overflow-hidden">
+    <Card className={cn("card-interactive card-shadow hover:shadow-lg border-gray-200 rounded-2xl sm:rounded-3xl overflow-hidden", className)} style={style}>
       <CardContent className="p-0">
         <div className="flex">
           <div 
