@@ -71,6 +71,23 @@ export default function Medications() {
     enabled: !!selectedMed
   });
 
+  // Fetch all refill reminders and effectiveness data once
+  const { data: allRefillReminders = [] } = useQuery({
+    queryKey: ['allRefillReminders', selectedProfile],
+    queryFn: () => selectedProfile ?
+    base44.entities.RefillReminder.filter({ profile_id: selectedProfile, status: 'pending' }, '-refill_due_date') :
+    [],
+    enabled: !!selectedProfile
+  });
+
+  const { data: allEffectiveness = [] } = useQuery({
+    queryKey: ['allEffectiveness', selectedProfile],
+    queryFn: () => selectedProfile ?
+    base44.entities.MedicationEffectiveness.filter({ profile_id: selectedProfile }, '-recorded_at') :
+    [],
+    enabled: !!selectedProfile
+  });
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Medication.create(data),
     onSuccess: () => {

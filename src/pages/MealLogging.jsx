@@ -83,8 +83,8 @@ export default function MealLogging() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file) => {
-      const { data } = await base44.integrations.Core.UploadFile({ file });
-      return data.file_url;
+      const result = await base44.integrations.Core.UploadFile({ file });
+      return result.file_url;
     }
   });
 
