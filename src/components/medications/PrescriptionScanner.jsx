@@ -17,8 +17,8 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
 
   const uploadMutation = useMutation({
     mutationFn: async (file) => {
-      const { data } = await base44.integrations.Core.UploadFile({ file });
-      return data.file_url;
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      return file_url;
     }
   });
 
