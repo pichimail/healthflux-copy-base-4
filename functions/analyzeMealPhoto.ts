@@ -61,11 +61,11 @@ Format as JSON:
 }`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a nutrition analysis AI that provides accurate, health-conscious meal assessments."
+          content: "You are a nutrition analysis AI that provides accurate, health-conscious meal assessments. Always respond with valid JSON."
         },
         {
           role: "user",
@@ -75,8 +75,7 @@ Format as JSON:
           ]
         }
       ],
-      response_format: { type: "json_object" },
-      max_tokens: 1000,
+      max_tokens: 1500,
     });
 
     const analysis = JSON.parse(response.choices[0].message.content);
