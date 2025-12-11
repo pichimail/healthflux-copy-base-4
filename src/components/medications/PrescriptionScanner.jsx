@@ -22,22 +22,32 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
     }
   });
 
+  const mapFrequency = (freq) => {
+    const lower = freq?.toLowerCase() || '';
+    if (lower.includes('once') || (lower.includes('1') && lower.includes('day'))) return 'once_daily';
+    if (lower.includes('twice') || (lower.includes('2') && lower.includes('day'))) return 'twice_daily';
+    if (lower.includes('three') || (lower.includes('3') && lower.includes('day'))) return 'three_times_daily';
+    if (lower.includes('four') || (lower.includes('4') && lower.includes('day'))) return 'four_times_daily';
+    if (lower.includes('needed') || lower.includes('prn')) return 'as_needed';
+    return 'once_daily';
+  };
+
+  const generateTimes = (frequency) => {
+    const timeMap = {
+      once_daily: ['08:00'],
+      twice_daily: ['08:00', '20:00'],
+      three_times_daily: ['08:00', '14:00', '20:00'],
+      four_times_daily: ['08:00', '12:00', '16:00', '20:00'],
+      as_needed: []
+    };
+    return timeMap[frequency] || ['08:00'];
+  };
+
   const extractMutation = useMutation({
     mutationFn: async (fileUrl) => {
-      // Extract medications using AI directly
+      // Extract medications using AI
       const extraction = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a medical AI assistant. Extract all medication information from this prescription or medication label image.
-
-For each medication identified, extract:
-- Medication name (generic and brand if available)
-- Dosage (e.g., 500mg, 10mg)
-- Frequency (once_daily, twice_daily, three_times_daily, four_times_daily, as_needed)
-- Instructions (e.g., take with food, take at bedtime)
-- Prescriber name (if visible)
-- Refills remaining (if visible)
-- Any special warnings or notes
-
-Provide suggested times based on frequency (e.g., ["08:00", "20:00"] for twice daily).`,
+        prompt: `Analyze this prescription and extract all medications with their details. For each medication, extract: medication name, generic name (if mentioned), dosage, frequency (describe naturally like "once daily", "twice daily", etc.), route of administration, prescribed by (doctor name), purpose, and special instructions.`,
         file_urls: [fileUrl],
         response_json_schema: {
           type: 'object',
@@ -53,34 +63,35 @@ Provide suggested times based on frequency (e.g., ["08:00", "20:00"] for twice d
                   instructions: { type: 'string' },
                   prescriber: { type: 'string' },
                   refills_remaining: { type: 'number' },
-                  warnings: { type: 'string' },
-                  suggested_times: { type: 'array', items: { type: 'string' } }
+                  warnings: { type: 'string' }
                 }
               }
             },
-            confidence: { type: 'number' },
-            extraction_notes: { type: 'string' }
+            confidence: { type: 'number' }
           }
         }
       });
 
-      // Check for drug interactions with existing medications
+      // Map frequencies and generate times
+      const processedMeds = extraction.medications?.map(med => {
+        const frequency = mapFrequency(med.frequency);
+        const suggested_times = generateTimes(frequency);
+        return { ...med, frequency, suggested_times };
+      }) || [];
+
+      // Check for drug interactions
       const existingMeds = await base44.entities.Medication.filter({
         profile_id: profileId,
         is_active: true
       });
 
       let interactionWarnings = [];
-      if (existingMeds.length > 0 && extraction.medications?.length > 0) {
-        const newMedNames = extraction.medications.map(m => m.medication_name).join(', ');
+      if (existingMeds.length > 0 && processedMeds.length > 0) {
+        const newMedNames = processedMeds.map(m => m.medication_name).join(', ');
         const existingMedNames = existingMeds.map(m => m.medication_name).join(', ');
 
         const interactions = await base44.integrations.Core.InvokeLLM({
-          prompt: `Check for drug interactions between these NEW medications: ${newMedNames}
-          
-And these EXISTING medications: ${existingMedNames}
-
-List any potential interactions with severity level.`,
+          prompt: `Check for drug interactions between these NEW medications: ${newMedNames} and these EXISTING medications: ${existingMedNames}. List interactions with severity.`,
           response_json_schema: {
             type: 'object',
             properties: {
@@ -105,11 +116,10 @@ List any potential interactions with severity level.`,
 
       return {
         success: true,
-        medications: extraction.medications || [],
+        medications: processedMeds,
         confidence: extraction.confidence || 0,
-        extraction_notes: extraction.extraction_notes || '',
         interaction_warnings: interactionWarnings,
-        extracted_count: extraction.medications?.length || 0
+        extracted_count: processedMeds.length
       };
     },
     onSuccess: (data) => {
