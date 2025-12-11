@@ -20,6 +20,7 @@ import SideEffectTracker from '../components/medication/SideEffectTracker';
 import MedicationHistory from '../components/medication/MedicationHistory';
 import RefillManager from '../components/medications/RefillManager';
 import EffectivenessTracker from '../components/medications/EffectivenessTracker';
+import AIEnhancedFeatures from '../components/medications/AIEnhancedFeatures';
 import ProviderReports from '../components/medications/ProviderReports';
 import MedicationReconciliation from '../components/medications/MedicationReconciliation';
 import PrescriptionScanner from '../components/medications/PrescriptionScanner';
@@ -335,6 +336,8 @@ export default function Medications() {
                   <RefillManager medication={med} profileId={med.profile_id} />
                   
                   <EffectivenessTracker medication={med} profileId={med.profile_id} />
+
+                  <AIEnhancedFeatures medication={med} profileId={med.profile_id} />
 
                   <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                     <div className="flex items-center gap-2 text-xs">
