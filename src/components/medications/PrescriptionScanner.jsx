@@ -24,19 +24,104 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
 
   const extractMutation = useMutation({
     mutationFn: async (fileUrl) => {
-      const response = await base44.functions.invoke('extractMedicationFromImage', {
-        file_url: fileUrl,
-        profile_id: profileId
+      // Extract medications using AI directly
+      const extraction = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a medical AI assistant. Extract all medication information from this prescription or medication label image.
+
+For each medication identified, extract:
+- Medication name (generic and brand if available)
+- Dosage (e.g., 500mg, 10mg)
+- Frequency (once_daily, twice_daily, three_times_daily, four_times_daily, as_needed)
+- Instructions (e.g., take with food, take at bedtime)
+- Prescriber name (if visible)
+- Refills remaining (if visible)
+- Any special warnings or notes
+
+Provide suggested times based on frequency (e.g., ["08:00", "20:00"] for twice daily).`,
+        file_urls: [fileUrl],
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            medications: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  medication_name: { type: 'string' },
+                  dosage: { type: 'string' },
+                  frequency: { type: 'string' },
+                  instructions: { type: 'string' },
+                  prescriber: { type: 'string' },
+                  refills_remaining: { type: 'number' },
+                  warnings: { type: 'string' },
+                  suggested_times: { type: 'array', items: { type: 'string' } }
+                }
+              }
+            },
+            confidence: { type: 'number' },
+            extraction_notes: { type: 'string' }
+          }
+        }
       });
-      return response.data;
+
+      // Check for drug interactions with existing medications
+      const existingMeds = await base44.entities.Medication.filter({
+        profile_id: profileId,
+        is_active: true
+      });
+
+      let interactionWarnings = [];
+      if (existingMeds.length > 0 && extraction.medications?.length > 0) {
+        const newMedNames = extraction.medications.map(m => m.medication_name).join(', ');
+        const existingMedNames = existingMeds.map(m => m.medication_name).join(', ');
+
+        const interactions = await base44.integrations.Core.InvokeLLM({
+          prompt: `Check for drug interactions between these NEW medications: ${newMedNames}
+          
+And these EXISTING medications: ${existingMedNames}
+
+List any potential interactions with severity level.`,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              interactions: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    new_medication: { type: 'string' },
+                    existing_medication: { type: 'string' },
+                    severity: { type: 'string' },
+                    description: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        interactionWarnings = interactions.interactions || [];
+      }
+
+      return {
+        success: true,
+        medications: extraction.medications || [],
+        confidence: extraction.confidence || 0,
+        extraction_notes: extraction.extraction_notes || '',
+        interaction_warnings: interactionWarnings,
+        extracted_count: extraction.medications?.length || 0
+      };
     },
     onSuccess: (data) => {
-      if (data.success) {
+      if (data.success && data.extracted_count > 0) {
         setExtractedData(data);
         toast.success(`Extracted ${data.extracted_count} medication(s)`);
+      } else {
+        toast.error('No medications found in image');
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Extraction error:', error);
       toast.error('Failed to extract medications');
     }
   });
