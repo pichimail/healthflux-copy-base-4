@@ -39,35 +39,35 @@ export default function Medications() {
     end_date: '',
     purpose: '',
     prescriber: '',
-    reminders_enabled: true,
+    reminders_enabled: true
   });
 
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => base44.auth.me()
   });
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['profiles', user?.email],
     queryFn: () => base44.entities.Profile.filter({ created_by: user.email }, '-created_date'),
-    enabled: !!user,
+    enabled: !!user
   });
 
   const { data: medications = [], isLoading } = useQuery({
     queryKey: ['medications', selectedProfile],
-    queryFn: () => selectedProfile
-      ? base44.entities.Medication.filter({ profile_id: selectedProfile, is_active: true }, '-created_date')
-      : base44.entities.Medication.filter({ is_active: true }, '-created_date'),
+    queryFn: () => selectedProfile ?
+    base44.entities.Medication.filter({ profile_id: selectedProfile, is_active: true }, '-created_date') :
+    base44.entities.Medication.filter({ is_active: true }, '-created_date')
   });
 
   const { data: logs = [] } = useQuery({
     queryKey: ['medicationLogs', selectedMed?.id],
-    queryFn: () => selectedMed
-      ? base44.entities.MedicationLog.filter({ medication_id: selectedMed.id }, '-scheduled_time', 10)
-      : [],
-    enabled: !!selectedMed,
+    queryFn: () => selectedMed ?
+    base44.entities.MedicationLog.filter({ medication_id: selectedMed.id }, '-scheduled_time', 10) :
+    [],
+    enabled: !!selectedMed
   });
 
   const createMutation = useMutation({
@@ -76,7 +76,7 @@ export default function Medications() {
       queryClient.invalidateQueries(['medications']);
       setDialogOpen(false);
       resetForm();
-    },
+    }
   });
 
   const updateMutation = useMutation({
@@ -85,7 +85,7 @@ export default function Medications() {
       queryClient.invalidateQueries(['medications']);
       setDialogOpen(false);
       resetForm();
-    },
+    }
   });
 
   const logMutation = useMutation({
@@ -93,7 +93,7 @@ export default function Medications() {
     onSuccess: () => {
       queryClient.invalidateQueries(['medicationLogs']);
       setLogDialogOpen(false);
-    },
+    }
   });
 
   const resetForm = () => {
@@ -106,7 +106,7 @@ export default function Medications() {
       end_date: '',
       purpose: '',
       prescriber: '',
-      reminders_enabled: true,
+      reminders_enabled: true
     });
     setSelectedMed(null);
   };
@@ -122,15 +122,15 @@ export default function Medications() {
       end_date: med.end_date || '',
       purpose: med.purpose || '',
       prescriber: med.prescriber || '',
-      reminders_enabled: med.reminders_enabled ?? true,
+      reminders_enabled: med.reminders_enabled ?? true
     });
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const profileId = selectedProfile || profiles.find(p => p.relationship === 'self')?.id;
-    
+    const profileId = selectedProfile || profiles.find((p) => p.relationship === 'self')?.id;
+
     if (!profileId) {
       alert('Please select a profile');
       return;
@@ -147,7 +147,7 @@ export default function Medications() {
         if (interactionCheck.analysis.overall_severity === 'major' || interactionCheck.analysis.overall_severity === 'severe') {
           const proceed = confirm(
             `⚠️ WARNING: Potential ${interactionCheck.analysis.overall_severity} drug interaction detected!\n\n` +
-            `${interactionCheck.analysis.interactions.map(i => i.description).join('\n\n')}\n\n` +
+            `${interactionCheck.analysis.interactions.map((i) => i.description).join('\n\n')}\n\n` +
             'Do you want to proceed anyway? Please consult your doctor.'
           );
           if (!proceed) return;
@@ -160,7 +160,7 @@ export default function Medications() {
     const data = {
       ...formData,
       profile_id: profileId,
-      is_active: true,
+      is_active: true
     };
 
     if (selectedMed) {
@@ -176,7 +176,7 @@ export default function Medications() {
       profile_id: medication.profile_id,
       scheduled_time: new Date().toISOString(),
       taken_at: status === 'taken' ? new Date().toISOString() : null,
-      status,
+      status
     });
   };
 
@@ -184,7 +184,7 @@ export default function Medications() {
     if (confirm('Mark this medication as inactive?')) {
       updateMutation.mutate({
         id: med.id,
-        data: { ...med, is_active: false },
+        data: { ...med, is_active: false }
       });
     }
   };
@@ -192,14 +192,14 @@ export default function Medications() {
   const addTimeSlot = () => {
     setFormData({
       ...formData,
-      times: [...formData.times, '12:00'],
+      times: [...formData.times, '12:00']
     });
   };
 
   const removeTimeSlot = (index) => {
     setFormData({
       ...formData,
-      times: formData.times.filter((_, i) => i !== index),
+      times: formData.times.filter((_, i) => i !== index)
     });
   };
 
@@ -221,8 +221,8 @@ export default function Medications() {
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A] rounded-2xl font-semibold shadow-lg active-press h-11 sm:h-12 px-4 sm:px-6"
-        >
+          className="bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A] rounded-2xl font-semibold shadow-lg active-press h-11 sm:h-12 px-4 sm:px-6">
+
           <Plus className="w-4 h-4 sm:mr-2" />
           <span className="hidden sm:inline">Add Med</span>
         </Button>
@@ -236,66 +236,66 @@ export default function Medications() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Profiles</SelectItem>
-            {profiles.map(profile => (
-              <SelectItem key={profile.id} value={profile.id}>
+            {profiles.map((profile) =>
+            <SelectItem key={profile.id} value={profile.id}>
                 {profile.full_name}
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
 
       {/* Smart Features */}
       <div className="space-y-3 mb-4 sm:mb-6">
-        <PrescriptionScanner 
-          profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-          onMedicationsExtracted={() => queryClient.invalidateQueries(['medications'])}
-        />
+        <PrescriptionScanner
+          profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id}
+          onMedicationsExtracted={() => queryClient.invalidateQueries(['medications'])} />
+
         
-        <MedicationReconciliation 
-          profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-          medications={medications}
-        />
+        <MedicationReconciliation
+          profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id}
+          medications={medications} />
+
       </div>
 
       {/* Drug Interaction Warnings */}
-      <DrugInteractionWarnings profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+      <DrugInteractionWarnings profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id} />
 
       {/* Medication Reminders */}
-      <MedicationReminders 
-        medications={medications} 
-        profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-      />
+      <MedicationReminders
+        medications={medications}
+        profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id} />
+
 
       {/* Mobile-First Tabs */}
       <Tabs defaultValue="medications" className="mb-4 sm:mb-6">
         <TabsList className="grid w-full grid-cols-4 rounded-2xl h-11 sm:h-12">
-          <TabsTrigger value="medications" className="text-xs sm:text-sm rounded-xl">Meds</TabsTrigger>
+          <TabsTrigger value="medications" className="bg-transparent px-3 py-1 text-xs font-medium rounded-xl inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow sm:text-sm">Meds</TabsTrigger>
           <TabsTrigger value="adherence" className="text-xs sm:text-sm rounded-xl">Track</TabsTrigger>
           <TabsTrigger value="sideeffects" className="text-xs sm:text-sm rounded-xl">Side FX</TabsTrigger>
           <TabsTrigger value="reports" className="text-xs sm:text-sm rounded-xl">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="medications" className="mt-4">
-          {isLoading ? (
-        <div className="flex justify-center py-12">
+          {isLoading ?
+          <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-10 sm:h-12 w-10 sm:w-12 border-b-2 border-purple-600" />
-        </div>
-      ) : medications.length === 0 ? (
-        <div className="text-center py-8 sm:py-12">
+        </div> :
+          medications.length === 0 ?
+          <div className="text-center py-8 sm:py-12">
           <Pill className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
           <p className="text-gray-600 mb-4 text-sm">No active medications</p>
           <Button onClick={() => setDialogOpen(true)} className="rounded-2xl bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A] active-press shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Add Medication
           </Button>
-        </div>
-      ) : (
-        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+        </div> :
+
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
           {medications.map((med) => {
-            const profile = profiles.find(p => p.id === med.profile_id);
-            return (
-              <Card key={med.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl active-press hover:shadow-lg transition-all">
+              const profile = profiles.find((p) => p.id === med.profile_id);
+              return (
+                <Card key={med.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl active-press hover:shadow-lg transition-all">
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
@@ -307,26 +307,26 @@ export default function Medications() {
                           {med.medication_name}
                         </h3>
                         <p className="text-gray-600 mb-1 sm:mb-2 text-xs sm:text-sm">{med.dosage}</p>
-                        {profile && (
+                        {profile &&
                           <p className="text-xs text-gray-500 truncate">{profile.full_name}</p>
-                        )}
+                          }
                       </div>
                     </div>
                     <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(med)}
-                        className="rounded-xl h-9 w-9 sm:h-10 sm:w-10 active-press"
-                      >
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(med)}
+                          className="rounded-xl h-9 w-9 sm:h-10 sm:w-10 active-press">
+
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeactivate(med)}
-                        className="text-red-600 hover:bg-red-50 rounded-xl h-9 w-9 sm:h-10 sm:w-10 active-press"
-                      >
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeactivate(med)}
+                          className="text-red-600 hover:bg-red-50 rounded-xl h-9 w-9 sm:h-10 sm:w-10 active-press">
+
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -341,17 +341,17 @@ export default function Medications() {
                       <Clock className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-gray-500" />
                       <span className="text-gray-700 capitalize">{med.frequency.replace(/_/g, ' ')}</span>
                     </div>
-                    {med.times && med.times.length > 0 && (
+                    {med.times && med.times.length > 0 &&
                       <div className="flex items-center gap-2 text-xs">
                         <Bell className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-gray-500" />
                         <span className="text-gray-700">{med.times.join(', ')}</span>
                       </div>
-                    )}
-                    {med.purpose && (
+                      }
+                    {med.purpose &&
                       <p className="text-xs text-gray-600 bg-[#F4F4F2] p-2 rounded-xl">
                         {med.purpose}
                       </p>
-                    )}
+                      }
                     <div className="flex items-center gap-2 text-xs">
                       <Calendar className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-gray-500" />
                       <span className="text-gray-700">
@@ -362,29 +362,29 @@ export default function Medications() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <Button
-                      size="sm"
-                      onClick={() => handleLogDose(med, 'taken')}
-                      className="bg-green-500 hover:bg-green-600 rounded-2xl text-xs active-press shadow-md h-10 sm:h-11"
-                    >
+                        size="sm"
+                        onClick={() => handleLogDose(med, 'taken')}
+                        className="bg-green-500 hover:bg-green-600 rounded-2xl text-xs active-press shadow-md h-10 sm:h-11">
+
                       <CheckCircle className="w-3.5 h-3.5 mr-1" />
                       Taken
                     </Button>
                     <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleLogDose(med, 'skipped')}
-                      className="rounded-2xl text-xs active-press h-10 sm:h-11"
-                    >
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleLogDose(med, 'skipped')}
+                        className="rounded-2xl text-xs active-press h-10 sm:h-11">
+
                       <XCircle className="w-3.5 h-3.5 mr-1" />
                       Skip
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-            );
-          })}
+              </Card>);
+
+            })}
         </div>
-      )}
+          }
         </TabsContent>
 
         <TabsContent value="adherence" className="mt-4">
@@ -395,32 +395,32 @@ export default function Medications() {
               <TabsTrigger value="history" className="text-xs sm:text-sm rounded-xl">History</TabsTrigger>
             </TabsList>
             <TabsContent value="ai" className="mt-3 sm:mt-4">
-              <MedicationAdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+              <MedicationAdherenceInsights profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id} />
             </TabsContent>
             <TabsContent value="insights" className="mt-3 sm:mt-4">
-              <AdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+              <AdherenceInsights profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id} />
             </TabsContent>
             <TabsContent value="history" className="mt-3 sm:mt-4">
-              <MedicationHistory 
-                profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-                medications={medications}
-              />
+              <MedicationHistory
+                profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id}
+                medications={medications} />
+
             </TabsContent>
           </Tabs>
         </TabsContent>
 
         <TabsContent value="sideeffects" className="mt-4">
-          <SideEffectTracker 
-            profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-            medications={medications}
-          />
+          <SideEffectTracker
+            profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id}
+            medications={medications} />
+
         </TabsContent>
 
         <TabsContent value="reports" className="mt-4">
-          <ProviderReports 
-            profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id}
-            medications={medications}
-          />
+          <ProviderReports
+            profileId={selectedProfile || profiles.find((p) => p.relationship === 'self')?.id}
+            medications={medications} />
+
         </TabsContent>
       </Tabs>
 
@@ -445,8 +445,8 @@ export default function Medications() {
                   onChange={(e) => setFormData({ ...formData, medication_name: e.target.value })}
                   placeholder="e.g., Aspirin"
                   className="h-11 sm:h-12 rounded-2xl"
-                  required
-                />
+                  required />
+
               </div>
               <div className="space-y-2">
                 <Label htmlFor="dosage" className="text-sm">Dosage *</Label>
@@ -456,8 +456,8 @@ export default function Medications() {
                   onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
                   placeholder="e.g., 500mg"
                   className="h-11 sm:h-12 rounded-2xl"
-                  required
-                />
+                  required />
+
               </div>
             </div>
 
@@ -465,8 +465,8 @@ export default function Medications() {
               <Label htmlFor="frequency" className="text-sm">Frequency *</Label>
               <Select
                 value={formData.frequency}
-                onValueChange={(value) => setFormData({ ...formData, frequency: value })}
-              >
+                onValueChange={(value) => setFormData({ ...formData, frequency: value })}>
+
                 <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
                   <SelectValue />
                 </SelectTrigger>
@@ -483,34 +483,34 @@ export default function Medications() {
 
             <div className="space-y-2">
               <Label className="text-sm">Reminder Times</Label>
-              {formData.times.map((time, index) => (
-                <div key={index} className="flex gap-2">
+              {formData.times.map((time, index) =>
+              <div key={index} className="flex gap-2">
                   <Input
-                    type="time"
-                    value={time}
-                    onChange={(e) => updateTimeSlot(index, e.target.value)}
-                    className="flex-1 h-11 sm:h-12 rounded-2xl"
-                  />
-                  {formData.times.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeTimeSlot(index)}
-                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl active-press"
-                    >
+                  type="time"
+                  value={time}
+                  onChange={(e) => updateTimeSlot(index, e.target.value)}
+                  className="flex-1 h-11 sm:h-12 rounded-2xl" />
+
+                  {formData.times.length > 1 &&
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeTimeSlot(index)}
+                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl active-press">
+
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                  )}
+                }
                 </div>
-              ))}
+              )}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={addTimeSlot}
-                className="w-full rounded-2xl active-press h-10 sm:h-11"
-              >
+                className="w-full rounded-2xl active-press h-10 sm:h-11">
+
                 <Plus className="w-4 h-4 mr-1" />
                 Add Time
               </Button>
@@ -525,8 +525,8 @@ export default function Medications() {
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                   className="h-11 sm:h-12 rounded-2xl"
-                  required
-                />
+                  required />
+
               </div>
               <div className="space-y-2">
                 <Label htmlFor="end_date" className="text-sm">End Date</Label>
@@ -535,8 +535,8 @@ export default function Medications() {
                   type="date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="h-11 sm:h-12 rounded-2xl"
-                />
+                  className="h-11 sm:h-12 rounded-2xl" />
+
               </div>
             </div>
 
@@ -547,8 +547,8 @@ export default function Medications() {
                 value={formData.purpose}
                 onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                 placeholder="e.g., High blood pressure"
-                className="h-11 sm:h-12 rounded-2xl"
-              />
+                className="h-11 sm:h-12 rounded-2xl" />
+
             </div>
 
             <div className="space-y-2">
@@ -558,8 +558,8 @@ export default function Medications() {
                 value={formData.prescriber}
                 onChange={(e) => setFormData({ ...formData, prescriber: e.target.value })}
                 placeholder="Doctor's name"
-                className="h-11 sm:h-12 rounded-2xl"
-              />
+                className="h-11 sm:h-12 rounded-2xl" />
+
             </div>
 
             <div className="flex items-center justify-between p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
@@ -567,8 +567,8 @@ export default function Medications() {
               <Switch
                 id="reminders"
                 checked={formData.reminders_enabled}
-                onCheckedChange={(checked) => setFormData({ ...formData, reminders_enabled: checked })}
-              />
+                onCheckedChange={(checked) => setFormData({ ...formData, reminders_enabled: checked })} />
+
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-4">
@@ -576,21 +576,21 @@ export default function Medications() {
                 type="button"
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
-                className="rounded-2xl active-press h-11 sm:h-12"
-              >
+                className="rounded-2xl active-press h-11 sm:h-12">
+
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#F7C9A3] hover:bg-[#E7B993] text-[#0A0A0A] rounded-2xl active-press shadow-lg h-11 sm:h-12"
-                disabled={createMutation.isLoading || updateMutation.isLoading}
-              >
+                disabled={createMutation.isLoading || updateMutation.isLoading}>
+
                 {selectedMed ? 'Update' : 'Add'}
               </Button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
