@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +9,7 @@ import { Sparkles, Brain, TrendingUp, AlertCircle, Lightbulb, Heart, Activity } 
 import { Badge } from '@/components/ui/badge';
 
 export default function Insights() {
+  const { t } = useTranslation();
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [insights, setInsights] = useState(null);
@@ -106,9 +108,9 @@ Provide clear, actionable insights in a friendly tone.`;
       {/* Mobile-First Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-          💡 Insights
+          💡 {t('insights.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600">Smart health analysis</p>
+        <p className="text-xs sm:text-sm text-gray-600">{t('insights.subtitle')}</p>
       </div>
 
       {/* Profile Selector */}
@@ -132,7 +134,7 @@ Provide clear, actionable insights in a friendly tone.`;
           className="bg-[#EDE6F7] hover:bg-[#DDD6E7] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12"
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          {generating ? 'Analyzing...' : 'Generate Insights'}
+          {generating ? t('symptoms.analyzing') : t('insights.generate')}
         </Button>
       </div>
 
@@ -142,7 +144,7 @@ Provide clear, actionable insights in a friendly tone.`;
           <CardContent className="p-3 sm:p-4">
             <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Vitals</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.vitals')}</p>
           </CardContent>
         </Card>
 
@@ -150,7 +152,7 @@ Provide clear, actionable insights in a friendly tone.`;
           <CardContent className="p-3 sm:p-4">
             <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Labs</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.labs')}</p>
           </CardContent>
         </Card>
 
@@ -158,7 +160,7 @@ Provide clear, actionable insights in a friendly tone.`;
           <CardContent className="p-3 sm:p-4">
             <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{abnormalResults.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Alerts</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.alerts')}</p>
           </CardContent>
         </Card>
       </div>
@@ -169,7 +171,7 @@ Provide clear, actionable insights in a friendly tone.`;
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <CardTitle className="flex items-center gap-2 text-red-600 text-sm sm:text-base font-semibold">
               <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5" />
-              Abnormal Results
+              {t('lab_results.abnormal_results') || 'Abnormal Results'}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
@@ -201,7 +203,7 @@ Provide clear, actionable insights in a friendly tone.`;
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4" style={{ backgroundColor: '#EDE6F7' }}>
             <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-sm sm:text-base">
               <Brain className="w-4 sm:w-5 h-4 sm:h-5" />
-              Health Insights
+              {t('insights.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-6">

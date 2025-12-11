@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 
 export default function LabResults() {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [filterCategory, setFilterCategory] = useState('all');
@@ -156,9 +158,9 @@ export default function LabResults() {
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-            🧪 Lab Results
+            🧪 {t('lab_results.title')}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600">Test tracking</p>
+          <p className="text-xs sm:text-sm text-gray-600">{t('lab_results.subtitle')}</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
@@ -172,10 +174,10 @@ export default function LabResults() {
       {/* Tabs */}
       <Tabs defaultValue="results" className="mb-4 sm:mb-6">
         <TabsList className="grid w-full grid-cols-2 rounded-2xl h-11 sm:h-12">
-          <TabsTrigger value="results" className="text-xs sm:text-sm rounded-xl">Lab Results</TabsTrigger>
+          <TabsTrigger value="results" className="text-xs sm:text-sm rounded-xl">{t('lab_results.title')}</TabsTrigger>
           <TabsTrigger value="trends" className="text-xs sm:text-sm rounded-xl">
             <BarChart3 className="w-4 h-4 mr-1" />
-            Trends & Analysis
+            {t('lab_results.trends_analysis') || 'Trends & Analysis'}
           </TabsTrigger>
         </TabsList>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +28,7 @@ import PrescriptionScanner from '../components/medications/PrescriptionScanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Medications() {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [logDialogOpen, setLogDialogOpen] = useState(false);
   const [selectedMed, setSelectedMed] = useState(null);
@@ -233,9 +235,9 @@ export default function Medications() {
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-            💊 Medications
+            💊 {t('nav.meds')}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600">Track & manage</p>
+          <p className="text-xs sm:text-sm text-gray-600">{t('medications.subtitle')}</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
@@ -288,10 +290,10 @@ export default function Medications() {
       {/* Mobile-First Tabs */}
       <Tabs defaultValue="medications" className="mb-4 sm:mb-6">
         <TabsList className="grid w-full grid-cols-4 rounded-2xl h-11 sm:h-12">
-          <TabsTrigger value="medications" className="bg-transparent px-3 py-1 text-xs font-medium rounded-xl inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow sm:text-sm">Meds</TabsTrigger>
-          <TabsTrigger value="adherence" className="text-xs sm:text-sm rounded-xl">Track</TabsTrigger>
-          <TabsTrigger value="sideeffects" className="text-xs sm:text-sm rounded-xl">Side FX</TabsTrigger>
-          <TabsTrigger value="reports" className="text-xs sm:text-sm rounded-xl">Reports</TabsTrigger>
+          <TabsTrigger value="medications" className="bg-transparent px-3 py-1 text-xs font-medium rounded-xl inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow sm:text-sm">{t('nav.meds')}</TabsTrigger>
+          <TabsTrigger value="adherence" className="text-xs sm:text-sm rounded-xl">{t('medications.track') || 'Track'}</TabsTrigger>
+          <TabsTrigger value="sideeffects" className="text-xs sm:text-sm rounded-xl">{t('medications.side_fx') || 'Side FX'}</TabsTrigger>
+          <TabsTrigger value="reports" className="text-xs sm:text-sm rounded-xl">{t('analytics.reports')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="medications" className="mt-4">

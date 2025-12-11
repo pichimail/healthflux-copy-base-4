@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { Users, Plus, Edit, Trash2, User, Heart, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function Profiles() {
+  const { t } = useTranslation();
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -141,9 +143,9 @@ export default function Profiles() {
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-            👨‍👩‍👧‍👦 Profiles
+            👨‍👩‍👧‍👦 {t('profiles.title')}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600">Family health</p>
+          <p className="text-xs sm:text-sm text-gray-600">{t('profiles.subtitle')}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -161,12 +163,12 @@ export default function Profiles() {
           <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-3xl">
             <DialogHeader>
               <DialogTitle className="text-base sm:text-lg">
-                {selectedProfile ? 'Edit Profile' : 'Add Family Member'}
+                {selectedProfile ? t('profiles.edit') : t('profiles.add_member')}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="full_name" className="text-sm">Full Name *</Label>
+                <Label htmlFor="full_name" className="text-sm">{t('profiles.full_name')} *</Label>
                 <Input
                   id="full_name"
                   value={formData.full_name}
@@ -178,7 +180,7 @@ export default function Profiles() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="relationship" className="text-sm">Relationship *</Label>
+                  <Label htmlFor="relationship" className="text-sm">{t('profiles.relationship')} *</Label>
                   <Select
                     value={formData.relationship}
                     onValueChange={(value) => setFormData({ ...formData, relationship: value })}
@@ -187,18 +189,18 @@ export default function Profiles() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="self">Self</SelectItem>
-                      <SelectItem value="spouse">Spouse</SelectItem>
-                      <SelectItem value="child">Child</SelectItem>
-                      <SelectItem value="parent">Parent</SelectItem>
-                      <SelectItem value="sibling">Sibling</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="self">{t('profiles.self')}</SelectItem>
+                      <SelectItem value="spouse">{t('profiles.spouse')}</SelectItem>
+                      <SelectItem value="child">{t('profiles.child')}</SelectItem>
+                      <SelectItem value="parent">{t('profiles.parent')}</SelectItem>
+                      <SelectItem value="sibling">{t('profiles.sibling')}</SelectItem>
+                      <SelectItem value="other">{t('profiles.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date_of_birth" className="text-sm">Date of Birth</Label>
+                  <Label htmlFor="date_of_birth" className="text-sm">{t('profiles.date_of_birth')}</Label>
                   <Input
                     id="date_of_birth"
                     type="date"
@@ -211,30 +213,30 @@ export default function Profiles() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="gender" className="text-sm">Gender</Label>
+                  <Label htmlFor="gender" className="text-sm">{t('profiles.gender')}</Label>
                   <Select
                     value={formData.gender}
                     onValueChange={(value) => setFormData({ ...formData, gender: value })}
                   >
                     <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
-                      <SelectValue placeholder="Select" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="male">{t('profiles.male')}</SelectItem>
+                      <SelectItem value="female">{t('profiles.female')}</SelectItem>
+                      <SelectItem value="other">{t('common.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="blood_group" className="text-sm">Blood Group</Label>
+                  <Label htmlFor="blood_group" className="text-sm">{t('profiles.blood_group')}</Label>
                   <Select
                     value={formData.blood_group}
                     onValueChange={(value) => setFormData({ ...formData, blood_group: value })}
                   >
                     <SelectTrigger className="h-11 sm:h-12 rounded-2xl">
-                      <SelectValue placeholder="Select" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent>
                       {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(group => (
@@ -246,7 +248,7 @@ export default function Profiles() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="height" className="text-sm">Height (cm)</Label>
+                <Label htmlFor="height" className="text-sm">{t('profiles.height')}</Label>
                 <Input
                   id="height"
                   type="number"
@@ -264,14 +266,14 @@ export default function Profiles() {
                   onClick={() => setDialogOpen(false)}
                   className="rounded-2xl active-press h-11 sm:h-12"
                 >
-                  Cancel
+                  {t('profiles.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="bg-[#0B5A46] hover:bg-[#094A38] text-white rounded-2xl active-press shadow-lg h-11 sm:h-12"
                   disabled={createMutation.isLoading || updateMutation.isLoading}
                 >
-                  {selectedProfile ? 'Update' : 'Add'}
+                  {selectedProfile ? t('common.update') : t('common.add')}
                 </Button>
               </div>
             </form>
@@ -336,7 +338,7 @@ export default function Profiles() {
                       className="rounded-2xl text-xs active-press h-10"
                     >
                       <Edit className="w-3 h-3 mr-1" />
-                      Edit
+                      {t('profiles.edit')}
                     </Button>
                     {profile.relationship !== 'self' && (
                       <Button
@@ -359,10 +361,10 @@ export default function Profiles() {
       {profiles.length === 0 && !isLoading && (
         <div className="text-center py-8 sm:py-12">
           <Users className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
-          <p className="text-gray-600 mb-4 text-sm">No profiles yet</p>
+          <p className="text-gray-600 mb-4 text-sm">{t('profiles.no_profiles')}</p>
           <Button onClick={() => setDialogOpen(true)} className="rounded-2xl bg-[#0B5A46] hover:bg-[#094A38] text-white active-press shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
-            Add Profile
+            {t('profiles.add_profile')}
           </Button>
         </div>
       )}
