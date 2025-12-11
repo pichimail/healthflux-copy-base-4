@@ -69,18 +69,6 @@ export default function WellnessInsights() {
     enabled: !!selectedProfileId
   });
 
-  const feedbackMutation = useMutation({
-    mutationFn: async ({ insightId, feedback }) => {
-      return await base44.entities.HealthInsight.update(insightId, {
-        feedback,
-        feedback_date: new Date().toISOString()
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['insights']);
-    }
-  });
-
   const generateInsights = async () => {
     setGenerating(true);
     try {
