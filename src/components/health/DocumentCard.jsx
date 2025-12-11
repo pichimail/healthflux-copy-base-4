@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Image, MoreVertical, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { FileText, Image, MoreVertical, Loader2, AlertCircle, CheckCircle, Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
 
-export default function DocumentCard({ document, compact = false, onView, onDelete, onReprocess, className, style }) {
+export default function DocumentCard({ document, compact = false, onView, onDelete, onReprocess, onShare, className, style }) {
   const getFileIcon = (fileType) => {
     if (fileType?.includes('image')) return <Image className="h-6 w-6 text-blue-500" />;
     if (fileType?.includes('pdf')) return <FileText className="h-6 w-6 text-red-500" />;
@@ -94,6 +94,12 @@ export default function DocumentCard({ document, compact = false, onView, onDele
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => onView(document)}>View Details</DropdownMenuItem>
+              {onShare && (
+                <DropdownMenuItem onClick={() => onShare(document)}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share Record
+                </DropdownMenuItem>
+              )}
               {document.status === 'failed' && onReprocess && (
                 <DropdownMenuItem onClick={() => onReprocess(document)} className="text-blue-600">
                   Reprocess Document

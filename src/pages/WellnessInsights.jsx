@@ -1,420 +1,343 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { 
+  Brain, TrendingUp, Heart, AlertCircle, Sparkles, Activity, 
+  RefreshCw, ThumbsUp, ThumbsDown, ExternalLink, FileText, Stethoscope
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, TrendingUp, Activity, Heart, Utensils, Moon, 
-  Dumbbell, AlertTriangle, CheckCircle, Sparkles, Loader2,
-  Target, Calendar, ArrowRight
-} from 'lucide-react';
 import ProfileSwitcher from '../components/ProfileSwitcher';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ShareRecordButton from '../components/ShareRecordButton';
 
 export default function WellnessInsights() {
   const { t } = useTranslation();
-  const [user, setUser] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [analysis, setAnalysis] = useState(null);
-
+  
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const userData = await base44.auth.me();
-    setUser(userData);
-    
-    const profiles = await base44.entities.Profile.filter({ 
-      relationship: 'self',
-      created_by: userData.email 
-    });
-    
-    if (profiles.length > 0) {
-      setSelectedProfileId(profiles[0].id);
-    }
-  };
-
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['profiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date'),
-    enabled: !!user,
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
   });
 
-  const generateAnalysis = async () => {
-    setAnalyzing(true);
+  const { data: profiles = [] } = useQuery({
+    queryKey: ['profiles', user?.email],
+    queryFn: () => base44.entities.Profile.filter({ created_by: user.email }),
+    enabled: !!user
+  });
+
+  React.useEffect(() => {
+    if (profiles.length > 0 && !selectedProfileId) {
+      const self = profiles.find(p => p.relationship === 'self');
+      setSelectedProfileId(self?.id || profiles[0].id);
+    }
+  }, [profiles, selectedProfileId]);
+
+  const { data: vitals = [] } = useQuery({
+    queryKey: ['vitals', selectedProfileId],
+    queryFn: () => base44.entities.VitalMeasurement.filter({ profile_id: selectedProfileId }, '-measured_at', 100),
+    enabled: !!selectedProfileId
+  });
+
+  const { data: labs = [] } = useQuery({
+    queryKey: ['labs', selectedProfileId],
+    queryFn: () => base44.entities.LabResult.filter({ profile_id: selectedProfileId }, '-test_date', 100),
+    enabled: !!selectedProfileId
+  });
+
+  const { data: medications = [] } = useQuery({
+    queryKey: ['medications', selectedProfileId],
+    queryFn: () => base44.entities.Medication.filter({ profile_id: selectedProfileId }),
+    enabled: !!selectedProfileId
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: async ({ insightId, feedback }) => {
+      return await base44.entities.HealthInsight.update(insightId, {
+        feedback,
+        feedback_date: new Date().toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['insights']);
+    }
+  });
+
+  const generateInsights = async () => {
+    setGenerating(true);
     try {
       const { data } = await base44.functions.invoke('predictiveHealthAnalysis', {
         profile_id: selectedProfileId
       });
-      setAnalysis(data.analysis);
+      setAnalysis(data);
     } catch (error) {
-      console.error('Analysis error:', error);
-      if (error.response?.data?.message) {
-        alert(error.response.data.message);
-      }
+      alert('Failed to generate insights');
     } finally {
-      setAnalyzing(false);
+      setGenerating(false);
     }
   };
 
-  if (!user || !selectedProfileId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
-  }
+  const getSeverityColor = (severity) => {
+    const colors = {
+      critical: 'bg-red-100 text-red-800 border-red-200',
+      high: 'bg-orange-100 text-orange-800 border-orange-200',
+      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      low: 'bg-blue-100 text-blue-800 border-blue-200',
+      info: 'bg-green-100 text-green-800 border-green-200'
+    };
+    return colors[severity] || colors.info;
+  };
+
+  const openArticle = (url) => {
+    window.open(url, '_blank');
+  };
 
   return (
-    <div className="px-6 py-6">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">{t('wellness.title')}</h1>
-          <p className="text-sm text-gray-600">{t('wellness.subtitle')}</p>
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
+            ✨ {t('wellness.title')}
+          </h1>
+          <ShareRecordButton
+            profileId={selectedProfileId}
+            shareType="profile_summary"
+            buttonText="Share"
+            size="sm"
+          />
         </div>
-        <div className="flex gap-3">
+        <p className="text-xs sm:text-sm text-gray-600 mb-3">{t('wellness.subtitle')}</p>
+        
+        {profiles.length > 0 && (
           <ProfileSwitcher
             profiles={profiles}
             selectedProfile={selectedProfileId}
             onProfileChange={setSelectedProfileId}
           />
-        </div>
+        )}
       </div>
 
-      {!analysis ? (
-        <Card className="border-0 shadow-sm rounded-2xl bg-gradient-to-br from-purple-50 to-blue-50">
-          <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Brain className="w-10 h-10 text-purple-600" />
+      {/* Generate Button */}
+      <Card className="mb-4 sm:mb-6 border-0 rounded-3xl shadow-lg bg-gradient-to-r from-purple-50 to-blue-50">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <Brain className="w-6 h-6 text-purple-600" />
             </div>
-            <h2 className="text-2xl font-bold text-[#0A0A0A] mb-2">
-              {t('wellness.advanced_analytics')}
-            </h2>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              {t('wellness.analytics_desc')}
-            </p>
-            <Button 
-              onClick={generateAnalysis} 
-              disabled={analyzing}
-              className="bg-purple-600 hover:bg-purple-700 rounded-xl text-lg px-8 py-6"
-            >
-              {analyzing ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  {t('wellness.analyzing_data')}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  {t('wellness.generate_insights')}
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {/* Overall Health Score */}
-          <Card className="border-0 shadow-sm rounded-2xl bg-gradient-to-br from-green-50 to-blue-50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#0A0A0A] mb-1">{t('wellness.overall_score')}</h3>
-                  <p className="text-sm text-gray-600">{t('wellness.score_desc')}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-5xl font-bold text-[#0A0A0A]">{analysis.risk_score || 75}</p>
-                  <p className="text-sm text-gray-600">{t('wellness.out_of')} 100</p>
-                </div>
-              </div>
-              <Progress value={analysis.risk_score || 75} className="h-3" />
-            </CardContent>
-          </Card>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#0A0A0A] mb-1">{t('wellness.advanced_analytics')}</h3>
+              <p className="text-sm text-gray-600 mb-4">{t('wellness.analytics_desc')}</p>
+              <Button
+                onClick={generateInsights}
+                disabled={generating}
+                className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl active-press shadow-lg h-11"
+              >
+                {generating ? (
+                  <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{t('wellness.refreshing')}</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" />{t('wellness.generate_insights')}</>
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Risk Factors */}
-          {analysis.risk_factors && analysis.risk_factors.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-2xl">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-orange-600" />
+      {/* Analysis Results */}
+      {analysis && (
+        <div className="space-y-4">
+          {/* Health Score */}
+          {analysis.health_score && (
+            <Card className="border-2 rounded-3xl">
+              <CardHeader className="border-b p-4">
+                <CardTitle className="text-base">{t('wellness.overall_score')}</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-6">
+                  <div className="text-5xl font-bold text-blue-600">{analysis.health_score}</div>
+                  <div className="flex-1">
+                    <Progress value={analysis.health_score} className="h-3 mb-2" />
+                    <p className="text-xs text-gray-600">{t('wellness.score_desc')}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Risk Factors with Actions */}
+          {analysis.risk_factors?.length > 0 && (
+            <Card className="border-2 rounded-3xl">
+              <CardHeader className="border-b p-4">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
                   {t('wellness.risk_factors')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {analysis.risk_factors.map((risk, idx) => (
-                    <div key={idx} className={`p-4 rounded-xl border-2 ${
-                      risk.severity === 'critical' ? 'bg-red-50 border-red-200' :
-                      risk.severity === 'high' ? 'bg-orange-50 border-orange-200' :
-                      risk.severity === 'medium' ? 'bg-yellow-50 border-yellow-200' :
-                      'bg-blue-50 border-blue-200'
-                    }`}>
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-[#0A0A0A]">{risk.factor}</h4>
-                        <div className="flex gap-2">
-                          <Badge className={`text-xs ${
-                            risk.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                            risk.severity === 'high' ? 'bg-orange-100 text-orange-700' :
-                            risk.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-blue-100 text-blue-700'
-                          }`}>
-                            {risk.severity}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {risk.likelihood} likelihood
-                          </Badge>
+              <CardContent className="p-4 space-y-3">
+                {analysis.risk_factors.map((risk, idx) => (
+                  <div key={idx} className="p-4 bg-red-50 rounded-2xl border-2 border-red-200">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-red-900 text-sm mb-1">{risk.factor}</h4>
+                        <p className="text-xs text-red-800">{risk.description}</p>
+                      </div>
+                      <Badge className="bg-red-200 text-red-900 rounded-xl">
+                        {risk.severity}
+                      </Badge>
+                    </div>
+
+                    {/* Actionable Recommendations */}
+                    {risk.recommendations?.map((rec, ridx) => (
+                      <div key={ridx} className="mt-3 p-3 bg-white rounded-xl">
+                        <p className="text-xs font-semibold text-gray-900 mb-1">💡 {rec.action}</p>
+                        <p className="text-xs text-gray-700">{rec.details}</p>
+                        {rec.article_url && (
+                          <Button
+                            onClick={() => openArticle(rec.article_url)}
+                            size="sm"
+                            variant="outline"
+                            className="mt-2 rounded-xl text-xs"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Read Article
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+
+                    {risk.consult_doctor && (
+                      <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                        <div className="flex items-center gap-2">
+                          <Stethoscope className="h-4 w-4 text-amber-700" />
+                          <p className="text-xs font-semibold text-amber-900">Consult your doctor about this</p>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-700">{risk.description}</p>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           )}
 
-          {/* Predictive Insights */}
-          {analysis.predictions && analysis.predictions.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-violet-900 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+          {/* Predictive Insights with Feedback */}
+          {analysis.predictions?.length > 0 && (
+            <Card className="border-2 rounded-3xl">
+              <CardHeader className="border-b p-4">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-purple-600" />
                   {t('wellness.predictive_insights')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {analysis.predictions.map((prediction, idx) => (
-                    <div key={idx} className="p-4 bg-white rounded-xl border border-violet-200">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h4 className="font-semibold text-violet-900">{prediction.condition}</h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Calendar className="w-3 h-3 text-violet-600" />
-                            <span className="text-xs text-violet-700">{prediction.timeframe}</span>
-                            <Badge className="text-xs bg-violet-100 text-violet-700">
-                              {prediction.probability} {t('wellness.probability')}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-700">{prediction.rationale}</p>
+              <CardContent className="p-4 space-y-3">
+                {analysis.predictions.map((pred, idx) => (
+                  <div key={idx} className="p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-purple-900 text-sm">{pred.prediction}</h4>
+                      <Badge className="bg-purple-200 text-purple-900 rounded-xl">
+                        {Math.round(pred.probability * 100)}%
+                      </Badge>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-xs text-purple-800 mb-3">{pred.reasoning}</p>
+
+                    {/* Dietary Changes */}
+                    {pred.dietary_changes?.length > 0 && (
+                      <div className="mb-3 p-3 bg-white rounded-xl">
+                        <p className="text-xs font-semibold text-gray-900 mb-2">🥗 Dietary Changes</p>
+                        <ul className="space-y-1">
+                          {pred.dietary_changes.map((change, cidx) => (
+                            <li key={cidx} className="text-xs text-gray-700">• {change}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Related Articles */}
+                    {pred.articles?.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold text-gray-900">📚 Recommended Reading</p>
+                        {pred.articles.map((article, aidx) => (
+                          <Button
+                            key={aidx}
+                            onClick={() => openArticle(article.url)}
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start rounded-xl text-xs"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-2" />
+                            {article.title}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Feedback */}
+                    {pred.insight_id && (
+                      <div className="flex gap-2 mt-3 pt-3 border-t">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => feedbackMutation.mutate({ insightId: pred.insight_id, feedback: 'helpful' })}
+                          className="flex-1 rounded-xl"
+                        >
+                          <ThumbsUp className="h-3 w-3 mr-1" />
+                          Helpful
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => feedbackMutation.mutate({ insightId: pred.insight_id, feedback: 'not_helpful' })}
+                          className="flex-1 rounded-xl"
+                        >
+                          <ThumbsDown className="h-3 w-3 mr-1" />
+                          Not Helpful
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           )}
 
-          {/* Lifestyle Recommendations */}
-          {analysis.lifestyle_recommendations && (
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Diet Recommendations */}
-              {analysis.lifestyle_recommendations.diet && analysis.lifestyle_recommendations.diet.length > 0 && (
-                <Card className="border-0 shadow-sm rounded-2xl">
-                  <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                      <Utensils className="w-5 h-5 text-green-600" />
-                      {t('wellness.nutrition')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <ul className="space-y-2">
-                      {analysis.lifestyle_recommendations.diet.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Exercise Recommendations */}
-              {analysis.lifestyle_recommendations.exercise && analysis.lifestyle_recommendations.exercise.length > 0 && (
-                <Card className="border-0 shadow-sm rounded-2xl">
-                  <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                      <Dumbbell className="w-5 h-5 text-blue-600" />
-                      {t('wellness.exercise')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <ul className="space-y-2">
-                      {analysis.lifestyle_recommendations.exercise.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Sleep Recommendations */}
-              {analysis.lifestyle_recommendations.sleep && analysis.lifestyle_recommendations.sleep.length > 0 && (
-                <Card className="border-0 shadow-sm rounded-2xl">
-                  <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                      <Moon className="w-5 h-5 text-indigo-600" />
-                      {t('wellness.sleep')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <ul className="space-y-2">
-                      {analysis.lifestyle_recommendations.sleep.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Stress Management */}
-              {analysis.lifestyle_recommendations.stress && analysis.lifestyle_recommendations.stress.length > 0 && (
-                <Card className="border-0 shadow-sm rounded-2xl">
-                  <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-pink-600" />
-                      {t('wellness.stress_mgmt')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <ul className="space-y-2">
-                      {analysis.lifestyle_recommendations.stress.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-pink-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          )}
-
-          {/* Preventive Actions */}
-          {analysis.preventive_actions && analysis.preventive_actions.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-2xl">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-600" />
+          {/* Preventive Action Plan */}
+          {analysis.preventive_actions?.length > 0 && (
+            <Card className="border-2 rounded-3xl">
+              <CardHeader className="border-b p-4">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-green-600" />
                   {t('wellness.preventive_plan')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-3">
-                  {analysis.preventive_actions.map((action, idx) => (
-                    <div key={idx} className={`p-4 rounded-xl ${
-                      action.priority === 'high' ? 'bg-red-50 border-2 border-red-200' :
-                      action.priority === 'medium' ? 'bg-yellow-50 border-2 border-yellow-200' :
-                      'bg-green-50 border-2 border-green-200'
-                    }`}>
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-[#0A0A0A]">{action.action}</h4>
-                        <Badge className={`text-xs ${
-                          action.priority === 'high' ? 'bg-red-100 text-red-700' :
-                          action.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {action.priority} {t('wellness.priority')}
-                        </Badge>
+              <CardContent className="p-4 space-y-2">
+                {analysis.preventive_actions.map((action, idx) => (
+                  <div key={idx} className="p-3 bg-green-50 rounded-2xl">
+                    <div className="flex items-start gap-2">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        action.priority === 'high' ? 'bg-red-500' :
+                        action.priority === 'medium' ? 'bg-amber-500' : 'bg-blue-500'
+                      }`}>
+                        <span className="text-white text-xs font-bold">{idx + 1}</span>
                       </div>
-                      <p className="text-sm text-gray-700">{action.impact}</p>
+                      <div className="flex-1">
+                        <p className="font-semibold text-green-900 text-sm">{action.action}</p>
+                        <p className="text-xs text-green-800 mt-1">{action.details}</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           )}
-
-          {/* Early Warning Signs */}
-          {analysis.early_warnings && analysis.early_warnings.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-2xl bg-gradient-to-br from-orange-50 to-red-50">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-orange-900 flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  {t('wellness.early_warnings')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {analysis.early_warnings.map((warning, idx) => (
-                    <div key={idx} className="p-3 bg-white rounded-xl border border-orange-200">
-                      <div className="flex items-start justify-between mb-1">
-                        <p className="font-semibold text-orange-900 text-sm">{warning.symptom}</p>
-                        <Badge className={`text-xs ${
-                          warning.urgency === 'urgent' ? 'bg-red-100 text-red-700' :
-                          warning.urgency === 'consult' ? 'bg-orange-100 text-orange-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {warning.urgency}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-700">{warning.action}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Optimization Opportunities */}
-          {analysis.optimization_opportunities && analysis.optimization_opportunities.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-2xl">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-yellow-600" />
-                  {t('wellness.optimization')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {analysis.optimization_opportunities.map((opp, idx) => (
-                    <div key={idx} className="p-4 bg-[#F4F4F2] rounded-xl">
-                      <h4 className="font-semibold text-[#0A0A0A] mb-1">{opp.area}</h4>
-                      <p className="text-sm text-gray-600 mb-2">{opp.current_issue}</p>
-                      <div className="flex items-center gap-2 text-sm">
-                        <ArrowRight className="w-4 h-4 text-green-600" />
-                        <span className="text-green-700 font-medium">{opp.recommendation}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <Button 
-            onClick={generateAnalysis} 
-            variant="outline" 
-            className="w-full rounded-xl"
-            disabled={analyzing}
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('wellness.refreshing')}
-              </>
-            ) : (
-              t('wellness.refresh_analysis')
-            )}
-          </Button>
         </div>
       )}
     </div>
   );
 }
+
+const feedbackMutation = { mutate: () => {} };
