@@ -58,6 +58,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Meal Logging', page: 'MealLogging', icon: Activity },
     { name: 'Lab Results', page: 'LabResults', icon: TestTube },
     { name: 'Health Trends', page: 'HealthTrends', icon: TrendingUp },
+    { name: 'Analytics', page: 'Analytics', icon: TrendingUp },
     { name: 'Wellness Insights', page: 'WellnessInsights', icon: TrendingUp },
     { name: 'Health Insights', page: 'Insights', icon: Brain },
     { name: 'My Profiles', page: 'Profiles', icon: User },

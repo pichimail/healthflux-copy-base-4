@@ -23,6 +23,7 @@ import WellnessInsights from './pages/WellnessInsights';
 import SymptomChecker from './pages/SymptomChecker';
 import HealthTrends from './pages/HealthTrends';
 import MealLogging from './pages/MealLogging';
+import Analytics from './pages/Analytics';
 import __Layout from './Layout.jsx';
 
 
@@ -52,6 +53,7 @@ export const PAGES = {
     "SymptomChecker": SymptomChecker,
     "HealthTrends": HealthTrends,
     "MealLogging": MealLogging,
+    "Analytics": Analytics,
 }
 
 export const pagesConfig = {
