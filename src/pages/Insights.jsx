@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Brain, TrendingUp, AlertCircle, Lightbulb, Heart, Activity } from 'lucide-react';
+import { Sparkles, Brain, TrendingUp, AlertCircle, Lightbulb, Heart, Activity, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function Insights() {
@@ -53,6 +53,33 @@ export default function Insights() {
       return base44.entities.Medication.filter({ profile_id: profileId, is_active: true });
     },
     enabled: profiles.length > 0,
+  });
+
+  const { data: healthInsights = [] } = useQuery({
+    queryKey: ['healthInsights', selectedProfile],
+    queryFn: async () => {
+      const profileId = selectedProfile || profiles.find(p => p.relationship === 'self')?.id;
+      if (!profileId) return [];
+      return base44.entities.HealthInsight.filter({ profile_id: profileId, is_dismissed: false }, '-created_date', 10);
+    },
+    enabled: profiles.length > 0,
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: ({ id, feedback }) => base44.entities.HealthInsight.update(id, { 
+      feedback, 
+      feedback_date: new Date().toISOString() 
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['healthInsights']);
+    }
+  });
+
+  const dismissMutation = useMutation({
+    mutationFn: (id) => base44.entities.HealthInsight.update(id, { is_dismissed: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['healthInsights']);
+    }
   });
 
   const generateInsights = async () => {
@@ -164,6 +191,79 @@ Provide clear, actionable insights in a friendly tone.`;
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Generated Health Insights */}
+      {healthInsights.length > 0 && (
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-base sm:text-lg font-bold text-[#0A0A0A] mb-3 flex items-center gap-2">
+            <Brain className="w-5 h-5" />
+            AI Health Insights
+          </h2>
+          <div className="space-y-3">
+            {healthInsights.map((insight) => (
+              <Card key={insight.id} className="border-0 card-shadow rounded-2xl">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-[#0A0A0A] text-sm">{insight.title}</h3>
+                        <Badge 
+                          className={
+                            insight.severity === 'critical' ? 'bg-red-100 text-red-700' :
+                            insight.severity === 'high' ? 'bg-orange-100 text-orange-700' :
+                            insight.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-blue-100 text-blue-700'
+                          }
+                        >
+                          {insight.severity}
+                        </Badge>
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-600">{insight.description}</p>
+                    </div>
+                    <div className="flex items-center gap-1 ml-2">
+                      {!insight.feedback && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => feedbackMutation.mutate({ id: insight.id, feedback: 'helpful' })}
+                            className="text-green-500 hover:text-green-600 h-8 w-8 p-0"
+                            title="Helpful"
+                          >
+                            <ThumbsUp className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => feedbackMutation.mutate({ id: insight.id, feedback: 'not_helpful' })}
+                            className="text-red-500 hover:text-red-600 h-8 w-8 p-0"
+                            title="Not Helpful"
+                          >
+                            <ThumbsDown className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                      {insight.feedback && (
+                        <Badge variant="outline" className="text-xs">
+                          {insight.feedback === 'helpful' ? '👍' : '👎'}
+                        </Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => dismissMutation.mutate(insight.id)}
+                        className="text-gray-400 hover:text-gray-600 h-8 w-8 p-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Abnormal Results */}
       {abnormalResults.length > 0 && (
