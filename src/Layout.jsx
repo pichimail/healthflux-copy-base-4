@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
   const moreItems = [
     { name: 'AI Chat', page: 'AIAssistant', icon: Brain },
     { name: 'Lab Results', page: 'LabResults', icon: TestTube },
-    { name: 'Trends', page: 'Trends', icon: TrendingUp },
+    { name: 'Health Trends', page: 'HealthTrends', icon: TrendingUp },
     { name: 'Wellness Insights', page: 'WellnessInsights', icon: TrendingUp },
     { name: 'Health Insights', page: 'Insights', icon: Brain },
     { name: 'My Profiles', page: 'Profiles', icon: User },
