@@ -17,7 +17,9 @@ export const translations = {
       close: "Close",
       back: "Back",
       next: "Next",
-      done: "Done"
+      done: "Done",
+      select: "Select",
+      other: "Other"
     },
     nav: {
       home: "Home",
@@ -72,8 +74,10 @@ export const translations = {
       title: "Settings",
       subtitle: "Account & preferences",
       language: "Language",
+      language_preference: "Preferred Language",
       select_language: "Select Language",
       notifications: "Notifications",
+      account_info: "Account Information",
       save_preferences: "Save Preferences"
     },
     onboarding: {
@@ -81,7 +85,18 @@ export const translations = {
       subtitle: "Your personal health companion",
       choose_language: "Choose Your Language",
       language_description: "Select your preferred language to continue",
-      get_started: "Get Started"
+      get_started: "Get Started",
+      create_profile: "Create Your Profile",
+      profile_description: "Tell us a bit about yourself"
+    },
+    profiles: {
+      full_name: "Full Name",
+      date_of_birth: "Date of Birth",
+      gender: "Gender",
+      male: "Male",
+      female: "Female",
+      blood_group: "Blood Group",
+      height: "Height"
     },
     messages: {
       success: "Success!",
@@ -106,7 +121,9 @@ export const translations = {
       close: "बंद करें",
       back: "वापस",
       next: "अगला",
-      done: "पूर्ण"
+      done: "पूर्ण",
+      select: "चुनें",
+      other: "अन्य"
     },
     nav: {
       home: "होम",
@@ -161,8 +178,10 @@ export const translations = {
       title: "सेटिंग्स",
       subtitle: "खाता और वरीयताएं",
       language: "भाषा",
+      language_preference: "पसंदीदा भाषा",
       select_language: "भाषा चुनें",
       notifications: "सूचनाएं",
+      account_info: "खाता जानकारी",
       save_preferences: "वरीयताएं सहेजें"
     },
     onboarding: {
@@ -170,7 +189,18 @@ export const translations = {
       subtitle: "आपका व्यक्तिगत स्वास्थ्य साथी",
       choose_language: "अपनी भाषा चुनें",
       language_description: "जारी रखने के लिए अपनी पसंदीदा भाषा चुनें",
-      get_started: "शुरू करें"
+      get_started: "शुरू करें",
+      create_profile: "अपनी प्रोफ़ाइल बनाएं",
+      profile_description: "हमें अपने बारे में थोड़ा बताएं"
+    },
+    profiles: {
+      full_name: "पूरा नाम",
+      date_of_birth: "जन्म तिथि",
+      gender: "लिंग",
+      male: "पुरुष",
+      female: "महिला",
+      blood_group: "रक्त समूह",
+      height: "ऊंचाई"
     },
     messages: {
       success: "सफल!",
@@ -195,7 +225,9 @@ export const translations = {
       close: "మూసివేయండి",
       back: "వెనక్కి",
       next: "తదుపరి",
-      done: "పూర్తయింది"
+      done: "పూర్తయింది",
+      select: "ఎంచుకోండి",
+      other: "ఇతర"
     },
     nav: {
       home: "హోమ్",
@@ -250,8 +282,10 @@ export const translations = {
       title: "సెట్టింగ్‌లు",
       subtitle: "ఖాతా & ప్రాధాన్యతలు",
       language: "భాష",
+      language_preference: "ఇష్టపడే భాష",
       select_language: "భాషను ఎంచుకోండి",
       notifications: "నోటిఫికేషన్లు",
+      account_info: "ఖాతా సమాచారం",
       save_preferences: "ప్రాధాన్యతలను సేవ్ చేయండి"
     },
     onboarding: {
@@ -259,7 +293,18 @@ export const translations = {
       subtitle: "మీ వ్యక్తిగత ఆరోగ్య సహచరుడు",
       choose_language: "మీ భాషను ఎంచుకోండి",
       language_description: "కొనసాగించడానికి మీ ఇష్టమైన భాషను ఎంచుకోండి",
-      get_started: "ప్రారంభించండి"
+      get_started: "ప్రారంభించండి",
+      create_profile: "మీ ప్రొఫైల్‌ను సృష్టించండి",
+      profile_description: "మీ గురించి కొంచెం చెప్పండి"
+    },
+    profiles: {
+      full_name: "పూర్తి పేరు",
+      date_of_birth: "పుట్టిన తేదీ",
+      gender: "లింగం",
+      male: "పురుషుడు",
+      female: "స్త్రీ",
+      blood_group: "రక్త వర్గం",
+      height: "ఎత్తు"
     },
     messages: {
       success: "విజయం!",

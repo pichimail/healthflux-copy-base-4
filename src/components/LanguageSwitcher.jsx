@@ -13,8 +13,11 @@ export default function LanguageSwitcher({ showLabel = true, className = '' }) {
   const { i18n } = useTranslation();
 
   const handleLanguageChange = async (languageCode) => {
-    await i18n.changeLanguage(languageCode);
     localStorage.setItem('userLanguage', languageCode);
+    await i18n.changeLanguage(languageCode);
+    
+    // Force page reload to ensure all components re-render with new language
+    window.location.reload();
     
     // Update user preferences in database if user is logged in
     try {
