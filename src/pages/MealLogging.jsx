@@ -481,7 +481,7 @@ export default function MealLogging() {
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              {t('meal_logging.7day_trend')}
+              {t('meal_logging.seven_day_trend')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
