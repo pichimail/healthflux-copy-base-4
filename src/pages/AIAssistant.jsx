@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Brain, TrendingUp, Heart, Activity, Pill, AlertCircle, Sparkles, MessageSquare, MapPin, Loader2 } from 'lucide-react';
+import { Brain, TrendingUp, Heart, Activity, Pill, AlertCircle, Sparkles, MessageSquare, MapPin, Loader2, Download, Share2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import AIHealthChat from '../components/AIHealthChat';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { createPageUrl } from '../utils';
 
 export default function AIAssistant() {
   const { t } = useTranslation();
@@ -19,9 +20,15 @@ export default function AIAssistant() {
   const [summary, setSummary] = useState(null);
   const queryClient = useQueryClient();
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
   const { data: profiles = [] } = useQuery({
-    queryKey: ['profiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date')
+    queryKey: ['profiles', user?.email],
+    queryFn: () => base44.entities.Profile.filter({ created_by: user.email }, '-created_date'),
+    enabled: !!user
   });
 
   useEffect(() => {
@@ -36,19 +43,36 @@ export default function AIAssistant() {
   const { data: vitals = [] } = useQuery({
     queryKey: ['vitals', selectedProfile],
     queryFn: () => base44.entities.VitalMeasurement.filter({ profile_id: selectedProfile }, '-measured_at', 30),
-    enabled: !!selectedProfile
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
   });
 
   const { data: labResults = [] } = useQuery({
     queryKey: ['labResults', selectedProfile],
     queryFn: () => base44.entities.LabResult.filter({ profile_id: selectedProfile }, '-test_date', 20),
-    enabled: !!selectedProfile
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
   });
 
   const { data: medications = [] } = useQuery({
     queryKey: ['medications', selectedProfile],
-    queryFn: () => base44.entities.Medication.filter({ profile_id: selectedProfile, is_active: true }),
-    enabled: !!selectedProfile
+    queryFn: () => base44.entities.Medication.filter({ profile_id: selectedProfile }),
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
+  });
+
+  const { data: medicationLogs = [] } = useQuery({
+    queryKey: ['medicationLogs', selectedProfile],
+    queryFn: () => base44.entities.MedicationLog.filter({ profile_id: selectedProfile }, '-logged_at', 50),
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
+  });
+
+  const { data: mealLogs = [] } = useQuery({
+    queryKey: ['mealLogs', selectedProfile],
+    queryFn: () => base44.entities.MealLog.filter({ profile_id: selectedProfile }, '-meal_date', 30),
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
   });
 
   const { data: documents = [] } = useQuery({
@@ -57,35 +81,95 @@ export default function AIAssistant() {
     enabled: !!selectedProfile
   });
 
+  const { data: insights = [] } = useQuery({
+    queryKey: ['insights', selectedProfile],
+    queryFn: () => base44.entities.HealthInsight.filter({ profile_id: selectedProfile, is_dismissed: false }, '-created_date', 20),
+    enabled: !!selectedProfile,
+    refetchInterval: 10000
+  });
+
   const generateHealthSummary = async () => {
     setGenerating(true);
     try {
-      const vitalsData = vitals.map((v) => `${v.vital_type}: ${v.value || `${v.systolic}/${v.diastolic}`} ${v.unit}`).join(', ');
-      const labData = labResults.map((l) => `${l.test_name}: ${l.value} ${l.unit} (${l.flag})`).join(', ');
-      const medsData = medications.map((m) => `${m.medication_name} ${m.dosage}`).join(', ');
+      // Comprehensive data collection
+      const vitalsData = vitals.map((v) => `${v.vital_type}: ${v.value || `${v.systolic}/${v.diastolic}`} ${v.unit} on ${new Date(v.measured_at).toLocaleDateString()}`).join('; ');
+      const labData = labResults.map((l) => `${l.test_name}: ${l.value} ${l.unit} (${l.flag}) on ${new Date(l.test_date).toLocaleDateString()}`).join('; ');
+      
+      // Medication analysis
+      const activeMeds = medications.filter(m => m.is_active);
+      const medsData = activeMeds.map((m) => `${m.medication_name} ${m.dosage}`).join(', ');
+      
+      // Medication adherence
+      const takenLogs = medicationLogs.filter(log => log.status === 'taken');
+      const skippedLogs = medicationLogs.filter(log => log.status === 'skipped');
+      const adherenceRate = medicationLogs.length > 0 ? ((takenLogs.length / medicationLogs.length) * 100).toFixed(0) : 0;
+      
+      // Meal analysis
+      const totalCalories = mealLogs.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+      const avgDailyCalories = mealLogs.length > 0 ? (totalCalories / mealLogs.length).toFixed(0) : 0;
+      const recentMeals = mealLogs.slice(0, 7).map(m => `${m.meal_name} (${m.calories} kcal)`).join(', ');
+      
+      // Health insights summary
+      const criticalInsights = insights.filter(i => i.severity === 'critical' || i.severity === 'high');
+      const insightsText = criticalInsights.map(i => i.title).join('; ');
 
-      const prompt = `As a health AI assistant, provide a comprehensive health summary for ${currentProfile?.full_name}:
+      const prompt = `Generate a comprehensive health summary for ${currentProfile?.full_name}. Use clear, plain language without markdown formatting or ### headers.
 
-Health Data:
-- Age: ${currentProfile?.date_of_birth ? new Date().getFullYear() - new Date(currentProfile.date_of_birth).getFullYear() : 'Unknown'}
-- Gender: ${currentProfile?.gender || 'Unknown'}
-- Blood Group: ${currentProfile?.blood_group || 'Unknown'}
-- Allergies: ${currentProfile?.allergies?.join(', ') || 'None'}
-- Chronic Conditions: ${currentProfile?.chronic_conditions?.join(', ') || 'None'}
-- Current Medications: ${medsData || 'None'}
-- Recent Vitals (30 days): ${vitalsData || 'None'}
-- Recent Lab Results (20 tests): ${labData || 'None'}
+PATIENT PROFILE
+Age: ${currentProfile?.date_of_birth ? new Date().getFullYear() - new Date(currentProfile.date_of_birth).getFullYear() : 'Unknown'} years
+Gender: ${currentProfile?.gender || 'Unknown'}
+Blood Group: ${currentProfile?.blood_group || 'Unknown'}
+Known Allergies: ${currentProfile?.allergies?.join(', ') || 'None reported'}
+Chronic Conditions: ${currentProfile?.chronic_conditions?.join(', ') || 'None reported'}
 
-Generate:
-1. **Overall Health Status** - Brief assessment
-2. **Key Findings** - Important observations from data
-3. **Vital Trends** - Blood pressure, weight, heart rate patterns
-4. **Lab Analysis** - Notable results and what they mean
-5. **Current Medications** - List with purposes
-6. **Lifestyle Recommendations** - Diet, exercise, sleep
-7. **Action Items** - What to monitor or discuss with doctor
+VITAL SIGNS HISTORY (Last 30 days, ${vitals.length} measurements)
+${vitalsData || 'No vital signs recorded'}
 
-Keep the language simple, empathetic, and actionable.`;
+LABORATORY RESULTS (Last 20 tests)
+${labData || 'No lab results available'}
+
+MEDICATION MANAGEMENT
+Active Medications: ${medsData || 'None'}
+Total Logs: ${medicationLogs.length} entries
+Taken: ${takenLogs.length} doses
+Skipped: ${skippedLogs.length} doses
+Adherence Rate: ${adherenceRate}%
+
+NUTRITION TRACKING (Last 30 days)
+Total Meals Logged: ${mealLogs.length}
+Average Daily Calories: ${avgDailyCalories} kcal
+Recent Meals: ${recentMeals || 'No meals logged'}
+
+ACTIVE HEALTH ALERTS
+${insightsText || 'No critical alerts'}
+
+Generate a detailed health summary with these sections (use plain text, no markdown):
+
+SECTION 1: OVERALL HEALTH STATUS
+Provide a brief 2-3 sentence assessment of current health based on all available data.
+
+SECTION 2: KEY FINDINGS
+List 3-5 important observations from the data with specific numbers and dates.
+
+SECTION 3: VITAL SIGN TRENDS
+Analyze blood pressure, weight, heart rate patterns. Mention if values are improving, stable, or concerning.
+
+SECTION 4: LABORATORY ANALYSIS
+Explain notable lab results in simple terms. What do the abnormal values mean?
+
+SECTION 5: MEDICATION ADHERENCE
+Comment on medication compliance (${adherenceRate}%). If below 80%, suggest strategies.
+
+SECTION 6: NUTRITION ASSESSMENT
+Evaluate calorie intake (${avgDailyCalories} kcal/day). Provide specific dietary recommendations.
+
+SECTION 7: LIFESTYLE RECOMMENDATIONS
+Give 4-5 specific, actionable suggestions for diet, exercise, and sleep.
+
+SECTION 8: ACTION ITEMS
+List what to monitor closely and what to discuss with doctor. Include urgency levels.
+
+Write in a warm, empathetic tone. Use specific numbers from the data. Make it clear and actionable.`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt,
@@ -104,6 +188,19 @@ Keep the language simple, empathetic, and actionable.`;
   const abnormalLabs = labResults.filter((r) => r.flag !== 'normal');
   const latestVitals = vitals.slice(0, 5);
 
+  const downloadSummary = () => {
+    if (!summary) return;
+    const blob = new Blob([summary], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `health-summary-${currentProfile?.full_name}-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  };
+
   return (
     <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 max-w-7xl mx-auto">
       {/* Mobile-First Header */}
@@ -112,21 +209,8 @@ Keep the language simple, empathetic, and actionable.`;
         <p className="text-xs sm:text-sm text-gray-600">{t('ai_assistant.subtitle')}</p>
       </div>
 
-      {/* Profile Selector */}
+      {/* Action Buttons */}
       <div className="flex flex-col gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <Select value={selectedProfile || ''} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200">
-            <SelectValue placeholder="Select Profile" />
-          </SelectTrigger>
-          <SelectContent>
-            {profiles.map((profile) =>
-            <SelectItem key={profile.id} value={profile.id}>
-                {profile.full_name}
-              </SelectItem>
-            )}
-          </SelectContent>
-        </Select>
-
         <div className="grid grid-cols-2 gap-2">
           <Button
             onClick={() => setChatOpen(true)}
@@ -192,14 +276,40 @@ Keep the language simple, empathetic, and actionable.`;
       {summary &&
       <Card className="border-0 shadow-sm rounded-2xl mb-6">
           <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#E9F46A' }}>
-            <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-lg">
-              <Brain className="w-5 h-5" />
-              {t('ai_assistant.health_summary')}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-lg">
+                <Brain className="w-5 h-5" />
+                {t('ai_assistant.health_summary')}
+              </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  onClick={downloadSummary}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl bg-white/80 hover:bg-white"
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Download</span>
+                </Button>
+                <Button
+                  onClick={() => {
+                    const url = `${window.location.origin}${createPageUrl('PublicShare')}?type=summary&profile=${selectedProfile}`;
+                    navigator.clipboard.writeText(url);
+                    alert('Share link copied to clipboard!');
+                  }}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl bg-white/80 hover:bg-white"
+                >
+                  <Share2 className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Share</span>
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
             <div className="prose prose-sm md:prose-base max-w-none">
-              <div className="whitespace-pre-wrap text-[#0A0A0A] leading-relaxed text-sm md:text-base">
+              <div className="whitespace-pre-wrap text-[#0A0A0A] leading-relaxed text-sm md:text-base font-sans">
                 {summary}
               </div>
             </div>
