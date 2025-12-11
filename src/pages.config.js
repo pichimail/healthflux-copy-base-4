@@ -24,6 +24,8 @@ import SymptomChecker from './pages/SymptomChecker';
 import HealthTrends from './pages/HealthTrends';
 import MealLogging from './pages/MealLogging';
 import Analytics from './pages/Analytics';
+import FamilySharing from './pages/FamilySharing';
+import Wearables from './pages/Wearables';
 import __Layout from './Layout.jsx';
 
 
@@ -54,6 +56,8 @@ export const PAGES = {
     "HealthTrends": HealthTrends,
     "MealLogging": MealLogging,
     "Analytics": Analytics,
+    "FamilySharing": FamilySharing,
+    "Wearables": Wearables,
 }
 
 export const pagesConfig = {
