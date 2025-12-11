@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import i18n from '../components/i18n/i18nSetup';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -8,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Bell, Mail, Activity, Pill, Calendar, Sparkles } from 'lucide-react';
 
 export default function Settings() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
 
