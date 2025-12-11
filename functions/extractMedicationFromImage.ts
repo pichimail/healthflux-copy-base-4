@@ -79,7 +79,7 @@ Respond ONLY with valid JSON (no markdown):
     });
 
     // Check for drug interactions with existing medications
-    const existingMeds = await base44.entities.Medication.filter({
+    const existingMeds = await base44.asServiceRole.entities.Medication.filter({
       profile_id,
       is_active: true
     });
