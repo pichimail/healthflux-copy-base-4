@@ -15,6 +15,7 @@ import {
 'lucide-react';
 import { format, isToday, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import ProfileSwitcher from '../components/ProfileSwitcher';
+import AINutritionistAssistant from '../components/nutrition/AINutritionistAssistant';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -464,6 +465,13 @@ export default function MealLogging() {
           </CardContent>
         </Card>
       }
+
+      {/* AI Nutritionist Assistant */}
+      <AINutritionistAssistant
+        profileId={selectedProfileId}
+        recentMeals={todayMeals}
+        nutritionGoal={nutritionGoal}
+      />
 
       {/* Weekly Trend Chart */}
       {last7DaysData.length > 0 &&
