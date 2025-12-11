@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, FileText, Activity, Pill, TrendingUp, 
-  User, TestTube, Brain, Menu, X, AlertCircle, MoreVertical, Settings, Shield, LogOut, Stethoscope, Users
+  User, TestTube, Brain, Menu, X, AlertCircle, MoreVertical, Settings, Shield, LogOut, Stethoscope, Users, Watch
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -56,15 +56,14 @@ export default function Layout({ children, currentPageName }) {
   ];
 
   const moreItems = [
-    { name: 'AI Chat', page: 'AIAssistant', icon: Brain },
+    { name: 'Flux Chat', page: 'AIAssistant', icon: Brain },
     { name: 'Meal Logging', page: 'MealLogging', icon: Activity },
     { name: 'Lab Results', page: 'LabResults', icon: TestTube },
     { name: 'Health Trends', page: 'HealthTrends', icon: TrendingUp },
     { name: 'Analytics', page: 'Analytics', icon: TrendingUp },
     { name: 'Wellness Insights', page: 'WellnessInsights', icon: TrendingUp },
-    { name: 'Health Insights', page: 'Insights', icon: Brain },
-    { name: 'My Profiles', page: 'Profiles', icon: User },
-    { name: 'Family Sharing', page: 'FamilySharing', icon: Users },
+    { name: 'Smart Insights', page: 'Insights', icon: Brain },
+    { name: 'Family Profiles', page: 'FamilyProfiles', icon: Users },
     { name: 'Wearables', page: 'Wearables', icon: Activity },
     { name: 'Emergency Profile', page: 'EmergencyProfile', icon: AlertCircle },
   ];

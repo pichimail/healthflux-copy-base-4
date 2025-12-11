@@ -32,7 +32,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
             <TabsTrigger value="details" className="text-xs sm:text-sm rounded-xl">Details</TabsTrigger>
             <TabsTrigger value="chat" className="text-xs sm:text-sm rounded-xl">Chat</TabsTrigger>
             {document.ai_summary && (
-              <TabsTrigger value="ai" className="text-xs sm:text-sm rounded-xl">Analysis</TabsTrigger>
+              <TabsTrigger value="analysis" className="text-xs sm:text-sm rounded-xl">Analysis</TabsTrigger>
             )}
           </TabsList>
 
@@ -154,7 +154,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
             </TabsContent>
 
             {document.ai_summary && (
-              <TabsContent value="ai" className="mt-0 p-3 sm:p-4">
+              <TabsContent value="analysis" className="mt-0 p-3 sm:p-4">
                 <div className="space-y-3 sm:space-y-4">
                   <div className="p-3 sm:p-4 bg-violet-50 rounded-xl sm:rounded-2xl border-2 border-violet-200">
                     <h3 className="font-semibold text-violet-900 mb-2 flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function DocumentViewer({ document, open, onClose, profileId }) {
                               style={{ width: `${document.health_score}%` }}
                             />
                           </div>
-                          <p className="text-xs text-blue-700 mt-1">Smart Analysis</p>
+                          <p className="text-xs text-blue-700 mt-1">Flux Analysis</p>
                         </div>
                       </div>
                     </div>

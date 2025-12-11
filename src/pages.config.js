@@ -26,6 +26,7 @@ import MealLogging from './pages/MealLogging';
 import Analytics from './pages/Analytics';
 import FamilySharing from './pages/FamilySharing';
 import Wearables from './pages/Wearables';
+import FamilyProfiles from './pages/FamilyProfiles';
 import __Layout from './Layout.jsx';
 
 
@@ -58,6 +59,7 @@ export const PAGES = {
     "Analytics": Analytics,
     "FamilySharing": FamilySharing,
     "Wearables": Wearables,
+    "FamilyProfiles": FamilyProfiles,
 }
 
 export const pagesConfig = {

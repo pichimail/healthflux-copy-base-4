@@ -363,8 +363,8 @@ export default function Dashboard() {
             </div>
           </Link>
 
-          {/* Profiles Card */}
-          <Link to={createPageUrl('Profiles')}>
+          {/* Family Profiles Card */}
+          <Link to={createPageUrl('FamilyProfiles')}>
             <div
               className="rounded-2xl sm:rounded-3xl p-3 sm:p-4 h-28 sm:h-36 flex flex-col relative cursor-pointer active-press card-shadow hover:shadow-lg transition-all"
               style={{ backgroundColor: '#0B5A46' }}
@@ -373,7 +373,7 @@ export default function Dashboard() {
                 Family<br />Members
               </div>
               <div className="text-sm sm:text-base font-semibold text-white mt-auto">
-                Profiles
+                Family
               </div>
               <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 bg-white/20 rounded-xl flex items-center justify-center">
                 <Users className="w-4 h-4 text-white" />
@@ -595,35 +595,35 @@ export default function Dashboard() {
         </Card>
 
         {/* Recent Documents */}
-        <Card className="border-0 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-gray-100">
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Recent Documents</CardTitle>
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Recent Docs</CardTitle>
               <Link to={createPageUrl('Documents')}>
-                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50">
-                  View All <ArrowRight className="w-3 h-3 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl active-press h-8">
+                  View <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4">
             {documents.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">No documents uploaded yet</p>
+              <p className="text-center text-gray-600 py-6 sm:py-8 text-xs sm:text-sm">No docs</p>
             ) : (
-              <div className="space-y-3">
-                {documents.slice(0, 4).map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-blue-600" />
+              <div className="space-y-2 sm:space-y-3">
+                {documents.slice(0, 3).map((doc) => (
+                  <div key={doc.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#F4F4F2] rounded-2xl">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-900 truncate">{doc.title}</p>
-                      <p className="text-sm text-slate-600">
-                        {format(new Date(doc.created_date), 'MMM d, yyyy')}
+                      <p className="font-medium text-[#0A0A0A] text-xs sm:text-sm truncate">{doc.title}</p>
+                      <p className="text-xs text-gray-500">
+                        {format(new Date(doc.created_date), 'MMM d')}
                       </p>
                     </div>
-                    <Badge variant="outline" className="capitalize">
-                      {doc.document_type.replace(/_/g, ' ')}
+                    <Badge variant="outline" className="capitalize text-xs rounded-xl flex-shrink-0">
+                      {doc.document_type?.split('_')[0]}
                     </Badge>
                   </div>
                 ))}
@@ -632,38 +632,38 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Abnormal Lab Results */}
-        <Card className="border-0 shadow-md bg-white/80 backdrop-blur">
-          <CardHeader className="border-b border-slate-100">
+        {/* Lab Alerts */}
+        <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
+          <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold">Lab Alerts</CardTitle>
+              <CardTitle className="text-sm sm:text-base font-semibold text-[#0A0A0A]">Lab Alerts</CardTitle>
               <Link to={createPageUrl('LabResults')}>
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-50 rounded-xl active-press h-8">
+                  View <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4">
             {labResults.filter(r => r.flag !== 'normal').length === 0 ? (
-              <div className="text-center py-8">
-                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
-                <p className="text-gray-600 text-sm">All lab results are normal</p>
+              <div className="text-center py-4 sm:py-6">
+                <CheckCircle className="w-8 sm:w-10 h-8 sm:h-10 text-green-500 mx-auto mb-2" />
+                <p className="text-gray-600 text-xs sm:text-sm">All normal</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {labResults.filter(r => r.flag !== 'normal').slice(0, 4).map((result) => (
-                  <div key={result.id} className="flex items-start justify-between p-4 bg-[#F4F4F2] rounded-xl">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className={`w-5 h-5 mt-0.5 ${result.flag === 'high' ? 'text-red-500' : 'text-yellow-500'}`} />
-                      <div>
-                        <p className="font-semibold text-[#0A0A0A] text-sm">{result.test_name}</p>
+              <div className="space-y-2 sm:space-y-3">
+                {labResults.filter(r => r.flag !== 'normal').slice(0, 3).map((result) => (
+                  <div key={result.id} className="flex items-start justify-between p-3 sm:p-4 bg-[#F4F4F2] rounded-2xl">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <AlertCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${result.flag === 'high' ? 'text-red-500' : 'text-yellow-500'}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[#0A0A0A] text-xs sm:text-sm truncate">{result.test_name}</p>
                         <p className="text-xs text-gray-600">
                           {result.value} {result.unit}
                         </p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`text-xs ${
+                    <Badge variant="outline" className={`text-xs rounded-xl flex-shrink-0 ml-2 ${
                       result.flag === 'high' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                     }`}>
                       {result.flag}
@@ -716,10 +716,10 @@ export default function Dashboard() {
           <DialogHeader className="p-6 pb-4 border-b border-gray-200" style={{ backgroundColor: '#E9F46A' }}>
             <DialogTitle className="flex items-center gap-2 text-[#0A0A0A]">
               <Brain className="w-5 h-5" />
-              Health Analytics & Predictions
+              Smart Health Analytics
             </DialogTitle>
             <p className="text-xs text-gray-700 mt-1">
-              Ask natural language questions about your health data and get intelligent insights
+              Ask questions about your health data and get intelligent insights
             </p>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">

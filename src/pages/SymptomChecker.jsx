@@ -178,19 +178,31 @@ export default function SymptomChecker() {
         )}
       </div>
 
-      {/* Emergency Button */}
+      {/* Emergency Buttons */}
       <Alert className="mb-4 sm:mb-6 bg-red-50 border-red-200">
         <AlertTriangle className="h-4 w-4 text-red-600" />
-        <AlertDescription className="text-xs sm:text-sm text-red-700 flex items-center justify-between">
-          <span>{t('symptoms.emergency')}</span>
-          <Button
-            onClick={callEmergency}
-            size="sm"
-            className="bg-red-600 hover:bg-red-700 text-white rounded-2xl ml-2 h-9 active-press shadow-lg"
-          >
-            <Phone className="w-4 h-4 mr-1" />
-            {t('symptoms.call_911')}
-          </Button>
+        <AlertDescription>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span className="text-xs sm:text-sm text-red-700">{t('symptoms.emergency')}</span>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => window.location.href = 'tel:108'}
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white rounded-2xl h-9 active-press shadow-lg flex-1 sm:flex-none"
+              >
+                <Phone className="w-4 h-4 mr-1" />
+                Call 108
+              </Button>
+              <Button
+                onClick={() => window.location.href = 'tel:911'}
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white rounded-2xl h-9 active-press shadow-lg flex-1 sm:flex-none"
+              >
+                <Phone className="w-4 h-4 mr-1" />
+                Call 911
+              </Button>
+            </div>
+          </div>
         </AlertDescription>
       </Alert>
 
