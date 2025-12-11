@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +14,7 @@ import {
 import ProfileSwitcher from '../components/ProfileSwitcher';
 
 export default function SymptomChecker() {
+  const { t } = useTranslation();
   const [symptoms, setSymptoms] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -163,9 +165,9 @@ export default function SymptomChecker() {
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-          🩺 Symptom Checker
+          🩺 {t('symptoms.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">AI-powered health triage</p>
+        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{t('symptoms.subtitle')}</p>
         
         {profiles.length > 0 && (
           <ProfileSwitcher
@@ -180,14 +182,14 @@ export default function SymptomChecker() {
       <Alert className="mb-4 sm:mb-6 bg-red-50 border-red-200">
         <AlertTriangle className="h-4 w-4 text-red-600" />
         <AlertDescription className="text-xs sm:text-sm text-red-700 flex items-center justify-between">
-          <span>Life-threatening emergency?</span>
+          <span>{t('symptoms.emergency')}</span>
           <Button
             onClick={callEmergency}
             size="sm"
             className="bg-red-600 hover:bg-red-700 text-white rounded-2xl ml-2 h-9 active-press shadow-lg"
           >
             <Phone className="w-4 h-4 mr-1" />
-            Call 911
+            {t('symptoms.call_911')}
           </Button>
         </AlertDescription>
       </Alert>
@@ -195,14 +197,14 @@ export default function SymptomChecker() {
       {/* Input Section */}
       <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl mb-4 sm:mb-6">
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-          <CardTitle className="text-sm sm:text-base">Describe Your Symptoms</CardTitle>
+          <CardTitle className="text-sm sm:text-base">{t('symptoms.describe')}</CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
           <div className="space-y-3">
             <Textarea
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
-              placeholder="E.g., I've had a headache for 2 days, feeling nauseous, and my vision is a bit blurry..."
+              placeholder={t('symptoms.placeholder')}
               rows={5}
               className="rounded-2xl text-sm"
             />
@@ -214,7 +216,7 @@ export default function SymptomChecker() {
                 className={`flex-1 rounded-2xl active-press h-11 sm:h-12 ${isListening ? 'bg-red-50 text-red-600 border-red-200' : ''}`}
               >
                 <Mic className="w-4 h-4 mr-2" />
-                {isListening ? 'Stop Recording' : 'Voice Input'}
+                {isListening ? t('symptoms.stop_recording') : t('symptoms.voice_input')}
               </Button>
               
               <Button
@@ -225,12 +227,12 @@ export default function SymptomChecker() {
                 {analyzing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
+                    {t('symptoms.analyzing')}
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 mr-2" />
-                    Analyze
+                    {t('symptoms.analyze')}
                   </>
                 )}
               </Button>
@@ -255,7 +257,7 @@ export default function SymptomChecker() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-[#0A0A0A] text-sm sm:text-base mb-1 capitalize">
-                        {analysis.urgency_level} Level
+                        {analysis.urgency_level} {t('symptoms.urgency_level')}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-700">{analysis.urgency_message}</p>
                     </div>
@@ -270,7 +272,7 @@ export default function SymptomChecker() {
             <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
               <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                 <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5" />
-                Potential Causes
+                {t('symptoms.potential_causes')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3 sm:p-4">
@@ -284,14 +286,14 @@ export default function SymptomChecker() {
                         cause.likelihood === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-green-100 text-green-700'
                       }`}>
-                        {cause.likelihood} likelihood
+                        {cause.likelihood} {t('symptoms.likelihood')}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-700 mb-2">{cause.reasoning}</p>
                     {cause.relevant_to_history && (
                       <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
                         <Activity className="w-3 h-3 mr-1" />
-                        Related to your health history
+                        {t('symptoms.related_history')}
                       </Badge>
                     )}
                   </div>
@@ -306,7 +308,7 @@ export default function SymptomChecker() {
               <CardHeader className="border-b border-red-100 p-3 sm:p-4">
                 <CardTitle className="text-sm sm:text-base text-red-700 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Warning Signs
+                  {t('symptoms.warning_signs')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
@@ -327,13 +329,13 @@ export default function SymptomChecker() {
             <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
               <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                Recommendations
+                {t('symptoms.recommendations')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
               {analysis.recommendations?.immediate_actions?.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-[#0A0A0A] text-sm mb-2">Immediate Actions</h4>
+                  <h4 className="font-semibold text-[#0A0A0A] text-sm mb-2">{t('symptoms.immediate_actions')}</h4>
                   <ul className="space-y-1">
                     {analysis.recommendations.immediate_actions.map((action, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-gray-700">
@@ -347,7 +349,7 @@ export default function SymptomChecker() {
 
               {analysis.recommendations?.monitoring_advice?.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-[#0A0A0A] text-sm mb-2">Monitoring Advice</h4>
+                  <h4 className="font-semibold text-[#0A0A0A] text-sm mb-2">{t('symptoms.monitoring_advice')}</h4>
                   <ul className="space-y-1">
                     {analysis.recommendations.monitoring_advice.map((advice, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-gray-700">
@@ -361,7 +363,7 @@ export default function SymptomChecker() {
 
               {analysis.recommendations?.when_to_seek_care && (
                 <div className="p-3 bg-yellow-50 rounded-2xl">
-                  <h4 className="font-semibold text-yellow-900 text-sm mb-1">When to Seek Care</h4>
+                  <h4 className="font-semibold text-yellow-900 text-sm mb-1">{t('symptoms.when_seek_care')}</h4>
                   <p className="text-xs text-yellow-800">{analysis.recommendations.when_to_seek_care}</p>
                 </div>
               )}
@@ -372,7 +374,7 @@ export default function SymptomChecker() {
           {analysis.questions_for_doctor?.length > 0 && (
             <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
               <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base">Questions for Your Doctor</CardTitle>
+                <CardTitle className="text-sm sm:text-base">{t('symptoms.questions_doctor')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
                 <ul className="space-y-2">
@@ -391,7 +393,7 @@ export default function SymptomChecker() {
           {analysis.relevant_health_context?.length > 0 && (
             <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl bg-blue-50">
               <CardHeader className="border-b border-blue-100 p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base text-blue-900">Relevant to Your Health History</CardTitle>
+                <CardTitle className="text-sm sm:text-base text-blue-900">{t('symptoms.relevant_history')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
                 <ul className="space-y-1">
@@ -410,8 +412,7 @@ export default function SymptomChecker() {
           <Alert className="bg-gray-50 border-gray-200">
             <Info className="h-4 w-4 text-gray-600" />
             <AlertDescription className="text-xs text-gray-600">
-              This is an AI-powered assessment tool and should not replace professional medical advice. 
-              Always consult with a healthcare provider for proper diagnosis and treatment.
+              {t('symptoms.disclaimer')}
             </AlertDescription>
           </Alert>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function HealthTrends() {
+  const { t } = useTranslation();
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [dateRange, setDateRange] = useState('30d');
   const [customStartDate, setCustomStartDate] = useState('');
@@ -159,7 +161,7 @@ export default function HealthTrends() {
     if (data.length === 0) {
       return (
         <div className="text-center py-12 text-gray-500 text-sm">
-          No data available for selected period
+          {t('health_trends.no_data')}
         </div>
       );
     }
@@ -180,10 +182,10 @@ export default function HealthTrends() {
               {stats && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   <Badge variant="outline" className="text-xs">
-                    Avg: {stats.avg.toFixed(1)}
+                    {t('health_trends.avg')}: {stats.avg.toFixed(1)}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    Range: {stats.min.toFixed(1)} - {stats.max.toFixed(1)}
+                    {t('health_trends.range')}: {stats.min.toFixed(1)} - {stats.max.toFixed(1)}
                   </Badge>
                   <Badge className={`text-xs ${stats.trend > 0 ? 'bg-green-100 text-green-700' : stats.trend < 0 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
                     {stats.trend > 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : stats.trend < 0 ? <TrendingDown className="w-3 h-3 mr-1" /> : <Minus className="w-3 h-3 mr-1" />}
@@ -262,9 +264,9 @@ export default function HealthTrends() {
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-          📊 Health Trends
+          📊 {t('health_trends.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Visualize your health data</p>
+        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{t('health_trends.subtitle')}</p>
         
         {profiles.length > 0 && (
           <ProfileSwitcher
@@ -280,53 +282,53 @@ export default function HealthTrends() {
         <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
           <CardTitle className="text-sm sm:text-base flex items-center gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('health_trends.filters')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
           <div className="space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               <div className="space-y-2">
-                <Label className="text-xs">Date Range</Label>
+                <Label className="text-xs">{t('health_trends.date_range')}</Label>
                 <Select value={dateRange} onValueChange={setDateRange}>
                   <SelectTrigger className="h-10 sm:h-11 rounded-2xl text-xs sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="7d">Last 7 days</SelectItem>
-                    <SelectItem value="30d">Last 30 days</SelectItem>
-                    <SelectItem value="90d">Last 90 days</SelectItem>
-                    <SelectItem value="6m">Last 6 months</SelectItem>
-                    <SelectItem value="1y">Last year</SelectItem>
-                    <SelectItem value="custom">Custom range</SelectItem>
+                    <SelectItem value="7d">{t('health_trends.last_7_days')}</SelectItem>
+                    <SelectItem value="30d">{t('health_trends.last_30_days')}</SelectItem>
+                    <SelectItem value="90d">{t('health_trends.last_90_days')}</SelectItem>
+                    <SelectItem value="6m">{t('health_trends.last_6_months')}</SelectItem>
+                    <SelectItem value="1y">{t('health_trends.last_year')}</SelectItem>
+                    <SelectItem value="custom">{t('health_trends.custom_range')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs">Chart Type</Label>
+                <Label className="text-xs">{t('health_trends.chart_type')}</Label>
                 <Select value={chartType} onValueChange={setChartType}>
                   <SelectTrigger className="h-10 sm:h-11 rounded-2xl text-xs sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="line">Line Chart</SelectItem>
-                    <SelectItem value="area">Area Chart</SelectItem>
-                    <SelectItem value="bar">Bar Chart</SelectItem>
+                    <SelectItem value="line">{t('health_trends.line_chart')}</SelectItem>
+                    <SelectItem value="area">{t('health_trends.area_chart')}</SelectItem>
+                    <SelectItem value="bar">{t('health_trends.bar_chart')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs">Metric Filter</Label>
+                <Label className="text-xs">{t('health_trends.metric_filter')}</Label>
                 <Select value={selectedMetric} onValueChange={setSelectedMetric}>
                   <SelectTrigger className="h-10 sm:h-11 rounded-2xl text-xs sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Metrics</SelectItem>
-                    <SelectItem value="vitals">Vitals Only</SelectItem>
-                    <SelectItem value="labs">Labs Only</SelectItem>
+                    <SelectItem value="all">{t('health_trends.all_metrics')}</SelectItem>
+                    <SelectItem value="vitals">{t('health_trends.vitals_only')}</SelectItem>
+                    <SelectItem value="labs">{t('health_trends.labs_only')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -335,7 +337,7 @@ export default function HealthTrends() {
             {dateRange === 'custom' && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="text-xs">Start Date</Label>
+                  <Label className="text-xs">{t('health_trends.start_date')}</Label>
                   <Input
                     type="date"
                     value={customStartDate}
@@ -344,7 +346,7 @@ export default function HealthTrends() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs">End Date</Label>
+                  <Label className="text-xs">{t('health_trends.end_date')}</Label>
                   <Input
                     type="date"
                     value={customEndDate}
@@ -361,7 +363,7 @@ export default function HealthTrends() {
               className="w-full rounded-2xl active-press h-10 sm:h-11 text-xs sm:text-sm"
             >
               <Download className="w-4 h-4 mr-2" />
-              Export Data (CSV)
+              {t('health_trends.export_csv')}
             </Button>
           </div>
         </CardContent>
@@ -371,7 +373,7 @@ export default function HealthTrends() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">Vital Readings</div>
+            <div className="text-xs text-gray-600 mb-1">{t('health_trends.vital_readings')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {filteredVitals.length}
             </div>
@@ -379,7 +381,7 @@ export default function HealthTrends() {
         </Card>
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">Lab Tests</div>
+            <div className="text-xs text-gray-600 mb-1">{t('health_trends.lab_tests')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {filteredLabs.length}
             </div>
@@ -387,7 +389,7 @@ export default function HealthTrends() {
         </Card>
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">Vital Types</div>
+            <div className="text-xs text-gray-600 mb-1">{t('health_trends.vital_types')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {vitalTypes.length}
             </div>
@@ -395,7 +397,7 @@ export default function HealthTrends() {
         </Card>
         <Card className="border-0 card-shadow rounded-2xl">
           <CardContent className="p-3 sm:p-4">
-            <div className="text-xs text-gray-600 mb-1">Lab Types</div>
+            <div className="text-xs text-gray-600 mb-1">{t('health_trends.lab_types')}</div>
             <div className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">
               {labTests.length}
             </div>
@@ -408,7 +410,7 @@ export default function HealthTrends() {
         {/* Vitals Charts */}
         {(selectedMetric === 'all' || selectedMetric === 'vitals') && vitalTypes.length > 0 && (
           <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mt-6 mb-3">Vital Signs</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mt-6 mb-3">{t('health_trends.vital_signs')}</h2>
             {vitalTypes.includes('blood_pressure') && 
               renderChart(
                 prepareVitalChartData('blood_pressure'), 
@@ -464,7 +466,7 @@ export default function HealthTrends() {
         {/* Lab Results Charts */}
         {(selectedMetric === 'all' || selectedMetric === 'labs') && labTests.length > 0 && (
           <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mt-6 mb-3">Laboratory Results</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mt-6 mb-3">{t('health_trends.laboratory_results')}</h2>
             {labTests.map((test, idx) => 
               renderChart(
                 prepareLabChartData(test), 
@@ -481,8 +483,8 @@ export default function HealthTrends() {
           <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
             <CardContent className="p-12 text-center">
               <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">No health data for selected period</p>
-              <p className="text-xs text-gray-500">Try adjusting your date range or add more health records</p>
+              <p className="text-gray-600 mb-2">{t('health_trends.no_data')}</p>
+              <p className="text-xs text-gray-500">{t('health_trends.no_data_desc')}</p>
             </CardContent>
           </Card>
         )}

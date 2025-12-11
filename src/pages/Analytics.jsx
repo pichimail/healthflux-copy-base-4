@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +19,7 @@ import BenchmarkComparison from '../components/analytics/BenchmarkComparison';
 import CustomReports from '../components/analytics/CustomReports';
 
 export default function Analytics() {
+  const { t } = useTranslation();
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [dateRange, setDateRange] = useState('3months');
   const [activeTab, setActiveTab] = useState('trends');
@@ -81,9 +83,9 @@ export default function Analytics() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
-              📊 Advanced Analytics
+              📊 {t('analytics.title')}
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600">Deep health insights & predictions</p>
+            <p className="text-xs sm:text-sm text-gray-600">{t('analytics.subtitle')}</p>
           </div>
           <Button
             variant="outline"
@@ -91,7 +93,7 @@ export default function Analytics() {
             className="rounded-2xl active-press"
           >
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {t('analytics.export')}
           </Button>
         </div>
 
@@ -108,16 +110,16 @@ export default function Analytics() {
       <Card className="border-0 card-shadow rounded-2xl mb-4">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold">Time Range:</label>
+            <label className="text-sm font-semibold">{t('analytics.time_range')}</label>
             <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-40 h-10 rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1month">Last Month</SelectItem>
-                <SelectItem value="3months">Last 3 Months</SelectItem>
-                <SelectItem value="6months">Last 6 Months</SelectItem>
-                <SelectItem value="1year">Last Year</SelectItem>
+                <SelectItem value="1month">{t('analytics.last_month')}</SelectItem>
+                <SelectItem value="3months">{t('analytics.last_3_months')}</SelectItem>
+                <SelectItem value="6months">{t('analytics.last_6_months')}</SelectItem>
+                <SelectItem value="1year">{t('health_trends.last_year')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -129,23 +131,23 @@ export default function Analytics() {
         <TabsList className="grid w-full grid-cols-5 rounded-2xl h-11 mb-4">
           <TabsTrigger value="trends" className="text-xs sm:text-sm rounded-xl">
             <TrendingUp className="w-4 h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Trends</span>
+            <span className="hidden sm:inline">{t('analytics.trends')}</span>
           </TabsTrigger>
           <TabsTrigger value="correlations" className="text-xs sm:text-sm rounded-xl">
             <Brain className="w-4 h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Patterns</span>
+            <span className="hidden sm:inline">{t('analytics.patterns')}</span>
           </TabsTrigger>
           <TabsTrigger value="predictive" className="text-xs sm:text-sm rounded-xl">
             <Sparkles className="w-4 h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Predict</span>
+            <span className="hidden sm:inline">{t('analytics.predict')}</span>
           </TabsTrigger>
           <TabsTrigger value="benchmark" className="text-xs sm:text-sm rounded-xl">
             <BarChart3 className="w-4 h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Compare</span>
+            <span className="hidden sm:inline">{t('analytics.compare')}</span>
           </TabsTrigger>
           <TabsTrigger value="reports" className="text-xs sm:text-sm rounded-xl">
             <Download className="w-4 h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Reports</span>
+            <span className="hidden sm:inline">{t('analytics.reports')}</span>
           </TabsTrigger>
         </TabsList>
 

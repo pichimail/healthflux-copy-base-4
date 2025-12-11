@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,7 @@ import ProfileSwitcher from '../components/ProfileSwitcher';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function WellnessInsights() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -74,8 +76,8 @@ export default function WellnessInsights() {
     <div className="px-6 py-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">AI Wellness Insights</h1>
-          <p className="text-sm text-gray-600">Predictive health analytics and personalized recommendations</p>
+          <h1 className="text-2xl font-extrabold text-[#0A0A0A] mb-1">{t('wellness.title')}</h1>
+          <p className="text-sm text-gray-600">{t('wellness.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <ProfileSwitcher
@@ -93,11 +95,10 @@ export default function WellnessInsights() {
               <Brain className="w-10 h-10 text-purple-600" />
             </div>
             <h2 className="text-2xl font-bold text-[#0A0A0A] mb-2">
-              Advanced Health Analytics
+              {t('wellness.advanced_analytics')}
             </h2>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Our AI analyzes your comprehensive health data to provide predictive insights, 
-              identify potential risks, and deliver personalized wellness recommendations.
+              {t('wellness.analytics_desc')}
             </p>
             <Button 
               onClick={generateAnalysis} 
@@ -107,12 +108,12 @@ export default function WellnessInsights() {
               {analyzing ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Analyzing Your Health Data...
+                  {t('wellness.analyzing_data')}
                 </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Generate Health Insights
+                  {t('wellness.generate_insights')}
                 </>
               )}
             </Button>
@@ -125,12 +126,12 @@ export default function WellnessInsights() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#0A0A0A] mb-1">Overall Health Score</h3>
-                  <p className="text-sm text-gray-600">Based on comprehensive data analysis</p>
+                  <h3 className="text-lg font-semibold text-[#0A0A0A] mb-1">{t('wellness.overall_score')}</h3>
+                  <p className="text-sm text-gray-600">{t('wellness.score_desc')}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-5xl font-bold text-[#0A0A0A]">{analysis.risk_score || 75}</p>
-                  <p className="text-sm text-gray-600">out of 100</p>
+                  <p className="text-sm text-gray-600">{t('wellness.out_of')} 100</p>
                 </div>
               </div>
               <Progress value={analysis.risk_score || 75} className="h-3" />
@@ -143,7 +144,7 @@ export default function WellnessInsights() {
               <CardHeader className="border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-orange-600" />
-                  Identified Risk Factors
+                  {t('wellness.risk_factors')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -185,7 +186,7 @@ export default function WellnessInsights() {
               <CardHeader className="border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-violet-900 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
-                  Predictive Health Insights
+                  {t('wellness.predictive_insights')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -199,7 +200,7 @@ export default function WellnessInsights() {
                             <Calendar className="w-3 h-3 text-violet-600" />
                             <span className="text-xs text-violet-700">{prediction.timeframe}</span>
                             <Badge className="text-xs bg-violet-100 text-violet-700">
-                              {prediction.probability} probability
+                              {prediction.probability} {t('wellness.probability')}
                             </Badge>
                           </div>
                         </div>
@@ -221,7 +222,7 @@ export default function WellnessInsights() {
                   <CardHeader className="border-b border-gray-100">
                     <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                       <Utensils className="w-5 h-5 text-green-600" />
-                      Nutrition
+                      {t('wellness.nutrition')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -243,7 +244,7 @@ export default function WellnessInsights() {
                   <CardHeader className="border-b border-gray-100">
                     <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                       <Dumbbell className="w-5 h-5 text-blue-600" />
-                      Exercise
+                      {t('wellness.exercise')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -265,7 +266,7 @@ export default function WellnessInsights() {
                   <CardHeader className="border-b border-gray-100">
                     <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                       <Moon className="w-5 h-5 text-indigo-600" />
-                      Sleep
+                      {t('wellness.sleep')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -287,7 +288,7 @@ export default function WellnessInsights() {
                   <CardHeader className="border-b border-gray-100">
                     <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                       <Heart className="w-5 h-5 text-pink-600" />
-                      Stress Management
+                      {t('wellness.stress_mgmt')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -311,7 +312,7 @@ export default function WellnessInsights() {
               <CardHeader className="border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                   <Target className="w-5 h-5 text-blue-600" />
-                  Preventive Action Plan
+                  {t('wellness.preventive_plan')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -329,7 +330,7 @@ export default function WellnessInsights() {
                           action.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-green-100 text-green-700'
                         }`}>
-                          {action.priority} priority
+                          {action.priority} {t('wellness.priority')}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-700">{action.impact}</p>
@@ -346,7 +347,7 @@ export default function WellnessInsights() {
               <CardHeader className="border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-orange-900 flex items-center gap-2">
                   <Activity className="w-5 h-5" />
-                  Early Warning Signs to Monitor
+                  {t('wellness.early_warnings')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -377,7 +378,7 @@ export default function WellnessInsights() {
               <CardHeader className="border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-yellow-600" />
-                  Health Optimization Opportunities
+                  {t('wellness.optimization')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -406,10 +407,10 @@ export default function WellnessInsights() {
             {analyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Refreshing Analysis...
+                {t('wellness.refreshing')}
               </>
             ) : (
-              'Refresh Analysis'
+              t('wellness.refresh_analysis')
             )}
           </Button>
         </div>

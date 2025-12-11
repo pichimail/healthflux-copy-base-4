@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function EmergencyProfile() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -239,8 +241,8 @@ export default function EmergencyProfile() {
             <AlertCircle className="w-6 h-6 text-red-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-[#0A0A0A]">Emergency Health Profile</h1>
-            <p className="text-sm text-gray-600">Critical information for emergency responders</p>
+            <h1 className="text-2xl font-extrabold text-[#0A0A0A]">{t('emergency.title')}</h1>
+            <p className="text-sm text-gray-600">{t('emergency.subtitle')}</p>
           </div>
         </div>
       </div>
@@ -252,7 +254,7 @@ export default function EmergencyProfile() {
           className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold"
         >
           <Download className="w-4 h-4 mr-2" />
-          Download PDF
+          {t('emergency.download_pdf')}
         </Button>
         <Button
           onClick={() => setShareDialogOpen(true)}
@@ -260,7 +262,7 @@ export default function EmergencyProfile() {
           className="rounded-xl font-semibold"
         >
           <Share2 className="w-4 h-4 mr-2" />
-          Share Securely
+          {t('emergency.share_securely')}
         </Button>
       </div>
 
@@ -270,10 +272,9 @@ export default function EmergencyProfile() {
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-red-900 text-sm mb-1">Important</p>
+              <p className="font-semibold text-red-900 text-sm mb-1">{t('emergency.important')}</p>
               <p className="text-xs text-red-800">
-                This profile contains critical medical information. Keep it updated and accessible in case of emergencies.
-                Consider printing a copy or saving the PDF to your phone.
+                {t('emergency.alert_text')}
               </p>
             </div>
           </div>
@@ -283,29 +284,29 @@ export default function EmergencyProfile() {
       {/* Patient Information */}
       <Card className="border-0 shadow-sm rounded-2xl mb-4">
         <CardHeader className="border-b border-gray-100">
-          <CardTitle className="text-lg font-semibold text-[#0A0A0A]">Patient Information</CardTitle>
+          <CardTitle className="text-lg font-semibold text-[#0A0A0A]">{t('emergency.patient_info')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-gray-600 mb-1">Full Name</p>
+              <p className="text-xs text-gray-600 mb-1">{t('emergency.full_name')}</p>
               <p className="font-semibold text-[#0A0A0A]">{profile.full_name}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 mb-1">Date of Birth</p>
+              <p className="text-xs text-gray-600 mb-1">{t('emergency.dob')}</p>
               <p className="font-semibold text-[#0A0A0A]">
-                {profile.date_of_birth ? format(new Date(profile.date_of_birth), 'MMM d, yyyy') : 'Not provided'}
+                {profile.date_of_birth ? format(new Date(profile.date_of_birth), 'MMM d, yyyy') : t('emergency.not_provided')}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 mb-1">Blood Group</p>
+              <p className="text-xs text-gray-600 mb-1">{t('emergency.blood_group')}</p>
               <Badge className="bg-red-100 text-red-700 border-red-200 text-sm">
-                {profile.blood_group || 'Not provided'}
+                {profile.blood_group || t('emergency.not_provided')}
               </Badge>
             </div>
             <div>
-              <p className="text-xs text-gray-600 mb-1">Gender</p>
-              <p className="font-semibold text-[#0A0A0A] capitalize">{profile.gender || 'Not provided'}</p>
+              <p className="text-xs text-gray-600 mb-1">{t('emergency.gender')}</p>
+              <p className="font-semibold text-[#0A0A0A] capitalize">{profile.gender || t('emergency.not_provided')}</p>
             </div>
           </div>
         </CardContent>
@@ -316,14 +317,14 @@ export default function EmergencyProfile() {
         <CardHeader className="border-b border-gray-100">
           <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
             <Phone className="w-5 h-5 text-blue-600" />
-            Emergency Contact
+            {t('emergency.emergency_contact')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           {profile.emergency_contact ? (
             <p className="font-semibold text-[#0A0A0A] text-lg">{profile.emergency_contact}</p>
           ) : (
-            <p className="text-gray-600 text-sm">No emergency contact provided</p>
+            <p className="text-gray-600 text-sm">{t('emergency.no_contact')}</p>
           )}
         </CardContent>
       </Card>
@@ -333,7 +334,7 @@ export default function EmergencyProfile() {
         <CardHeader className="border-b border-gray-100">
           <CardTitle className="text-lg font-semibold text-red-600 flex items-center gap-2">
             <AlertCircle className="w-5 h-5" />
-            Allergies (CRITICAL)
+            {t('emergency.allergies')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -346,7 +347,7 @@ export default function EmergencyProfile() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600 text-sm">No known allergies</p>
+            <p className="text-gray-600 text-sm">{t('emergency.no_allergies')}</p>
           )}
         </CardContent>
       </Card>
@@ -356,7 +357,7 @@ export default function EmergencyProfile() {
         <CardHeader className="border-b border-gray-100">
           <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
             <Activity className="w-5 h-5 text-purple-600" />
-            Chronic Conditions
+            {t('emergency.chronic_conditions')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -369,7 +370,7 @@ export default function EmergencyProfile() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600 text-sm">No chronic conditions recorded</p>
+            <p className="text-gray-600 text-sm">{t('emergency.no_conditions')}</p>
           )}
         </CardContent>
       </Card>
@@ -379,7 +380,7 @@ export default function EmergencyProfile() {
         <CardHeader className="border-b border-gray-100">
           <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
             <Pill className="w-5 h-5 text-blue-600" />
-            Current Medications
+            {t('emergency.current_meds')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -403,7 +404,7 @@ export default function EmergencyProfile() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600 text-sm">No active medications</p>
+            <p className="text-gray-600 text-sm">{t('emergency.no_meds')}</p>
           )}
         </CardContent>
       </Card>
@@ -414,7 +415,7 @@ export default function EmergencyProfile() {
           <CardHeader className="border-b border-gray-100">
             <CardTitle className="text-lg font-semibold text-[#0A0A0A] flex items-center gap-2">
               <Activity className="w-5 h-5 text-green-600" />
-              Recent Vital Signs
+              {t('emergency.recent_vitals')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -446,12 +447,12 @@ export default function EmergencyProfile() {
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Share Emergency Profile Securely</DialogTitle>
+            <DialogTitle>{t('emergency.share_profile')}</DialogTitle>
           </DialogHeader>
           {!shareLink ? (
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="recipient_name">Recipient Name (Optional)</Label>
+                <Label htmlFor="recipient_name">{t('emergency.recipient_name')}</Label>
                 <Input
                   id="recipient_name"
                   value={shareData.recipient_name}
@@ -460,7 +461,7 @@ export default function EmergencyProfile() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="recipient_email">Recipient Email (Optional)</Label>
+                <Label htmlFor="recipient_email">{t('emergency.recipient_email')}</Label>
                 <Input
                   id="recipient_email"
                   type="email"
@@ -470,7 +471,7 @@ export default function EmergencyProfile() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="expires_hours">Link Expires In</Label>
+                <Label htmlFor="expires_hours">{t('emergency.expires_in')}</Label>
                 <Input
                   id="expires_hours"
                   type="number"
@@ -479,26 +480,26 @@ export default function EmergencyProfile() {
                   min={1}
                   max={168}
                 />
-                <p className="text-xs text-gray-600">Hours (1-168)</p>
+                <p className="text-xs text-gray-600">{t('emergency.hours')}</p>
               </div>
               <Button 
                 onClick={handleCreateShareLink}
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={createShareLinkMutation.isLoading}
               >
-                {createShareLinkMutation.isLoading ? 'Creating...' : 'Create Secure Link'}
+                {createShareLinkMutation.isLoading ? t('emergency.creating') : t('emergency.create_link')}
               </Button>
             </div>
           ) : (
             <div className="space-y-4 mt-4">
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                <p className="text-sm font-semibold text-green-900 mb-2">Secure Link Created</p>
+                <p className="text-sm font-semibold text-green-900 mb-2">{t('emergency.link_created')}</p>
                 <p className="text-xs text-green-700">
-                  Expires: {format(new Date(shareLink.expires_at), 'MMM d, yyyy h:mm a')}
+                  {t('emergency.expires')}: {format(new Date(shareLink.expires_at), 'MMM d, yyyy h:mm a')}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label>Share Link</Label>
+                <Label>{t('emergency.share_link')}</Label>
                 <div className="flex gap-2">
                   <Input
                     value={`${window.location.origin}/public-share/${shareLink.token}`}
@@ -515,7 +516,7 @@ export default function EmergencyProfile() {
                 </div>
               </div>
               <p className="text-xs text-gray-600">
-                Share this link with healthcare providers. It will expire automatically after the set time.
+                {t('emergency.share_desc')}
               </p>
             </div>
           )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,6 +12,7 @@ import AIHealthChat from '../components/AIHealthChat';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function AIAssistant() {
+  const { t } = useTranslation();
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -106,8 +108,8 @@ Keep the language simple, empathetic, and actionable.`;
     <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 max-w-7xl mx-auto">
       {/* Mobile-First Header */}
       <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">🤖 Flux Assistant</h1>
-        <p className="text-xs sm:text-sm text-gray-600">Health guidance</p>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">🤖 {t('ai_assistant.title')}</h1>
+        <p className="text-xs sm:text-sm text-gray-600">{t('ai_assistant.subtitle')}</p>
       </div>
 
       {/* Profile Selector */}
@@ -130,7 +132,7 @@ Keep the language simple, empathetic, and actionable.`;
             onClick={() => setChatOpen(true)}
             className="bg-[#9BB4FF] hover:bg-[#8BA4EE] text-[#0A0A0A] rounded-2xl font-semibold active-press shadow-lg h-11 sm:h-12">
             <MessageSquare className="w-4 h-4 mr-2" />
-            Chat
+            {t('ai_assistant.chat')}
           </Button>
           <Button
             onClick={generateHealthSummary}
@@ -139,12 +141,12 @@ Keep the language simple, empathetic, and actionable.`;
             {generating ?
             <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                <span className="hidden sm:inline">Analyzing...</span>
+                <span className="hidden sm:inline">{t('ai_assistant.analyzing')}</span>
               </> :
             <>
                 <Sparkles className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Summary</span>
-                <span className="sm:hidden">Gen</span>
+                <span className="hidden sm:inline">{t('ai_assistant.summary')}</span>
+                <span className="sm:hidden">{t('ai_assistant.gen')}</span>
               </>
             }
           </Button>
@@ -157,7 +159,7 @@ Keep the language simple, empathetic, and actionable.`;
           <CardContent className="p-3 sm:p-4">
             <Activity className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{vitals.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Vitals</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.vitals')}</p>
           </CardContent>
         </Card>
 
@@ -165,7 +167,7 @@ Keep the language simple, empathetic, and actionable.`;
           <CardContent className="p-3 sm:p-4">
             <Pill className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{medications.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Meds</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.meds')}</p>
           </CardContent>
         </Card>
 
@@ -173,7 +175,7 @@ Keep the language simple, empathetic, and actionable.`;
           <CardContent className="p-3 sm:p-4">
             <Heart className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{labResults.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Labs</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.labs')}</p>
           </CardContent>
         </Card>
 
@@ -181,7 +183,7 @@ Keep the language simple, empathetic, and actionable.`;
           <CardContent className="p-3 sm:p-4">
             <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-[#0A0A0A] mb-1 sm:mb-2" />
             <p className="text-lg sm:text-2xl font-bold text-[#0A0A0A]">{abnormalLabs.length}</p>
-            <p className="text-xs text-[#0A0A0A] opacity-80">Alerts</p>
+            <p className="text-xs text-[#0A0A0A] opacity-80">{t('ai_assistant.alerts')}</p>
           </CardContent>
         </Card>
       </div>
@@ -192,7 +194,7 @@ Keep the language simple, empathetic, and actionable.`;
           <CardHeader className="border-b border-gray-100" style={{ backgroundColor: '#E9F46A' }}>
             <CardTitle className="flex items-center gap-2 text-[#0A0A0A] text-lg">
               <Brain className="w-5 h-5" />
-              Health Summary
+              {t('ai_assistant.health_summary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
@@ -209,9 +211,9 @@ Keep the language simple, empathetic, and actionable.`;
       <Card className="border-0 shadow-sm rounded-2xl mb-6" style={{ backgroundColor: '#EDE6F7' }}>
           <CardContent className="p-8 md:p-12 text-center">
             <Brain className="w-12 md:w-16 h-12 md:h-16 text-purple-500 mx-auto mb-4" />
-            <h3 className="text-base md:text-lg font-semibold text-[#0A0A0A] mb-2">Get Your Health Summary</h3>
+            <h3 className="text-base md:text-lg font-semibold text-[#0A0A0A] mb-2">{t('ai_assistant.get_summary')}</h3>
             <p className="text-sm text-gray-700 mb-6">
-              Click "Generate Summary" to get personalized health insights, trend analysis, and recommendations based on your data.
+              {t('ai_assistant.summary_desc')}
             </p>
           </CardContent>
         </Card>
@@ -222,11 +224,11 @@ Keep the language simple, empathetic, and actionable.`;
         {/* Latest Vitals */}
         <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Recent Vitals</CardTitle>
+            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">{t('ai_assistant.recent_vitals')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
             {latestVitals.length === 0 ?
-            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">No vitals yet</p> :
+            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">{t('ai_assistant.no_vitals')}</p> :
 
             <div className="space-y-2">
                 {latestVitals.map((vital) =>
@@ -252,11 +254,11 @@ Keep the language simple, empathetic, and actionable.`;
         {/* Current Medications */}
         <Card className="border-0 card-shadow rounded-2xl sm:rounded-3xl">
           <CardHeader className="border-b border-gray-100 p-3 sm:p-4">
-            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">Medications</CardTitle>
+            <CardTitle className="text-sm font-semibold text-[#0A0A0A]">{t('ai_assistant.medications')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4">
             {medications.length === 0 ?
-            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">No meds</p> :
+            <p className="text-center text-gray-600 py-6 text-xs sm:text-sm">{t('ai_assistant.no_meds')}</p> :
 
             <div className="space-y-2">
                 {medications.slice(0, 5).map((med) =>
@@ -279,12 +281,12 @@ Keep the language simple, empathetic, and actionable.`;
               <MapPin className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-white mb-1">Find Doctors Nearby</h3>
+              <h3 className="text-base font-semibold text-white mb-1">{t('ai_assistant.find_doctors')}</h3>
               <p className="text-sm text-white/80 mb-4">
-                Connect with healthcare professionals in your area (Coming Soon)
+                {t('ai_assistant.doctors_desc')}
               </p>
               <Button disabled className="bg-white/20 hover:bg-white/30 text-white rounded-xl border-none">
-                Search Doctors
+                {t('ai_assistant.search_doctors')}
               </Button>
             </div>
           </div>
@@ -297,10 +299,10 @@ Keep the language simple, empathetic, and actionable.`;
           <DialogHeader className="p-6 pb-4 border-b border-gray-200" style={{ backgroundColor: '#E9F46A' }}>
             <DialogTitle className="flex items-center gap-2 text-[#0A0A0A]">
               <Brain className="w-5 h-5" />
-              Health Chat
+              {t('ai_assistant.health_chat')}
             </DialogTitle>
             <p className="text-xs text-gray-700 mt-1">
-              Ask questions about your health data and get personalized insights
+              {t('ai_assistant.chat_desc')}
             </p>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
