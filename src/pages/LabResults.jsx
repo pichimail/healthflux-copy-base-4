@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Plus, AlertCircle, CheckCircle, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Activity, Plus, AlertCircle, CheckCircle, Trash2, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
+import LabResultsCharts from '../components/labs/LabResultsCharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -167,39 +169,50 @@ export default function LabResults() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
-        <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
-            <SelectValue placeholder="Profile" />
-          </SelectTrigger>
-          <SelectContent>
-            {profiles.map(profile => (
-              <SelectItem key={profile.id} value={profile.id}>
-                {profile.full_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Tabs */}
+      <Tabs defaultValue="results" className="mb-4 sm:mb-6">
+        <TabsList className="grid w-full grid-cols-2 rounded-2xl h-11 sm:h-12">
+          <TabsTrigger value="results" className="text-xs sm:text-sm rounded-xl">Lab Results</TabsTrigger>
+          <TabsTrigger value="trends" className="text-xs sm:text-sm rounded-xl">
+            <BarChart3 className="w-4 h-4 mr-1" />
+            Trends & Analysis
+          </TabsTrigger>
+        </TabsList>
 
-        <Select value={filterCategory} onValueChange={setFilterCategory}>
-          <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="blood">Blood</SelectItem>
-            <SelectItem value="urine">Urine</SelectItem>
-            <SelectItem value="lipid">Lipid</SelectItem>
-            <SelectItem value="liver">Liver</SelectItem>
-            <SelectItem value="kidney">Kidney</SelectItem>
-            <SelectItem value="thyroid">Thyroid</SelectItem>
-            <SelectItem value="diabetes">Diabetes</SelectItem>
-            <SelectItem value="vitamin">Vitamin</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <TabsContent value="results" className="mt-4">
+          {/* Filters */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
+            <Select value={selectedProfile || 'self'} onValueChange={setSelectedProfile}>
+              <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
+                <SelectValue placeholder="Profile" />
+              </SelectTrigger>
+              <SelectContent>
+                {profiles.map(profile => (
+                  <SelectItem key={profile.id} value={profile.id}>
+                    {profile.full_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-full h-11 sm:h-12 rounded-2xl border-gray-200 text-xs sm:text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="blood">Blood</SelectItem>
+                <SelectItem value="urine">Urine</SelectItem>
+                <SelectItem value="lipid">Lipid</SelectItem>
+                <SelectItem value="liver">Liver</SelectItem>
+                <SelectItem value="kidney">Kidney</SelectItem>
+                <SelectItem value="thyroid">Thyroid</SelectItem>
+                <SelectItem value="diabetes">Diabetes</SelectItem>
+                <SelectItem value="vitamin">Vitamin</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
       {/* Lab Results List */}
       {isLoading ? (
@@ -290,6 +303,12 @@ export default function LabResults() {
           })}
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="trends" className="mt-4">
+          <LabResultsCharts labResults={labResults} profiles={profiles} />
+        </TabsContent>
+      </Tabs>
 
       {/* Add Lab Result Dialog - Mobile Optimized */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

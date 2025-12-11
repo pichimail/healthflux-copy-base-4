@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Activity, Heart, Thermometer, Weight, TrendingUp, Plus, Edit, Trash2 } from 'lucide-react';
+import { Activity, Heart, Thermometer, Weight, TrendingUp, Plus, Edit, Trash2, BarChart3 } from 'lucide-react';
+import VitalsTrendChart from '../components/vitals/VitalsTrendChart';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -172,22 +174,33 @@ export default function Vitals() {
         </Button>
       </div>
 
-      {/* Profile Filter */}
-      <div className="mb-4 sm:mb-6">
-        <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
-          <SelectTrigger className="w-full rounded-2xl border-gray-200 h-11 sm:h-12">
-            <SelectValue placeholder="All Profiles" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Profiles</SelectItem>
-            {profiles.map(profile => (
-              <SelectItem key={profile.id} value={profile.id}>
-                {profile.full_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Tabs */}
+      <Tabs defaultValue="vitals" className="mb-4 sm:mb-6">
+        <TabsList className="grid w-full grid-cols-2 rounded-2xl h-11 sm:h-12">
+          <TabsTrigger value="vitals" className="text-xs sm:text-sm rounded-xl">Vitals Log</TabsTrigger>
+          <TabsTrigger value="trends" className="text-xs sm:text-sm rounded-xl">
+            <BarChart3 className="w-4 h-4 mr-1" />
+            Trends
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="vitals" className="mt-4">
+          {/* Profile Filter */}
+          <div className="mb-4">
+            <Select value={selectedProfile || 'all'} onValueChange={setSelectedProfile}>
+              <SelectTrigger className="w-full rounded-2xl border-gray-200 h-11 sm:h-12">
+                <SelectValue placeholder="All Profiles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Profiles</SelectItem>
+                {profiles.map(profile => (
+                  <SelectItem key={profile.id} value={profile.id}>
+                    {profile.full_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
       {/* Vitals List */}
       {isLoading ? (
@@ -255,6 +268,17 @@ export default function Vitals() {
           })}
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="trends" className="mt-4 space-y-4">
+          <VitalsTrendChart vitals={vitals} vitalType="blood_pressure" profiles={profiles} />
+          <VitalsTrendChart vitals={vitals} vitalType="heart_rate" profiles={profiles} />
+          <VitalsTrendChart vitals={vitals} vitalType="blood_glucose" profiles={profiles} />
+          <VitalsTrendChart vitals={vitals} vitalType="weight" profiles={profiles} />
+          <VitalsTrendChart vitals={vitals} vitalType="temperature" profiles={profiles} />
+          <VitalsTrendChart vitals={vitals} vitalType="oxygen_saturation" profiles={profiles} />
+        </TabsContent>
+      </Tabs>
 
       {/* Add Vital Dialog - Mobile Optimized */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
