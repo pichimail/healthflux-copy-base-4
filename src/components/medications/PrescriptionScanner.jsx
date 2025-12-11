@@ -92,7 +92,7 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
   const handleAddAll = () => {
     if (!extractedData?.medications) return;
 
-    extractedData.medications.forEach(med => {
+    extractedData.medications.forEach((med) => {
       handleAddMedication(med);
     });
 
@@ -115,9 +115,9 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
               <label htmlFor="prescription-upload">
                 <Button
                   type="button"
-                  onClick={() => document.getElementById('prescription-upload').click()}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-2xl active-press shadow-lg h-10 sm:h-11"
-                >
+                  onClick={() => document.getElementById('prescription-upload').click()} className="bg-emerald-800 text-white px-4 py-2 text-sm font-medium rounded-2xl inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 w-full from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active-press shadow-lg h-10 sm:h-11">
+
+
                   <Upload className="w-4 h-4 mr-2" />
                   Scan Prescription
                 </Button>
@@ -127,8 +127,8 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                className="hidden"
-              />
+                className="hidden" />
+
             </div>
           </div>
         </CardContent>
@@ -141,130 +141,130 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
-            {(uploadMutation.isPending || extractMutation.isPending) && (
-              <div className="text-center py-8">
+            {(uploadMutation.isPending || extractMutation.isPending) &&
+            <div className="text-center py-8">
                 <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-3" />
                 <p className="text-sm text-gray-600">
                   {uploadMutation.isPending ? 'Uploading image...' : 'Extracting medication details...'}
                 </p>
               </div>
-            )}
+            }
 
-            {extractedData && (
-              <>
+            {extractedData &&
+            <>
                 {/* Confidence Score */}
                 <div className="p-4 bg-gray-50 rounded-2xl">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">Extraction Confidence</span>
                     <span className={`text-lg font-bold ${
-                      extractedData.confidence >= 80 ? 'text-green-600' : 
-                      extractedData.confidence >= 60 ? 'text-yellow-600' : 'text-red-600'
-                    }`}>
+                  extractedData.confidence >= 80 ? 'text-green-600' :
+                  extractedData.confidence >= 60 ? 'text-yellow-600' : 'text-red-600'}`
+                  }>
                       {extractedData.confidence}%
                     </span>
                   </div>
-                  {extractedData.extraction_notes && (
-                    <p className="text-xs text-gray-600 mt-2">{extractedData.extraction_notes}</p>
-                  )}
+                  {extractedData.extraction_notes &&
+                <p className="text-xs text-gray-600 mt-2">{extractedData.extraction_notes}</p>
+                }
                 </div>
 
                 {/* Interaction Warnings */}
-                {extractedData.interaction_warnings?.length > 0 && (
-                  <div className="p-4 bg-red-50 rounded-2xl border-2 border-red-200">
+                {extractedData.interaction_warnings?.length > 0 &&
+              <div className="p-4 bg-red-50 rounded-2xl border-2 border-red-200">
                     <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-red-700">
                       <AlertTriangle className="w-4 h-4" />
                       Drug Interaction Warnings
                     </h3>
                     <div className="space-y-2">
-                      {extractedData.interaction_warnings.map((warning, i) => (
-                        <div key={i} className="p-2 bg-white rounded-xl">
+                      {extractedData.interaction_warnings.map((warning, i) =>
+                  <div key={i} className="p-2 bg-white rounded-xl">
                           <p className="text-sm font-semibold">
                             {warning.new_medication} + {warning.existing_medication}
                           </p>
                           <Badge className={`text-xs rounded-xl mt-1 ${
-                            warning.severity === 'major' ? 'bg-red-100 text-red-700' :
-                            warning.severity === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-blue-100 text-blue-700'
-                          }`}>
+                    warning.severity === 'major' ? 'bg-red-100 text-red-700' :
+                    warning.severity === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-blue-100 text-blue-700'}`
+                    }>
                             {warning.severity.toUpperCase()}
                           </Badge>
                           <p className="text-xs text-gray-700 mt-1">{warning.description}</p>
                         </div>
-                      ))}
+                  )}
                     </div>
                   </div>
-                )}
+              }
 
                 {/* Extracted Medications */}
                 <div className="space-y-3">
                   <h3 className="font-semibold text-sm">Extracted Medications ({extractedData.medications.length})</h3>
-                  {extractedData.medications.map((med, i) => (
-                    <div key={i} className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200">
+                  {extractedData.medications.map((med, i) =>
+                <div key={i} className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h4 className="font-semibold text-sm text-[#0A0A0A]">{med.medication_name}</h4>
                           <p className="text-xs text-gray-600 mt-1">Dosage: {med.dosage}</p>
                           <p className="text-xs text-gray-600">Frequency: {med.frequency}</p>
-                          {med.suggested_times?.length > 0 && (
-                            <p className="text-xs text-gray-600">Times: {med.suggested_times.join(', ')}</p>
-                          )}
-                          {med.prescriber && (
-                            <p className="text-xs text-gray-600">Prescriber: {med.prescriber}</p>
-                          )}
-                          {med.refills_remaining !== null && (
-                            <p className="text-xs text-gray-600">Refills: {med.refills_remaining}</p>
-                          )}
-                          {med.instructions && (
-                            <p className="text-xs text-gray-700 mt-2 bg-white/50 p-2 rounded-xl">
+                          {med.suggested_times?.length > 0 &&
+                      <p className="text-xs text-gray-600">Times: {med.suggested_times.join(', ')}</p>
+                      }
+                          {med.prescriber &&
+                      <p className="text-xs text-gray-600">Prescriber: {med.prescriber}</p>
+                      }
+                          {med.refills_remaining !== null &&
+                      <p className="text-xs text-gray-600">Refills: {med.refills_remaining}</p>
+                      }
+                          {med.instructions &&
+                      <p className="text-xs text-gray-700 mt-2 bg-white/50 p-2 rounded-xl">
                               📋 {med.instructions}
                             </p>
-                          )}
-                          {med.warnings && (
-                            <p className="text-xs text-red-700 mt-2 bg-red-50 p-2 rounded-xl">
+                      }
+                          {med.warnings &&
+                      <p className="text-xs text-red-700 mt-2 bg-red-50 p-2 rounded-xl">
                               ⚠️ {med.warnings}
                             </p>
-                          )}
+                      }
                         </div>
                         <Button
-                          size="sm"
-                          onClick={() => handleAddMedication(med)}
-                          disabled={addMedicationMutation.isPending}
-                          className="bg-green-600 hover:bg-green-700 text-white rounded-2xl active-press text-xs h-9"
-                        >
+                      size="sm"
+                      onClick={() => handleAddMedication(med)}
+                      disabled={addMedicationMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700 text-white rounded-2xl active-press text-xs h-9">
+
                           <Plus className="w-3 h-3 mr-1" />
                           Add
                         </Button>
                       </div>
                     </div>
-                  ))}
+                )}
                 </div>
 
                 <div className="flex gap-2">
                   <Button
-                    onClick={handleAddAll}
-                    disabled={addMedicationMutation.isPending}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl active-press h-11"
-                  >
+                  onClick={handleAddAll}
+                  disabled={addMedicationMutation.isPending}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl active-press h-11">
+
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Add All
                   </Button>
                   <Button
-                    onClick={() => {
-                      setScanDialogOpen(false);
-                      setExtractedData(null);
-                      setSelectedFile(null);
-                    }}
-                    variant="outline"
-                    className="flex-1 rounded-2xl active-press h-11"
-                  >
+                  onClick={() => {
+                    setScanDialogOpen(false);
+                    setExtractedData(null);
+                    setSelectedFile(null);
+                  }}
+                  variant="outline"
+                  className="flex-1 rounded-2xl active-press h-11">
+
                     Cancel
                   </Button>
                 </div>
               </>
-            )}
+            }
           </div>
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>);
+
 }
