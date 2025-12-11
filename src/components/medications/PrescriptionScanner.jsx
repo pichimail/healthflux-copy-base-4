@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Camera, Upload, Loader2, CheckCircle, AlertTriangle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -233,6 +233,9 @@ export default function PrescriptionScanner({ profileId, onMedicationsExtracted 
         <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-3xl">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Prescription Analysis</DialogTitle>
+            <DialogDescription>
+              Review extracted medications and add them to your profile
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
