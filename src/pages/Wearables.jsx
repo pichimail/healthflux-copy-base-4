@@ -552,5 +552,3 @@ export default function Wearables() {
     </div>
   );
 }
-
-const deleteSyncMutation = { mutate: () => {} };

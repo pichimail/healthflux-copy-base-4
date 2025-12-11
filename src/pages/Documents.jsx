@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { 
   Upload, Search, Filter, Grid, List, FileText, 
-  Calendar, X
+  Calendar, X, Share2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,7 @@ export default function Documents() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [documentToShare, setDocumentToShare] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -426,6 +427,7 @@ export default function Documents() {
                           }
                         }}
                         onReprocess={reprocessDocument}
+                        onShare={(doc) => setDocumentToShare(doc)}
                       />
                     ))}
                   </div>
@@ -461,6 +463,7 @@ export default function Documents() {
                       }
                     }}
                     onReprocess={reprocessDocument}
+                    onShare={(doc) => setDocumentToShare(doc)}
                   />
                 ))}
               </div>
@@ -482,6 +485,28 @@ export default function Documents() {
         onClose={() => setSelectedDocument(null)}
         profileId={selectedProfileId}
       />
+
+      {/* Share Document Dialog */}
+      {documentToShare && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full">
+            <h3 className="font-bold text-lg mb-4">Share Document</h3>
+            <ShareRecordButton
+              profileId={selectedProfileId}
+              shareType="document"
+              resourceIds={[documentToShare.id]}
+              buttonText="Create Share Link"
+            />
+            <Button
+              variant="outline"
+              onClick={() => setDocumentToShare(null)}
+              className="w-full mt-3 rounded-2xl"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

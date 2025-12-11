@@ -24,6 +24,21 @@ export const translations = {
       disclaimer: "This is an AI-powered assessment tool and should not replace professional medical advice. Always consult with a healthcare provider for proper diagnosis and treatment.",
       urgency_level: "Level"
     },
+    insurance: {
+      title: "Health Insurance",
+      subtitle: "Manage policies and claims",
+      policies: "Policies",
+      claims: "Claims",
+      coverage: "Coverage",
+      add_policy: "Add Policy",
+      file_claim: "File Claim",
+      cost_estimator: "Cost Estimator",
+      ask_policy: "Ask about policy",
+      active: "Active",
+      expired: "Expired",
+      no_policies: "No insurance policies",
+      no_claims: "No claims filed"
+    },
     ai_assistant: {
       title: "Flux Assistant",
       subtitle: "Health guidance",

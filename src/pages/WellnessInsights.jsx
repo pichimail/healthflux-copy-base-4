@@ -21,6 +21,18 @@ export default function WellnessInsights() {
   
   const queryClient = useQueryClient();
 
+  const feedbackMutation = useMutation({
+    mutationFn: async ({ insightId, feedback }) => {
+      return await base44.entities.HealthInsight.update(insightId, {
+        feedback,
+        feedback_date: new Date().toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['insights']);
+    }
+  });
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
@@ -72,7 +84,7 @@ export default function WellnessInsights() {
   const generateInsights = async () => {
     setGenerating(true);
     try {
-      const { data } = await base44.functions.invoke('predictiveHealthAnalysis', {
+      const { data } = await base44.functions.invoke('enhancedWellnessAnalysis', {
         profile_id: selectedProfileId
       });
       setAnalysis(data);
@@ -339,5 +351,3 @@ export default function WellnessInsights() {
     </div>
   );
 }
-
-const feedbackMutation = { mutate: () => {} };
