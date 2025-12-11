@@ -388,11 +388,15 @@ export default function Medications() {
         </TabsContent>
 
         <TabsContent value="adherence" className="mt-4">
-          <Tabs defaultValue="insights">
-            <TabsList className="grid w-full grid-cols-2 rounded-2xl h-11">
-              <TabsTrigger value="insights" className="text-xs sm:text-sm rounded-xl">Insights</TabsTrigger>
+          <Tabs defaultValue="ai">
+            <TabsList className="grid w-full grid-cols-3 rounded-2xl h-11">
+              <TabsTrigger value="ai" className="text-xs sm:text-sm rounded-xl">AI Analysis</TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs sm:text-sm rounded-xl">Patterns</TabsTrigger>
               <TabsTrigger value="history" className="text-xs sm:text-sm rounded-xl">History</TabsTrigger>
             </TabsList>
+            <TabsContent value="ai" className="mt-3 sm:mt-4">
+              <MedicationAdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
+            </TabsContent>
             <TabsContent value="insights" className="mt-3 sm:mt-4">
               <AdherenceInsights profileId={selectedProfile || profiles.find(p => p.relationship === 'self')?.id} />
             </TabsContent>
