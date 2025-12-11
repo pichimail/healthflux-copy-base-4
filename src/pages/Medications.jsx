@@ -228,7 +228,7 @@ export default function Medications() {
   };
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Mobile-First Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
@@ -310,10 +310,14 @@ export default function Medications() {
         </div> :
 
           <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-          {medications.map((med) => {
+          {medications.map((med, index) => {
               const profile = profiles.find((p) => p.id === med.profile_id);
               return (
-                <Card key={med.id} className="border-0 card-shadow rounded-2xl sm:rounded-3xl active-press hover:shadow-lg transition-all">
+                <Card 
+                  key={med.id} 
+                  className="border-0 card-shadow rounded-2xl sm:rounded-3xl card-interactive hover:shadow-lg fade-in-up"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">

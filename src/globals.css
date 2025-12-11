@@ -56,18 +56,84 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
   
-  /* Smooth scrolling */
+  /* Ultra-smooth scrolling for mobile */
   .smooth-scroll {
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
   }
   
-  /* Press effect for mobile */
+  /* Optimized press effects */
   .active-press {
-    transition: transform 0.1s ease;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .active-press:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+  
+  /* Smooth fade-in for lists */
+  .fade-in-up {
+    animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Pull-to-refresh effect */
+  .pull-refresh {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Smooth card hover for mobile */
+  .card-interactive {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-interactive:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Optimized modal animations */
+  .modal-overlay {
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  .modal-content {
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Prevent rubber band effect on iOS */
+  body {
+    overscroll-behavior-y: none;
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
 

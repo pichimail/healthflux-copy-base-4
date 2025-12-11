@@ -196,7 +196,7 @@ export default function MealLogging() {
   });
 
   return (
-    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6">
+    <div className="px-3 sm:px-6 py-4 sm:py-6 pb-24 sm:pb-6 smooth-scroll">
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A0A0A] mb-1">
@@ -517,10 +517,11 @@ export default function MealLogging() {
             </div> :
 
           <div className="space-y-2">
-              {todayMeals.map((meal) =>
+              {todayMeals.map((meal, index) =>
             <div
               key={meal.id}
-              className="bg-[#F4F4F2] p-3 rounded-2xl cursor-pointer hover:bg-[#E8E8E3]"
+              className="bg-[#F4F4F2] p-3 rounded-2xl cursor-pointer hover:bg-[#E8E8E3] card-interactive fade-in-up"
+              style={{ animationDelay: `${index * 0.05}s` }}
               onClick={() => setExpandedMeal(expandedMeal === meal.id ? null : meal.id)}>
 
                   <div className="flex items-start justify-between">
