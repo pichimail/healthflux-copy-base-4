@@ -21,6 +21,7 @@ import AdminRoles from './pages/AdminRoles';
 import Settings from './pages/Settings';
 import WellnessInsights from './pages/WellnessInsights';
 import SymptomChecker from './pages/SymptomChecker';
+import HealthTrends from './pages/HealthTrends';
 import __Layout from './Layout.jsx';
 
 
@@ -48,6 +49,7 @@ export const PAGES = {
     "Settings": Settings,
     "WellnessInsights": WellnessInsights,
     "SymptomChecker": SymptomChecker,
+    "HealthTrends": HealthTrends,
 }
 
 export const pagesConfig = {
