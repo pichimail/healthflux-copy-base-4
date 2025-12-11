@@ -13,14 +13,11 @@ export default function LanguageSwitcher({ showLabel = true, className = '' }) {
   const { i18n } = useTranslation();
 
   const handleLanguageChange = async (languageCode) => {
-    localStorage.setItem('userLanguage', languageCode);
-    await i18n.changeLanguage(languageCode);
-    
-    // Force page reload to ensure all components re-render with new language
-    window.location.reload();
-    
-    // Update user preferences in database if user is logged in
     try {
+      // Update localStorage first
+      localStorage.setItem('userLanguage', languageCode);
+      
+      // Update user preferences in database if user is logged in
       const { base44 } = await import('@/api/base44Client');
       const user = await base44.auth.me();
       if (user) {
@@ -37,8 +34,15 @@ export default function LanguageSwitcher({ showLabel = true, className = '' }) {
           });
         }
       }
+      
+      // Change language and reload page to ensure all components update
+      await i18n.changeLanguage(languageCode);
+      window.location.reload();
     } catch (error) {
       console.error('Error updating language preference:', error);
+      // Still try to change language even if DB update fails
+      await i18n.changeLanguage(languageCode);
+      window.location.reload();
     }
   };
 

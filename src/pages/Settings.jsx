@@ -106,15 +106,15 @@ export default function Settings() {
         <CardContent className="p-3 sm:p-4">
           <div className="space-y-3 sm:space-y-4">
             <div>
-              <p className="text-xs text-gray-600 mb-1">Email</p>
+              <p className="text-xs text-gray-600 mb-1">{t('common.email') || 'Email'}</p>
               <p className="font-semibold text-[#0A0A0A] text-sm truncate">{user.email}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 mb-1">Full Name</p>
-              <p className="font-semibold text-[#0A0A0A] text-sm truncate">{user.full_name || 'Not set'}</p>
+              <p className="text-xs text-gray-600 mb-1">{t('profiles.full_name') || 'Full Name'}</p>
+              <p className="font-semibold text-[#0A0A0A] text-sm truncate">{user.full_name || t('common.not_set') || 'Not set'}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 mb-1">Role</p>
+              <p className="text-xs text-gray-600 mb-1">{t('common.role') || 'Role'}</p>
               <p className="font-semibold text-[#0A0A0A] capitalize text-sm">{user.role || 'user'}</p>
             </div>
           </div>
@@ -135,8 +135,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Mail className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">Email</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">Receive via email</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('common.email') || 'Email'}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.receive_via_email') || 'Receive via email'}</p>
                 </div>
               </div>
               <Switch 
@@ -150,8 +150,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Activity className="w-4 sm:w-5 h-4 sm:h-5 text-green-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">Health Alerts</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">Critical notifications</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('settings.health_alerts')}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.critical_notifications')}</p>
                 </div>
               </div>
               <Switch 
@@ -165,8 +165,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Pill className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">Med Reminders</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">Take meds on time</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('settings.med_reminders')}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.take_meds_on_time')}</p>
                 </div>
               </div>
               <Switch 
@@ -180,8 +180,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-orange-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">Subscription</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">Billing info</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('settings.subscription')}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.billing_info')}</p>
                 </div>
               </div>
               <Switch 
@@ -195,8 +195,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Sparkles className="w-4 sm:w-5 h-4 sm:h-5 text-pink-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">Features</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">New updates</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('settings.features')}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.new_updates')}</p>
                 </div>
               </div>
               <Switch 
@@ -210,8 +210,8 @@ export default function Settings() {
               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <Bell className="w-4 sm:w-5 h-4 sm:h-5 text-slate-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <Label className="font-semibold text-[#0A0A0A] text-sm">System</Label>
-                  <p className="text-xs text-gray-600 hidden sm:block">Maintenance news</p>
+                  <Label className="font-semibold text-[#0A0A0A] text-sm">{t('settings.system')}</Label>
+                  <p className="text-xs text-gray-600 hidden sm:block">{t('settings.maintenance_news')}</p>
                 </div>
               </div>
               <Switch 

@@ -78,7 +78,18 @@ export const translations = {
       select_language: "Select Language",
       notifications: "Notifications",
       account_info: "Account Information",
-      save_preferences: "Save Preferences"
+      save_preferences: "Save Preferences",
+      receive_via_email: "Receive via email",
+      health_alerts: "Health Alerts",
+      critical_notifications: "Critical notifications",
+      med_reminders: "Med Reminders",
+      take_meds_on_time: "Take meds on time",
+      subscription: "Subscription",
+      billing_info: "Billing info",
+      features: "Features",
+      new_updates: "New updates",
+      system: "System",
+      maintenance_news: "Maintenance news"
     },
     onboarding: {
       welcome: "Welcome to HealthFlux",
@@ -182,7 +193,18 @@ export const translations = {
       select_language: "भाषा चुनें",
       notifications: "सूचनाएं",
       account_info: "खाता जानकारी",
-      save_preferences: "वरीयताएं सहेजें"
+      save_preferences: "वरीयताएं सहेजें",
+      receive_via_email: "ईमेल के माध्यम से प्राप्त करें",
+      health_alerts: "स्वास्थ्य अलर्ट",
+      critical_notifications: "महत्वपूर्ण सूचनाएं",
+      med_reminders: "दवा याददाश्त",
+      take_meds_on_time: "समय पर दवा लें",
+      subscription: "सदस्यता",
+      billing_info: "बिलिंग जानकारी",
+      features: "सुविधाएं",
+      new_updates: "नए अपडेट",
+      system: "सिस्टम",
+      maintenance_news: "रखरखाव समाचार"
     },
     onboarding: {
       welcome: "हेल्थफ्लक्स में आपका स्वागत है",
@@ -286,7 +308,18 @@ export const translations = {
       select_language: "భాషను ఎంచుకోండి",
       notifications: "నోటిఫికేషన్లు",
       account_info: "ఖాతా సమాచారం",
-      save_preferences: "ప్రాధాన్యతలను సేవ్ చేయండి"
+      save_preferences: "ప్రాధాన్యతలను సేవ్ చేయండి",
+      receive_via_email: "ఇమెయిల్ ద్వారా స్వీకరించండి",
+      health_alerts: "ఆరోగ్య హెచ్చరికలు",
+      critical_notifications: "కీలకమైన నోటిఫికేషన్లు",
+      med_reminders: "మందు రిమైండర్లు",
+      take_meds_on_time: "సమయానికి మందులు తీసుకోండి",
+      subscription: "చందా",
+      billing_info: "బిల్లింగ్ సమాచారం",
+      features: "ఫీచర్లు",
+      new_updates: "కొత్త అప్‌డేట్‌లు",
+      system: "సిస్టమ్",
+      maintenance_news: "నిర్వహణ వార్తలు"
     },
     onboarding: {
       welcome: "హెల్త్‌ఫ్లక్స్‌కి స్వాగతం",
