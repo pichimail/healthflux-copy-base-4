@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import DrugInteractionWarnings from '../components/medications/DrugInteractionWarnings';
 import MedicationReminders from '../components/medications/MedicationReminders';
+import MedicationAdherenceInsights from '../components/medications/MedicationAdherenceInsights';
 import AdherenceInsights from '../components/medication/AdherenceInsights';
 import SideEffectTracker from '../components/medication/SideEffectTracker';
 import MedicationHistory from '../components/medication/MedicationHistory';
