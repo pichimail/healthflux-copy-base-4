@@ -20,12 +20,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Image URL is required' }, { status: 400 });
     }
 
-    // Fetch user's health data for context
-    const [profile, medications, nutritionGoals] = await Promise.all([
-      base44.entities.Profile.filter({ id: profile_id }).then(p => p[0]),
-      base44.entities.Medication.filter({ profile_id, is_active: true }),
-      base44.entities.NutritionGoal.filter({ profile_id }, '-created_date', 1),
-    ]);
+    // Fetch user's health data for context (optional)
+    let profile, medications, nutritionGoals;
+    try {
+      [profile, medications, nutritionGoals] = await Promise.all([
+        base44.asServiceRole.entities.Profile.filter({ id: profile_id }).then(p => p[0]),
+        base44.asServiceRole.entities.Medication.filter({ profile_id, is_active: true }),
+        base44.asServiceRole.entities.NutritionGoal.filter({ profile_id }, '-created_date', 1),
+      ]);
+    } catch (error) {
+      console.log('Could not fetch context data:', error);
+      profile = null;
+      medications = [];
+      nutritionGoals = [];
+    }
 
     const prompt = `Analyze this meal image and provide detailed nutritional information.
 
