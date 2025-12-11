@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, FileText, Activity, Pill, TrendingUp, 
-  User, TestTube, Brain, Menu, X, AlertCircle, MoreVertical, Settings, Shield, LogOut, Stethoscope
+  User, TestTube, Brain, Menu, X, AlertCircle, MoreVertical, Settings, Shield, LogOut, Stethoscope, Users
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
