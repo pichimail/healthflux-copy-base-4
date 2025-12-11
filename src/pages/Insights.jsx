@@ -12,9 +12,15 @@ export default function Insights() {
   const [generating, setGenerating] = useState(false);
   const [insights, setInsights] = useState(null);
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me(),
+  });
+
   const { data: profiles = [] } = useQuery({
-    queryKey: ['profiles'],
-    queryFn: () => base44.entities.Profile.list('-created_date'),
+    queryKey: ['profiles', user?.email],
+    queryFn: () => base44.entities.Profile.filter({ created_by: user.email }, '-created_date'),
+    enabled: !!user,
   });
 
   const { data: vitals = [] } = useQuery({

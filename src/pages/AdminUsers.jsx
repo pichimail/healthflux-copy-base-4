@@ -49,10 +49,15 @@ export default function AdminUsers() {
   const { data: allUsers = [] } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const users = await base44.asServiceRole.entities.User.list('-created_date');
-      return users;
+      try {
+        const users = await base44.asServiceRole.entities.User.list('-created_date');
+        return users || [];
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+        return [];
+      }
     },
-    enabled: !checking,
+    enabled: !checking && !!user,
   });
 
   const { data: allProfiles = [] } = useQuery({
